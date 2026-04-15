@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="12" fill="#fef3c7"/>
+  <!-- Beer mug body -->
+  <path d="M14 18 h28 a2 2 0 0 1 2 2 v26 a6 6 0 0 1 -6 6 H18 a6 6 0 0 1 -6 -6 V20 a2 2 0 0 1 2 -2 z" fill="#f59e0b" stroke="#78350f" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Foam -->
+  <path d="M14 20 Q18 12 24 16 Q30 10 36 16 Q42 12 46 20 L46 24 L14 24 Z" fill="#fffbeb" stroke="#78350f" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Handle -->
+  <path d="M44 26 h6 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-6" fill="none" stroke="#78350f" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Beer highlight -->
+  <line x1="20" y1="30" x2="20" y2="44" stroke="#fcd34d" stroke-width="2" stroke-linecap="round"/>
+</svg>

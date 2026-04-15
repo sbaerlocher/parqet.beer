@@ -1,0 +1,143 @@
+{
+  "beer": [
+    {
+      "threshold": 100,
+      "icon": "🍺",
+      "title": { "de": "Feierabend-Trinker", "en": "After-Work Drinker" },
+      "description": {
+        "de": "100+ Bier im Portfolio",
+        "en": "100+ beers in your portfolio"
+      }
+    },
+    {
+      "threshold": 1000,
+      "icon": "🍻",
+      "title": { "de": "Stammgast", "en": "Regular" },
+      "description": {
+        "de": "1'000+ Bier — Du hast deinen Stammplatz verdient",
+        "en": "1,000+ beers — You've earned your bar stool"
+      }
+    },
+    {
+      "threshold": 5000,
+      "icon": "🏅",
+      "title": { "de": "Hopfen-Held", "en": "Hops Hero" },
+      "description": {
+        "de": "5'000+ Bier — Du träumst in Malz und Hopfen",
+        "en": "5,000+ beers — You dream in malt and hops"
+      }
+    },
+    {
+      "threshold": 10000,
+      "icon": "🏆",
+      "title": { "de": "10K Bier Club", "en": "10K Beer Club" },
+      "description": {
+        "de": "Willkommen im exklusiven 10'000 Bier Club",
+        "en": "Welcome to the exclusive 10,000 Beer Club"
+      }
+    },
+    {
+      "threshold": 50000,
+      "icon": "👑",
+      "title": { "de": "Bierkönig", "en": "Beer Royalty" },
+      "description": {
+        "de": "50'000+ Bier — Das Oktoberfest verneigt sich",
+        "en": "50,000+ beers — Oktoberfest bows to you"
+      }
+    },
+    {
+      "threshold": 100000,
+      "icon": "🏰",
+      "title": { "de": "Bier-Legende", "en": "Beer Legend" },
+      "description": {
+        "de": "100'000+ Bier — Selbst das Reinheitsgebot verneigt sich",
+        "en": "100,000+ beers — Even the Reinheitsgebot bows to you"
+      }
+    }
+  ],
+  "coffee": [
+    {
+      "threshold": 100,
+      "icon": "☕",
+      "title": { "de": "Koffein-Anfänger", "en": "Caffeine Beginner" },
+      "description": {
+        "de": "100+ Kaffee im Portfolio",
+        "en": "100+ coffees in your portfolio"
+      }
+    },
+    {
+      "threshold": 1000,
+      "icon": "☕",
+      "title": { "de": "Barista", "en": "Barista" },
+      "description": {
+        "de": "1'000+ Kaffee — Du riechst nach Espresso",
+        "en": "1,000+ coffees — You smell like espresso"
+      }
+    },
+    {
+      "threshold": 5000,
+      "icon": "🏅",
+      "title": { "de": "Kaffee-Kenner", "en": "Coffee Connoisseur" },
+      "description": {
+        "de": "5'000+ Kaffee — Single Origin only",
+        "en": "5,000+ coffees — Single origin only"
+      }
+    },
+    {
+      "threshold": 10000,
+      "icon": "🏆",
+      "title": { "de": "10K Kaffee Club", "en": "10K Coffee Club" },
+      "description": {
+        "de": "Willkommen im 10'000 Kaffee Club",
+        "en": "Welcome to the 10,000 Coffee Club"
+      }
+    },
+    {
+      "threshold": 50000,
+      "icon": "👑",
+      "title": { "de": "Koffein-Legende", "en": "Caffeine Legend" },
+      "description": {
+        "de": "50'000+ Kaffee — Dein Blut ist Espresso",
+        "en": "50,000+ coffees — Your blood is espresso"
+      }
+    }
+  ],
+  "smoothie": [
+    {
+      "threshold": 100,
+      "icon": "🥤",
+      "title": { "de": "Vitamin-Einsteiger", "en": "Vitamin Starter" },
+      "description": {
+        "de": "100+ Smoothies im Portfolio",
+        "en": "100+ smoothies in your portfolio"
+      }
+    },
+    {
+      "threshold": 1000,
+      "icon": "🥝",
+      "title": { "de": "Detox-Profi", "en": "Detox Pro" },
+      "description": {
+        "de": "1'000+ Smoothies — Dein Körper ist ein Tempel",
+        "en": "1,000+ smoothies — Your body is a temple"
+      }
+    },
+    {
+      "threshold": 5000,
+      "icon": "🏅",
+      "title": { "de": "Smoothie-Guru", "en": "Smoothie Guru" },
+      "description": {
+        "de": "5'000+ Smoothies — Du bist das Superfood",
+        "en": "5,000+ smoothies — You are the superfood"
+      }
+    },
+    {
+      "threshold": 10000,
+      "icon": "🏆",
+      "title": { "de": "10K Smoothie Club", "en": "10K Smoothie Club" },
+      "description": {
+        "de": "Willkommen im 10'000 Smoothie Club",
+        "en": "Welcome to the 10,000 Smoothie Club"
+      }
+    }
+  ]
+}

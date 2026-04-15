@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fde68a"/>
+    </linearGradient>
+    <linearGradient id="beerFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fcd34d"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Beer mug, scaled up -->
+  <g transform="translate(740 110) scale(7.2)">
+    <path d="M14 18 h28 a2 2 0 0 1 2 2 v26 a6 6 0 0 1 -6 6 H18 a6 6 0 0 1 -6 -6 V20 a2 2 0 0 1 2 -2 z" fill="url(#beerFill)" stroke="#78350f" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M14 20 Q18 12 24 16 Q30 10 36 16 Q42 12 46 20 L46 24 L14 24 Z" fill="#fffbeb" stroke="#78350f" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M44 26 h6 a4 4 0 0 1 4 4 v10 a4 4 0 0 1 -4 4 h-6" fill="none" stroke="#78350f" stroke-width="3" stroke-linejoin="round"/>
+    <line x1="20" y1="30" x2="20" y2="44" stroke="#fffbeb" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  </g>
+
+  <!-- Title -->
+  <text x="80" y="290" font-family="'Space Grotesk', system-ui, sans-serif" font-size="120" font-weight="700" fill="#78350f">parqet.beer</text>
+  <text x="80" y="370" font-family="'Space Grotesk', system-ui, sans-serif" font-size="42" font-weight="500" fill="#b45309">Dein Portfolio in Bier.</text>
+
+  <!-- Footer badge -->
+  <g transform="translate(80 470)">
+    <rect x="0" y="0" rx="28" ry="28" width="430" height="56" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+    <text x="32" y="37" font-family="'Space Grotesk', system-ui, sans-serif" font-size="26" font-weight="600" fill="#92400e">Community Spassprojekt</text>
+  </g>
+</svg>

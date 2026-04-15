@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#fef3c7" />
+    <title>%sveltekit.status% · parqet.beer</title>
+    <meta name="description" content="Etwas ist schiefgelaufen — parqet.beer" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #fffbeb;
+        --fg: #78350f;
+        --fg-muted: #b45309;
+        --fg-subtle: #d97706;
+        --accent: #d97706;
+        --accent-hover: #b45309;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0c0a09;
+          --fg: #fef3c7;
+          --fg-muted: #fde68a;
+          --fg-subtle: #fcd34d;
+          --accent: #92400e;
+          --accent-hover: #78350f;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          Helvetica,
+          Arial,
+          sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        text-align: center;
+        line-height: 1.5;
+      }
+      main {
+        max-width: 32rem;
+      }
+      .emoji {
+        font-size: 5rem;
+        line-height: 1;
+        margin-bottom: 1rem;
+      }
+      .status {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--fg-subtle);
+        margin: 0 0 0.75rem;
+      }
+      h1 {
+        font-size: clamp(2rem, 6vw, 3rem);
+        margin: 0 0 1rem;
+        color: var(--fg);
+        font-weight: 700;
+      }
+      p {
+        color: var(--fg-muted);
+        margin: 0 0 0.5rem;
+        font-size: 1.125rem;
+      }
+      .hint {
+        color: var(--fg-subtle);
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+      a.button {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: var(--accent);
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        transition: background 0.15s;
+      }
+      a.button:hover,
+      a.button:focus-visible {
+        background: var(--accent-hover);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="emoji" aria-hidden="true">💥</div>
+      <p class="status">Error · %sveltekit.status%</p>
+      <h1>%sveltekit.error.message%</h1>
+      <p>Da ist uns das Fass übergeschäumt.</p>
+      <p class="hint">The keg overflowed on us. Please try again in a moment.</p>
+      <a class="button" href="/">← parqet.beer</a>
+    </main>
+  </body>
+</html>

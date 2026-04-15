@@ -1,0 +1,22 @@
+[
+  { "name": "true fruits Purple Smoothie", "size": "250ml", "priceEur": 2.79, "priceChf": 3.6 },
+  { "name": "Starbucks Mango Dragonfruit", "size": "Grande", "priceEur": 5.49, "priceChf": 6.7 },
+  { "name": "dean&david Green Smoothie", "size": "400ml", "priceEur": 5.9, "priceChf": 7.2 },
+  { "name": "dean&david Açaí Bowl", "size": "350ml", "priceEur": 8.9, "priceChf": 10.5 },
+  { "name": "FOODIST Green Detox", "size": "250ml", "priceEur": 3.49, "priceChf": 4.3 },
+  { "name": "BIOTTA Vital Smoothie", "size": "250ml", "priceEur": 3.2, "priceChf": 3.7 },
+  { "name": "Daluma Green Smoothie", "size": "300ml", "priceEur": 7.5, "priceChf": 9.2 },
+  { "name": "Daluma Açaí Bowl", "size": "400ml", "priceEur": 12.5, "priceChf": 15.3 },
+  { "name": "The Juicery Super Smoothie", "size": "500ml", "priceEur": 8.0, "priceChf": 9.8 },
+  { "name": "The Juicery Açaí Bowl", "size": "400ml", "priceEur": 13.0, "priceChf": 15.9 },
+  { "name": "Kale & Me Cold Pressed Juice", "size": "320ml", "priceEur": 6.5, "priceChf": 8.0 },
+  { "name": "boostie Smoothie", "size": "330ml", "priceEur": 5.9, "priceChf": 7.2 },
+  { "name": "LA Cold Press Berlin", "size": "300ml", "priceEur": 7.5, "priceChf": 9.2 },
+  { "name": "Citronella Superfood Smoothie", "size": "330ml", "priceEur": 6.9, "priceChf": 8.4 },
+  { "name": "Juicery21 Cold Pressed Juice", "size": "330ml", "priceEur": 7.8, "priceChf": 9.5 },
+  { "name": "Juicery21 Açaí Bowl", "size": "400ml", "priceEur": 13.1, "priceChf": 16.0 },
+  { "name": "roots Sugarmama Bowl", "size": "400ml", "priceEur": 15.2, "priceChf": 18.5 },
+  { "name": "roots Million Dollar Shake", "size": "330ml", "priceEur": 8.2, "priceChf": 10.0 },
+  { "name": "Saftlade Smoothie", "size": "330ml", "priceEur": 7.0, "priceChf": 8.5 },
+  { "name": "SUC+ Juice Bar Smoothie", "size": "330ml", "priceEur": 6.6, "priceChf": 8.0 }
+]

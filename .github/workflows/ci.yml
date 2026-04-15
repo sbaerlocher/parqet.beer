@@ -1,0 +1,78 @@
+# Continuous Integration for parqet.beer.
+#
+# Quality/security gates (lint, typecheck, format, unit tests with coverage,
+# build, dependency audit, Trivy) are delegated to the shared reusable
+# workflow in sbaerlocher/.github. The E2E job stays local because the
+# reusable workflow doesn't cover Playwright.
+#
+# Deployment is handled by the Cloudflare Workers Git integration (configured
+# in the Cloudflare dashboard), not by GitHub Actions — so this file
+# deliberately has no deploy job and no Cloudflare secrets.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    uses: sbaerlocher/.github/.github/workflows/ci-js.yml@2026-04-11
+    secrets: inherit
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    needs: [ci]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
+
+  status:
+    name: All Checks Passed
+    runs-on: ubuntu-latest
+    needs: [ci, e2e]
+    if: always()
+    steps:
+      - name: Check results
+        env:
+          CI_RESULT: ${{ needs.ci.result }}
+          E2E_RESULT: ${{ needs.e2e.result }}
+        run: |
+          if [[ "$CI_RESULT" != "success" || "$E2E_RESULT" != "success" ]]; then
+            echo "CI failed (ci=$CI_RESULT, e2e=$E2E_RESULT)"
+            exit 1
+          fi
+          echo "All checks passed"

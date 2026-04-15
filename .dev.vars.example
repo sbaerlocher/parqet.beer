@@ -1,0 +1,14 @@
+# Copy this file to `.dev.vars` and fill in real values for local dev.
+# `.dev.vars` is gitignored — never commit it.
+
+# Parqet Connect OAuth Client ID (from https://developer.parqet.com/)
+PARQET_CLIENT_ID=your-parqet-client-id-here
+
+# Session encryption secret — generate a fresh one with:
+#   openssl rand -base64 32
+# Minimum 32 bytes. Never commit this file.
+#
+# In production this is bound via the Cloudflare Secrets Store (see
+# wrangler.jsonc). The local Wrangler emulator does not populate that
+# binding, so `resolveSessionSecret` falls back to this variable.
+SESSION_SECRET_DEV=replace-with-32-plus-bytes-of-randomness

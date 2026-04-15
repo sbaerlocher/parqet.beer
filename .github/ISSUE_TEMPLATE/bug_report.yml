@@ -1,0 +1,70 @@
+name: Bug Report
+description: Report a reproducible bug in parqet.beer
+title: '[Bug]: '
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report! Please fill out the fields below so we can reproduce the issue quickly.
+
+        For security vulnerabilities, please **do not** open a public issue — see [SECURITY.md](../../SECURITY.md).
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Preflight
+      options:
+        - label: I searched existing issues and could not find a duplicate.
+          required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear and concise description of the bug.
+      placeholder: When I click the dashboard refresh button, the value resets to zero.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal, numbered steps that reliably trigger the bug.
+      placeholder: |
+        1. Log in via Parqet Connect
+        2. Switch to the coffee tab
+        3. Click "refresh"
+    validations:
+      required: true
+  - type: input
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: The portfolio value should remain visible after refresh.
+    validations:
+      required: true
+  - type: input
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: The value is replaced with "0 coffees".
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: macOS 15.2, Windows 11, iOS 18, ...
+    validations:
+      required: true

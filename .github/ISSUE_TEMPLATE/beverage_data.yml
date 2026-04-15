@@ -1,0 +1,64 @@
+name: Beverage Data
+description: Propose a new beverage entry or correct an existing one
+title: '[Data]: '
+labels: ['data']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for curating beverage data! parqet.beer prefers **specialty over mass-market** — craft breweries, third-wave coffee roasters, indie smoothies. See [CONTRIBUTING.md](../../CONTRIBUTING.md#adding-a-beverage) for the full curation rules.
+
+        **One brand per issue.**
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Beer
+        - Coffee
+        - Smoothie
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      placeholder: BRLO Helles
+    validations:
+      required: true
+  - type: input
+    id: size
+    attributes:
+      label: Size
+      placeholder: 0.33l
+    validations:
+      required: true
+  - type: input
+    id: price-eur
+    attributes:
+      label: Price (EUR)
+      placeholder: '3.20'
+    validations:
+      required: true
+  - type: input
+    id: price-chf
+    attributes:
+      label: Price (CHF)
+      placeholder: '3.10'
+    validations:
+      required: true
+  - type: input
+    id: source-url
+    attributes:
+      label: Source URL
+      description: Producer page, menu, or reputable retailer where the price was observed.
+      placeholder: https://brlo.de/shop/...
+    validations:
+      required: true
+  - type: textarea
+    id: justification
+    attributes:
+      label: Why this beverage?
+      description: Craft / specialty / indie justification — one or two sentences on why this producer fits.
+    validations:
+      required: true

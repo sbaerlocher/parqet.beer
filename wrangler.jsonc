@@ -1,0 +1,129 @@
+{
+  // IMPORTANT: Do not commit real IDs here. See scripts/setup-fork.sh for setup.
+  //
+  // This config is environment-aware. The top-level section only contains
+  // settings that are shared between all environments; resource bindings
+  // (KV, Secrets Store, vars) live under `env.preview` and `env.production`.
+  //
+  // Deploy explicitly:
+  //   pnpm exec wrangler deploy --env preview
+  //   pnpm exec wrangler deploy --env production
+  //
+  // For local dev (`pnpm dev`), the Wrangler emulator reads the top-level
+  // `kv_namespaces` and `vars` below — these use safe dummy defaults and
+  // an in-memory KV namespace (id is a placeholder; the emulator ignores
+  // it when `--local` is active, which SvelteKit's dev server does).
+  "name": "parqet-beer",
+  "compatibility_date": "2026-04-07",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "main": ".svelte-kit/cloudflare/_worker.js",
+  "assets": {
+    "directory": ".svelte-kit/cloudflare",
+    "binding": "ASSETS",
+  },
+
+  // Wrangler runs this before `deploy`/`versions upload` so the SvelteKit
+  // bundle under `.svelte-kit/cloudflare` is always fresh — no risk of
+  // deploying a stale worker because someone forgot `pnpm build`.
+  "build": {
+    "command": "pnpm build",
+  },
+
+  // Workers Logs — captures console.* + request metadata in the Cloudflare
+  // dashboard. head_sampling_rate=0.1 keeps 10% of invocations to limit
+  // exposure of request metadata (PII risk) while still giving visibility
+  // for debugging. Bump temporarily when investigating incidents.
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1,
+  },
+
+  // ---- Local dev defaults ----
+  // These are only consulted when running `wrangler dev` / `pnpm dev`
+  // without `--env`. They use dummy values so a fresh clone boots without
+  // any Cloudflare account. Real IDs go under env.preview / env.production.
+  "kv_namespaces": [
+    {
+      "binding": "PARQET_KV",
+      "id": "local-dev-placeholder",
+    },
+  ],
+
+  "vars": {
+    "ENVIRONMENT": "development",
+    "PARQET_AUTHORIZE_URL": "https://connect.parqet.com/oauth2/authorize",
+    "PARQET_TOKEN_URL": "https://connect.parqet.com/oauth2/token",
+    "PARQET_API_URL": "https://connect.parqet.com",
+    // Public PKCE client ID — set via `.dev.vars` locally or per-env below.
+    "PARQET_CLIENT_ID": "your-parqet-client-id-here",
+  },
+
+  "env": {
+    // ---------- PREVIEW (PR deployments) ----------
+    // No custom domain — Cloudflare assigns a workers.dev URL per deploy.
+    // Uses its own KV namespace so preview writes never touch prod data.
+    "preview": {
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 0.1,
+      },
+      "kv_namespaces": [
+        {
+          "binding": "PARQET_KV",
+          "id": "REPLACE_WITH_YOUR_PREVIEW_KV_ID",
+        },
+      ],
+      "vars": {
+        "ENVIRONMENT": "preview",
+        "PARQET_AUTHORIZE_URL": "https://connect.parqet.com/oauth2/authorize",
+        "PARQET_TOKEN_URL": "https://connect.parqet.com/oauth2/token",
+        "PARQET_API_URL": "https://connect.parqet.com",
+        "PARQET_CLIENT_ID": "REPLACE_WITH_YOUR_PARQET_CLIENT_ID",
+      },
+    },
+
+    // ---------- PRODUCTION ----------
+    // Custom domain, dedicated KV, and the Secrets Store binding that
+    // holds SESSION_SECRET. `resolveSessionSecret` falls back to
+    // `SESSION_SECRET_DEV` from `.dev.vars` when the store is unavailable
+    // (local dev / preview without a store configured).
+    //
+    // Create the store + secret once per account via:
+    //   pnpm exec wrangler secrets-store store create parqet-beer --remote
+    //   openssl rand -base64 32 | pnpm exec wrangler secrets-store secret \
+    //     create <store-id> --name parqet_beer_session_secret \
+    //     --scopes workers --remote
+    "production": {
+      "name": "parqet-beer",
+      "routes": [{ "pattern": "parqet.beer", "custom_domain": true }],
+      "observability": {
+        "enabled": true,
+        "head_sampling_rate": 0.1,
+      },
+      "kv_namespaces": [
+        {
+          "binding": "PARQET_KV",
+          "id": "6ee74480858a47d28e28ab0346298bc4",
+        },
+      ],
+      "secrets_store_secrets": [
+        {
+          "binding": "SESSION_SECRET",
+          "store_id": "cff9e36f37b749f0adf1453dbf46f99b",
+          "secret_name": "parqet_beer_session_secret",
+        },
+      ],
+      "vars": {
+        "ENVIRONMENT": "production",
+        "PARQET_AUTHORIZE_URL": "https://connect.parqet.com/oauth2/authorize",
+        "PARQET_TOKEN_URL": "https://connect.parqet.com/oauth2/token",
+        "PARQET_API_URL": "https://connect.parqet.com",
+        // Public PKCE client ID — intentionally committed. There is no
+        // client secret for this OAuth flow; security comes from PKCE +
+        // redirect_uri allowlist on the Parqet Developer app.
+        "PARQET_CLIENT_ID": "019d6f34-2b08-7463-a950-ba854b199665",
+      },
+    },
+  },
+}
