@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { error, json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';

@@ -1,17 +1,18 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import type { Beverage, BeverageCategory, Currency } from '$lib/data/beverages';
-  import { formatNumber } from '$lib/calculator';
-  import { locale } from '$lib/stores/locale';
+  import type { Beverage, BeverageCategory } from '$lib/data/beverages';
+  import { convertValue, formatNumber } from '$lib/calculator';
+  import { locale, t } from '$lib/stores/locale';
 
   let {
     dividends,
+    dividendsCurrency,
     beverage,
-    currency,
     category,
   }: {
     dividends: number;
+    dividendsCurrency: string;
     beverage: Beverage;
-    currency: Currency;
     category: BeverageCategory;
   } = $props();
 
@@ -21,24 +22,24 @@
     smoothie: '🥤',
   };
 
-  const price = $derived(currency === 'CHF' ? beverage.priceChf : beverage.priceEur);
-  const count = $derived(Math.floor(dividends / price));
+  const count = $derived(
+    Math.floor(convertValue(dividends, dividendsCurrency, beverage.currency) / beverage.price)
+  );
 </script>
 
 {#if dividends > 0 && count > 0}
   <div
-    class="bg-gradient-to-r from-green-50 to-amber-50 rounded-2xl border border-green-300 p-5 mb-6"
+    class="rounded-2xl p-5 mb-6"
+    style="background: linear-gradient(to right, var(--card), var(--paper)); border: 1px solid var(--border)"
   >
     <div class="flex items-center gap-3 mb-3">
       <span class="text-3xl">💰</span>
       <div>
         <p class="text-sm text-green-700 font-medium">
-          {$locale === 'de' ? 'Deine Dividenden' : 'Your dividends'}
+          {$t.yourDividends}
         </p>
         <p class="text-xs text-green-500">
-          {$locale === 'de'
-            ? 'Ausschüttungen der letzten 12 Monate'
-            : 'Distributions over the last 12 months'}
+          {$t.dividendsSubtitle}
         </p>
       </div>
     </div>
@@ -46,12 +47,12 @@
       <div>
         <p class="text-2xl font-display font-bold text-green-800 tabular-nums">
           {formatNumber(Math.round(dividends), $locale)}
-          {currency}
+          {dividendsCurrency}
         </p>
         <p class="text-sm text-green-600 mt-1">
           = <span class="font-semibold">{formatNumber(count, $locale)} {beverage.name}</span>
           <span class="text-green-400 ml-1">
-            {$locale === 'de' ? 'gratis dazu' : 'on the house'}
+            {$t.onTheHouse}
           </span>
         </p>
       </div>

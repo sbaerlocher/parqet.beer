@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * FX constants shared between client-side display (calculator.ts) and
  * server-side holdings valuation (parqet-client.ts).
@@ -11,3 +12,10 @@
  * drift apart.
  */
 export const EUR_TO_CHF_RATE = 0.95;
+
+/** Convert an ISO 3166-1 alpha-2 country code to its flag emoji. */
+export function countryFlag(code: string): string {
+  return String.fromCodePoint(
+    ...[...code.toUpperCase()].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)
+  );
+}

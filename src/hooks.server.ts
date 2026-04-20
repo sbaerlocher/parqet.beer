@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: MIT
 import { json, type Handle } from '@sveltejs/kit';
 import {
-  getSession,
-  setSessionCookie,
+  getUserId,
+  getTokens,
+  storeTokens,
   resolveSessionSecret,
-  type AuthSession,
+  type FullSession,
 } from '$lib/server/auth';
 import { refreshAccessToken } from '$lib/server/parqet-client';
 import { rateLimit } from '$lib/server/rate-limit';
@@ -45,13 +47,18 @@ const LOGIN_RATE_LIMIT = 10;
 const LOGIN_RATE_WINDOW_SECONDS = 60;
 
 async function maybeRefreshSession(
-  session: AuthSession,
-  env: App.Platform['env'],
-  cookies: Parameters<typeof setSessionCookie>[0],
-  sessionSecret: string
-): Promise<AuthSession> {
-  if (!session.refreshToken) return session;
+  session: FullSession,
+  env: App.Platform['env']
+): Promise<FullSession> {
+  if (!session.refreshToken) {
+    console.warn('[auth:refresh] No refresh token in session, cannot refresh');
+    return session;
+  }
   if (session.expiresAt - Date.now() > REFRESH_SKEW_MS) return session;
+
+  console.log('[auth:refresh] Token expiring soon, attempting refresh', {
+    expiresIn: Math.round((session.expiresAt - Date.now()) / 1000),
+  });
 
   // Best-effort lock to prevent parallel requests from double-spending the
   // same refresh token. KV is eventually consistent, so this is not a hard
@@ -65,19 +72,29 @@ async function maybeRefreshSession(
   await env.PARQET_KV.put(lockKey, '1', { expirationTtl: 60 });
 
   const tokens = await refreshAccessToken(session.refreshToken, env);
-  if (!tokens) return session; // Fall through: endpoint call will 401, user re-auths.
+  if (!tokens) {
+    console.error('[auth:refresh] Refresh failed — token may be expired or revoked');
+    return session;
+  }
 
-  const refreshed: AuthSession = {
+  console.log('[auth:refresh] Refresh successful', {
+    hasNewRefreshToken: !!tokens.refresh_token,
+    newExpiresIn: tokens.expires_in,
+  });
+
+  const refreshed: FullSession = {
     userId: session.userId,
     accessToken: tokens.access_token,
     refreshToken: tokens.refresh_token ?? session.refreshToken,
     expiresAt: Date.now() + tokens.expires_in * 1000,
   };
 
-  // Persist to the encrypted session cookie so subsequent requests use the
-  // fresh token. Tokens are not mirrored to KV — the cookie is the only
-  // authoritative store.
-  await setSessionCookie(cookies, refreshed, sessionSecret);
+  // Persist refreshed tokens to KV (30-day TTL resets on each refresh).
+  await storeTokens(env.PARQET_KV, session.userId, {
+    accessToken: refreshed.accessToken,
+    refreshToken: refreshed.refreshToken,
+    expiresAt: refreshed.expiresAt,
+  });
 
   return refreshed;
 }
@@ -98,7 +115,15 @@ function rateLimitResponse(result: { resetAt: number }, limit: number): Response
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const env = event.platform?.env;
+  const platformEnv = event.platform?.env;
+  // `adapter-cloudflare` under `vite dev` populates `event.platform.env` as an
+  // empty object (not undefined), so guarding on `env` alone lets the session
+  // path through with no bindings. Require the two bindings we actually need —
+  // KV for rate-limiting/refresh-lock and the SESSION_SECRET for JWE — before
+  // running any auth logic. Without them we treat the request as anonymous,
+  // which is what the e2e smoke suite depends on for public routes.
+  const env =
+    platformEnv && platformEnv.PARQET_KV && platformEnv.SESSION_SECRET ? platformEnv : undefined;
 
   // Locale resolution runs unconditionally so SSR always has a valid lang
   // attribute, even in the (test) codepath where `event.platform` is absent.
@@ -109,11 +134,25 @@ export const handle: Handle = async ({ event, resolve }) => {
     // is an async binding in production and a plain string in local dev.
     const sessionSecret = await resolveSessionSecret(env);
 
-    const raw = await getSession(event.cookies, sessionSecret);
-    const session = raw ? await maybeRefreshSession(raw, env, event.cookies, sessionSecret) : null;
-    event.locals.session = session
-      ? { userId: session.userId, accessToken: session.accessToken }
-      : null;
+    const userId = await getUserId(event.cookies, sessionSecret);
+    if (userId) {
+      const tokenData = await getTokens(env.PARQET_KV, userId);
+      if (tokenData) {
+        const full: FullSession = {
+          userId,
+          accessToken: tokenData.accessToken,
+          refreshToken: tokenData.refreshToken,
+          expiresAt: tokenData.expiresAt,
+        };
+        const session = await maybeRefreshSession(full, env);
+        event.locals.session = { userId: session.userId, accessToken: session.accessToken };
+      } else {
+        // Cookie exists but tokens are gone from KV (expired after 30d).
+        event.locals.session = null;
+      }
+    } else {
+      event.locals.session = null;
+    }
 
     // adapter-cloudflare resolves this from cf-connecting-ip, so no manual
     // header fallback is needed.
@@ -136,7 +175,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     // otherwise so anonymous callers can't blast the Parqet proxy.
     const isAuthRoute = event.url.pathname.startsWith('/api/auth/');
     if (event.url.pathname.startsWith('/api/') && !isAuthRoute) {
-      const identifier = session?.userId ?? clientIp;
+      const identifier = userId ?? clientIp;
 
       const result = await rateLimit(env.PARQET_KV, {
         limit: API_RATE_LIMIT,

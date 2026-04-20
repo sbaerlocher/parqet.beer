@@ -1,10 +1,12 @@
+// SPDX-License-Identifier: MIT
 import { z } from 'zod';
 
 export const beverageSchema = z.object({
   name: z.string().min(1),
   size: z.string().min(1),
-  priceEur: z.number().positive().finite(),
-  priceChf: z.number().positive().finite(),
+  price: z.number().positive().finite(),
+  currency: z.enum(['EUR', 'CHF']),
+  country: z.string().length(2),
 });
 
 export const beverageListSchema = z

@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import { formatNumber } from '$lib/calculator';
   import { t, locale } from '$lib/stores/locale';
@@ -9,6 +10,8 @@
     portfolioValue,
     currency,
     showValue = true,
+    badgeIcon = '',
+    badgeTitle = '',
   }: {
     emoji: string;
     count: number;
@@ -16,6 +19,8 @@
     portfolioValue: number;
     currency: string;
     showValue?: boolean;
+    badgeIcon?: string;
+    badgeTitle?: string;
   } = $props();
 
   let generating = $state(false);
@@ -36,52 +41,99 @@
       throw new Error('canvas 2d context unavailable');
     }
 
-    const gradient = ctx.createLinearGradient(0, 0, 1200, 630);
-    gradient.addColorStop(0, '#fffbeb');
-    gradient.addColorStop(1, '#fef3c7');
-    ctx.fillStyle = gradient;
+    // Bierdeckel-style share card
+    // Background: warm paper
+    ctx.fillStyle = '#faf5ea';
     ctx.fillRect(0, 0, 1200, 630);
 
+    // Card container with subtle border
+    const cx = 80,
+      cy = 50,
+      cw = 1040,
+      ch = 530;
+    ctx.fillStyle = '#fffdf7';
+    ctx.beginPath();
+    ctx.roundRect(cx, cy, cw, ch, 16);
+    ctx.fill();
+    ctx.strokeStyle = '#e9d9b1';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Top accent line
     ctx.fillStyle = '#d97706';
-    ctx.fillRect(0, 0, 1200, 8);
+    ctx.fillRect(cx, cy, cw, 4);
 
-    ctx.fillStyle = '#78350f';
-    ctx.font = 'bold 48px system-ui, -apple-system, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('parqet.beer', 600, 80);
-
+    // Eyebrow label
     ctx.fillStyle = '#92400e';
-    ctx.font = '24px system-ui, -apple-system, sans-serif';
-    ctx.fillText($t.shareCardSubtitle, 600, 120);
+    ctx.font = '600 14px monospace';
+    ctx.textAlign = 'left';
+    ctx.letterSpacing = '2px';
+    ctx.fillText($t.shareCardEyebrow, cx + 40, cy + 50);
 
+    // parqet.beer wordmark (top right)
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#2b1d0e';
+    ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
+    ctx.fillText('parqet', cx + cw - 100, cy + 50);
+    ctx.fillStyle = '#d97706';
+    ctx.fillText('.beer', cx + cw - 40, cy + 50);
+
+    // Emoji
+    ctx.textAlign = 'left';
     ctx.font = '80px system-ui, -apple-system, sans-serif';
-    ctx.fillText(emoji, 600, 230);
+    ctx.fillText(emoji, cx + cw - 140, cy + 200);
 
-    ctx.fillStyle = '#78350f';
-    ctx.font = 'bold 120px system-ui, -apple-system, sans-serif';
-    ctx.fillText(formatNumber(count, $locale), 600, 370);
+    // Big count number
+    ctx.fillStyle = '#451a03';
+    ctx.font = 'bold 140px system-ui, -apple-system, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(formatNumber(count, $locale), cx + 40, cy + 260);
 
+    // Beverage name
     ctx.fillStyle = '#b45309';
-    ctx.font = '40px system-ui, -apple-system, sans-serif';
-    ctx.fillText(beverageName, 600, 430);
+    ctx.font = '500 28px monospace';
+    ctx.fillText(`× ${beverageName}`, cx + 40, cy + 310);
 
+    // Rank badge pill (right-aligned, same row as beverage name)
+    if (badgeIcon && badgeTitle) {
+      const badgeText = `${badgeIcon}  ${badgeTitle}`;
+      ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
+      const badgeW = ctx.measureText(badgeText).width + 32;
+      const badgeH = 36;
+      const badgeX = cx + cw - 40 - badgeW;
+      const badgeY = cy + 290;
+      ctx.fillStyle = '#fef3c7';
+      ctx.beginPath();
+      ctx.roundRect(badgeX, badgeY, badgeW, badgeH, badgeH / 2);
+      ctx.fill();
+      ctx.strokeStyle = '#fde68a';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = '#92400e';
+      ctx.textAlign = 'left';
+      ctx.fillText(badgeText, badgeX + 16, badgeY + 25);
+    }
+
+    // Divider
+    ctx.fillStyle = '#e9d9b1';
+    ctx.fillRect(cx + 40, cy + 340, cw - 80, 1);
+
+    // Portfolio value (if shown)
     if (showValue) {
       ctx.fillStyle = '#92400e';
-      ctx.font = '28px system-ui, -apple-system, sans-serif';
+      ctx.font = '500 22px monospace';
       ctx.fillText(
-        $t.shareCardPortfolioValue(
-          `${formatNumber(Math.round(portfolioValue), $locale)} ${currency}`
-        ),
-        600,
-        490
+        `${formatNumber(Math.round(portfolioValue), $locale)} ${currency}`,
+        cx + 40,
+        cy + 380
       );
     }
 
-    ctx.fillStyle = '#d97706';
-    ctx.fillRect(0, 560, 1200, 2);
-    ctx.fillStyle = '#b45309';
-    ctx.font = '20px system-ui, -apple-system, sans-serif';
-    ctx.fillText(`parqet.beer — ${$t.shareCardDisclaimer}`, 600, 600);
+    // Footer
+    ctx.fillStyle = '#8a6d3b';
+    ctx.font = '500 16px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`parqet.beer · ${$t.shareCardDisclaimer}`, cx + 40, cy + ch - 30);
 
     return canvas;
   }
@@ -175,7 +227,8 @@
 </script>
 
 <button
-  class="absolute top-3 right-3 w-7 h-7 flex items-center justify-center rounded-full bg-amber-50 hover:bg-amber-100 text-amber-500 hover:text-amber-700 transition-colors"
+  class="share-tab inline-flex items-center gap-1.5 font-mono text-[10px] font-bold tracking-widest cursor-pointer transition-transform"
+  style="padding: 5px 14px 6px; background: var(--amber-900, #78350f); color: #fef3c7; border: none; border-radius: 0 0 6px 6px; box-shadow: 0 3px 0 rgba(120, 53, 15, 0.2)"
   onclick={(e) => {
     e.stopPropagation();
     showPreview();
@@ -183,14 +236,7 @@
   disabled={generating}
   title={$t.shareButtonTitle}
 >
-  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-    />
-  </svg>
+  ↗ {$t.shareLabel}
 </button>
 
 <!--
@@ -202,10 +248,10 @@
   bind:this={dialogRef}
   onclick={handleDialogClick}
   onclose={revokePreview}
-  class="bg-transparent p-0 max-w-lg w-[calc(100%-2rem)] backdrop:bg-black/50"
+  class="bg-transparent p-0 max-w-2xl w-[calc(100%-2rem)] backdrop:bg-black/50 open:flex open:items-center open:justify-center fixed inset-0 m-auto h-fit"
   aria-label={$t.sharePreview}
 >
-  <div class="bg-white rounded-2xl shadow-2xl w-full p-4">
+  <div class="rounded-2xl shadow-2xl w-full p-4" style="background: var(--card)">
     <p class="text-sm text-amber-600 font-medium mb-3 text-center">
       {$t.sharePreview}
     </p>
@@ -234,7 +280,8 @@
       </button>
       <button
         type="button"
-        class="px-4 py-2 bg-white border border-amber-200 text-amber-700 text-sm font-medium rounded-lg hover:bg-amber-50 transition-colors"
+        class="px-4 py-2 border text-sm font-medium rounded-lg transition-colors"
+        style="background: var(--card); border-color: var(--border); color: var(--highlight)"
         onclick={closePreview}
       >
         {$t.shareCancel}
@@ -242,3 +289,9 @@
     </div>
   </div>
 </dialog>
+
+<style>
+  .share-tab:hover {
+    transform: translateY(1px);
+  }
+</style>

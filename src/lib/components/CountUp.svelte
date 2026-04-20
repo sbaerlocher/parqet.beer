@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import { formatNumber } from '$lib/calculator';
   import { locale } from '$lib/stores/locale';

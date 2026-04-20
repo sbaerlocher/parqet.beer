@@ -1,20 +1,26 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import { locale } from '$lib/stores/locale';
 </script>
 
-<div class="flex items-center gap-2 bg-white rounded-lg border border-amber-200 p-1">
+<div
+  class="inline-flex p-0.5 rounded-md"
+  style="background: var(--accent); border: 1px solid var(--border)"
+>
   <button
-    class="px-3 py-1 rounded text-sm font-medium transition-colors {$locale === 'de'
-      ? 'bg-amber-600 text-white'
-      : 'text-amber-600 hover:bg-amber-100'}"
+    class="px-2.5 py-1 rounded text-[11px] font-bold transition-all font-mono"
+    style={$locale === 'de'
+      ? 'background: var(--card); color: var(--highlight)'
+      : 'background: transparent; color: var(--highlight)'}
     onclick={() => locale.set('de')}
   >
     DE
   </button>
   <button
-    class="px-3 py-1 rounded text-sm font-medium transition-colors {$locale === 'en'
-      ? 'bg-amber-600 text-white'
-      : 'text-amber-600 hover:bg-amber-100'}"
+    class="px-2.5 py-1 rounded text-[11px] font-bold transition-all font-mono"
+    style={$locale === 'en'
+      ? 'background: var(--card); color: var(--highlight)'
+      : 'background: transparent; color: var(--highlight)'}
     onclick={() => locale.set('en')}
   >
     EN

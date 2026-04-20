@@ -105,10 +105,15 @@ Each entry follows this schema:
 {
   "name": "string",
   "size": "string (e.g. \"0.33l\", \"250ml\", \"12oz\")",
-  "priceEur": 0.0,
-  "priceChf": 0.0
+  "price": 0.0,
+  "currency": "EUR or CHF",
+  "country": "DE or CH (ISO 3166-1 alpha-2)"
 }
 ```
+
+Use the beverage's **real local price** in its home currency (e.g. EUR for
+German beers, CHF for Swiss beers). The app converts between currencies at
+runtime using the FX rate in `src/lib/fx.ts`.
 
 ### Curation rules
 
@@ -131,8 +136,8 @@ discuss in an issue first — do not stack SKUs.
 2. **Date** you checked the price (prices drift; we want a timestamp).
 3. **Craft / specialty justification** — one or two sentences on why this
    producer fits the curation rule above.
-4. **Currency note** — if one of `priceEur` / `priceChf` is converted rather
-   than observed, say so and give the conversion basis.
+4. **Country & currency** — set `country` and `currency` to the beverage's
+   home market (e.g. `"DE"` / `"EUR"` or `"CH"` / `"CHF"`).
 
 PRs that only bump mass-market SKUs will be closed with a pointer back to this
 section.

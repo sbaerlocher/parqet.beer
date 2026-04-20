@@ -10,12 +10,30 @@
       }
     },
     {
+      "threshold": 500,
+      "icon": "🍺",
+      "title": { "de": "Kneipen-Gänger", "en": "Pub Crawler" },
+      "description": {
+        "de": "500+ Bier — Du kennst jede Bar in der Stadt",
+        "en": "500+ beers — You know every bar in town"
+      }
+    },
+    {
       "threshold": 1000,
       "icon": "🍻",
       "title": { "de": "Stammgast", "en": "Regular" },
       "description": {
         "de": "1'000+ Bier — Du hast deinen Stammplatz verdient",
         "en": "1,000+ beers — You've earned your bar stool"
+      }
+    },
+    {
+      "threshold": 2500,
+      "icon": "🎖️",
+      "title": { "de": "Braumeister-Lehrling", "en": "Brewmaster Apprentice" },
+      "description": {
+        "de": "2'500+ Bier — Du kennst den Unterschied zwischen Ale und Lager",
+        "en": "2,500+ beers — You know the difference between ale and lager"
       }
     },
     {
@@ -37,6 +55,15 @@
       }
     },
     {
+      "threshold": 25000,
+      "icon": "🎪",
+      "title": { "de": "Oktoberfest-Veteran", "en": "Oktoberfest Veteran" },
+      "description": {
+        "de": "25'000+ Bier — Du hast dein eigenes Festzelt verdient",
+        "en": "25,000+ beers — You've earned your own beer tent"
+      }
+    },
+    {
       "threshold": 50000,
       "icon": "👑",
       "title": { "de": "Bierkönig", "en": "Beer Royalty" },
@@ -53,6 +80,33 @@
         "de": "100'000+ Bier — Selbst das Reinheitsgebot verneigt sich",
         "en": "100,000+ beers — Even the Reinheitsgebot bows to you"
       }
+    },
+    {
+      "threshold": 250000,
+      "icon": "⚜️",
+      "title": { "de": "Brau-Imperator", "en": "Brew Emperor" },
+      "description": {
+        "de": "250'000+ Bier — Du könntest eine eigene Brauerei eröffnen",
+        "en": "250,000+ beers — You could open your own brewery"
+      }
+    },
+    {
+      "threshold": 500000,
+      "icon": "🌍",
+      "title": { "de": "Welt-Braumeister", "en": "World Brewmaster" },
+      "description": {
+        "de": "500'000+ Bier — Jede Brauerei der Welt kennt deinen Namen",
+        "en": "500,000+ beers — Every brewery in the world knows your name"
+      }
+    },
+    {
+      "threshold": 1000000,
+      "icon": "💎",
+      "title": { "de": "Bier-Gottheit", "en": "Beer Deity" },
+      "description": {
+        "de": "1'000'000+ Bier — Du bist Bier",
+        "en": "1,000,000+ beers — You are beer"
+      }
     }
   ],
   "coffee": [
@@ -66,12 +120,30 @@
       }
     },
     {
+      "threshold": 500,
+      "icon": "☕",
+      "title": { "de": "Filterkaffee-Fan", "en": "Filter Coffee Fan" },
+      "description": {
+        "de": "500+ Kaffee — Schwarz, ohne alles",
+        "en": "500+ coffees — Black, no sugar"
+      }
+    },
+    {
       "threshold": 1000,
       "icon": "☕",
       "title": { "de": "Barista", "en": "Barista" },
       "description": {
         "de": "1'000+ Kaffee — Du riechst nach Espresso",
         "en": "1,000+ coffees — You smell like espresso"
+      }
+    },
+    {
+      "threshold": 2500,
+      "icon": "🎖️",
+      "title": { "de": "Latte-Art-Künstler", "en": "Latte Art Artist" },
+      "description": {
+        "de": "2'500+ Kaffee — Dein Milchschaum ist ein Kunstwerk",
+        "en": "2,500+ coffees — Your milk foam is a masterpiece"
       }
     },
     {
@@ -93,12 +165,57 @@
       }
     },
     {
+      "threshold": 25000,
+      "icon": "🫘",
+      "title": { "de": "Plantagen-Besitzer", "en": "Plantation Owner" },
+      "description": {
+        "de": "25'000+ Kaffee — Du hast deine eigene Bohnenquelle",
+        "en": "25,000+ coffees — You have your own bean source"
+      }
+    },
+    {
       "threshold": 50000,
       "icon": "👑",
       "title": { "de": "Koffein-Legende", "en": "Caffeine Legend" },
       "description": {
         "de": "50'000+ Kaffee — Dein Blut ist Espresso",
         "en": "50,000+ coffees — Your blood is espresso"
+      }
+    },
+    {
+      "threshold": 100000,
+      "icon": "🏰",
+      "title": { "de": "Kaffee-Mogul", "en": "Coffee Mogul" },
+      "description": {
+        "de": "100'000+ Kaffee — Starbucks fragt dich um Rat",
+        "en": "100,000+ coffees — Starbucks asks you for advice"
+      }
+    },
+    {
+      "threshold": 250000,
+      "icon": "⚜️",
+      "title": { "de": "Röst-Imperator", "en": "Roast Emperor" },
+      "description": {
+        "de": "250'000+ Kaffee — Du röstest deine Bohnen mit einem Blick",
+        "en": "250,000+ coffees — You roast beans with a single glance"
+      }
+    },
+    {
+      "threshold": 500000,
+      "icon": "🌍",
+      "title": { "de": "Welt-Barista", "en": "World Barista" },
+      "description": {
+        "de": "500'000+ Kaffee — Jede Rösterei pilgert zu dir",
+        "en": "500,000+ coffees — Every roastery pilgrimages to you"
+      }
+    },
+    {
+      "threshold": 1000000,
+      "icon": "💎",
+      "title": { "de": "Koffein-Gottheit", "en": "Caffeine Deity" },
+      "description": {
+        "de": "1'000'000+ Kaffee — Du bist Koffein",
+        "en": "1,000,000+ coffees — You are caffeine"
       }
     }
   ],
@@ -113,12 +230,30 @@
       }
     },
     {
+      "threshold": 500,
+      "icon": "🥤",
+      "title": { "de": "Mixer-Anfänger", "en": "Blender Beginner" },
+      "description": {
+        "de": "500+ Smoothies — Dein Mixer läuft heiss",
+        "en": "500+ smoothies — Your blender is running hot"
+      }
+    },
+    {
       "threshold": 1000,
       "icon": "🥝",
       "title": { "de": "Detox-Profi", "en": "Detox Pro" },
       "description": {
         "de": "1'000+ Smoothies — Dein Körper ist ein Tempel",
         "en": "1,000+ smoothies — Your body is a temple"
+      }
+    },
+    {
+      "threshold": 2500,
+      "icon": "🎖️",
+      "title": { "de": "Superfood-Junkie", "en": "Superfood Junkie" },
+      "description": {
+        "de": "2'500+ Smoothies — Chia, Acai, Spirulina — du kennst sie alle",
+        "en": "2,500+ smoothies — Chia, acai, spirulina — you know them all"
       }
     },
     {
@@ -137,6 +272,60 @@
       "description": {
         "de": "Willkommen im 10'000 Smoothie Club",
         "en": "Welcome to the 10,000 Smoothie Club"
+      }
+    },
+    {
+      "threshold": 25000,
+      "icon": "🌿",
+      "title": { "de": "Grüner Grossmeister", "en": "Green Grandmaster" },
+      "description": {
+        "de": "25'000+ Smoothies — Dein Blut ist grün",
+        "en": "25,000+ smoothies — Your blood runs green"
+      }
+    },
+    {
+      "threshold": 50000,
+      "icon": "👑",
+      "title": { "de": "Smoothie-Legende", "en": "Smoothie Legend" },
+      "description": {
+        "de": "50'000+ Smoothies — Jeder Obststand verneigt sich",
+        "en": "50,000+ smoothies — Every fruit stand bows to you"
+      }
+    },
+    {
+      "threshold": 100000,
+      "icon": "🏰",
+      "title": { "de": "Vitamin-Mogul", "en": "Vitamin Mogul" },
+      "description": {
+        "de": "100'000+ Smoothies — Du besitzt den Regenwald",
+        "en": "100,000+ smoothies — You own the rainforest"
+      }
+    },
+    {
+      "threshold": 250000,
+      "icon": "⚜️",
+      "title": { "de": "Detox-Imperator", "en": "Detox Emperor" },
+      "description": {
+        "de": "250'000+ Smoothies — Deine Zellen sind unsterblich",
+        "en": "250,000+ smoothies — Your cells are immortal"
+      }
+    },
+    {
+      "threshold": 500000,
+      "icon": "🌍",
+      "title": { "de": "Welt-Smoothie-Meister", "en": "World Smoothie Master" },
+      "description": {
+        "de": "500'000+ Smoothies — Jede Frucht auf der Erde kennt deinen Namen",
+        "en": "500,000+ smoothies — Every fruit on Earth knows your name"
+      }
+    },
+    {
+      "threshold": 1000000,
+      "icon": "💎",
+      "title": { "de": "Vitamin-Gottheit", "en": "Vitamin Deity" },
+      "description": {
+        "de": "1'000'000+ Smoothies — Du bist Photosynthese",
+        "en": "1,000,000+ smoothies — You are photosynthesis"
       }
     }
   ]

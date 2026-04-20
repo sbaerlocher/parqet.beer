@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import type { BeverageCategory } from '$lib/data/beverages';
   import { t } from '$lib/stores/locale';

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { writable, get } from 'svelte/store';
 import { browser } from '$app/environment';
 

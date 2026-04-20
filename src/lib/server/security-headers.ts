@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Security headers applied to every response by `hooks.server.ts`.
  *

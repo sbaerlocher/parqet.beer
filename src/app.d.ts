@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 declare global {
   namespace App {
     interface Locals {

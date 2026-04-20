@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import * as jose from 'jose';
 import { z } from 'zod';
 import type { Cookies } from '@sveltejs/kit';
@@ -7,16 +8,38 @@ export const SESSION_COOKIE = '__Host-auth_session';
 export const OAUTH_STATE_COOKIE = '__Host-oauth_state';
 export const OAUTH_VERIFIER_COOKIE = '__Host-oauth_code_verifier';
 
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days (matches KV token TTL)
 
-const AuthSessionSchema = z.object({
+// KV TTL for token entries — 30 days, same as parqet.parser.
+const TOKEN_KV_TTL = 2_592_000; // 30 days in seconds
+
+// Cookie only holds the userId — tokens live in KV.
+const SessionCookieSchema = z.object({
   userId: z.string().min(1),
+});
+
+// Token data stored in KV under `token:{userId}`.
+const TokenDataSchema = z.object({
   accessToken: z.string().min(1),
   refreshToken: z.string().min(1).optional(),
   expiresAt: z.number().int().nonnegative(),
 });
 
-export type AuthSession = z.infer<typeof AuthSessionSchema>;
+export type TokenData = z.infer<typeof TokenDataSchema>;
+
+// What route handlers see via `event.locals.session`.
+export interface AuthSession {
+  userId: string;
+  accessToken: string;
+}
+
+// Full session state used internally by the hooks refresh logic.
+export interface FullSession {
+  userId: string;
+  accessToken: string;
+  refreshToken?: string | undefined;
+  expiresAt: number;
+}
 
 // Minimum entropy for the JWE A256GCM key. We hash the secret via SHA-256 to
 // fit the 32-byte key size, but that hash only spreads existing entropy — it
@@ -65,41 +88,38 @@ async function deriveKey(secret: string): Promise<Uint8Array> {
   return new Uint8Array(hash);
 }
 
-export async function createSessionCookie(session: AuthSession, secret: string): Promise<string> {
+export async function createSessionCookie(userId: string, secret: string): Promise<string> {
   const secretKey = await deriveKey(secret);
-  return new jose.EncryptJWT({ session })
+  return new jose.EncryptJWT({ session: { userId } })
     .setProtectedHeader({ alg: 'dir', enc: 'A256GCM' })
     .setIssuedAt()
-    .setExpirationTime('7d')
+    .setExpirationTime('30d')
     .encrypt(secretKey);
 }
 
-export async function getSessionFromCookie(
-  cookie: string,
-  secret: string
-): Promise<AuthSession | null> {
+export async function getUserIdFromCookie(cookie: string, secret: string): Promise<string | null> {
   try {
     const secretKey = await deriveKey(secret);
     const { payload } = await jose.jwtDecrypt(cookie, secretKey);
-    const parsed = AuthSessionSchema.safeParse(payload['session']);
-    return parsed.success ? parsed.data : null;
+    const parsed = SessionCookieSchema.safeParse(payload['session']);
+    return parsed.success ? parsed.data.userId : null;
   } catch {
     return null;
   }
 }
 
-export async function getSession(cookies: Cookies, secret: string): Promise<AuthSession | null> {
+export async function getUserId(cookies: Cookies, secret: string): Promise<string | null> {
   const cookie = cookies.get(SESSION_COOKIE);
   if (!cookie) return null;
-  return getSessionFromCookie(cookie, secret);
+  return getUserIdFromCookie(cookie, secret);
 }
 
 export async function setSessionCookie(
   cookies: Cookies,
-  session: AuthSession,
+  userId: string,
   secret: string
 ): Promise<void> {
-  const encrypted = await createSessionCookie(session, secret);
+  const encrypted = await createSessionCookie(userId, secret);
   cookies.set(SESSION_COOKIE, encrypted, {
     httpOnly: true,
     secure: true,
@@ -113,14 +133,37 @@ export function clearSessionCookie(cookies: Cookies): void {
   cookies.delete(SESSION_COOKIE, { path: '/' });
 }
 
+// --- KV token storage ---
+
+export async function storeTokens(
+  kv: KVNamespace,
+  userId: string,
+  tokens: TokenData
+): Promise<void> {
+  await kv.put(`token:${userId}`, JSON.stringify(tokens), {
+    expirationTtl: TOKEN_KV_TTL,
+  });
+}
+
+export async function getTokens(kv: KVNamespace, userId: string): Promise<TokenData | null> {
+  const raw = await kv.get(`token:${userId}`);
+  if (!raw) return null;
+  const parsed = TokenDataSchema.safeParse(JSON.parse(raw));
+  return parsed.success ? parsed.data : null;
+}
+
 /**
  * Remove all KV entries owned by a user session. Called on logout so cached
- * Parqet data doesn't linger after the user explicitly ends their session.
- * Tokens are not stored in KV — they live only in the encrypted session
- * cookie, which is cleared separately.
+ * Parqet data and tokens don't linger after the user explicitly ends their
+ * session.
  */
 export async function clearUserKv(kv: KVNamespace, userId: string): Promise<void> {
-  const fixedKeys = [`user:${userId}`, `portfolios:${userId}`, `preferences:${userId}`];
+  const fixedKeys = [
+    `token:${userId}`,
+    `user:${userId}`,
+    `portfolios:${userId}`,
+    `preferences:${userId}`,
+  ];
 
   // Performance cache uses dynamic keys like `performance:{userId}:{ids}`.
   const performanceList = await kv.list({ prefix: `performance:${userId}:` });

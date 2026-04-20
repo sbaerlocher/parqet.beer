@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import '../app.css';
   import { browser } from '$app/environment';
@@ -32,6 +33,14 @@
 
   $effect(() => {
     document.documentElement.lang = $locale;
+  });
+
+  // Hydration marker. SSR does not set this attribute, so the presence of
+  // `html[data-hydrated]` is a reliable signal that client-side event
+  // handlers (onclick, etc.) have been attached — which the e2e suite
+  // depends on before simulating user interaction.
+  $effect(() => {
+    document.documentElement.setAttribute('data-hydrated', '');
   });
 </script>
 

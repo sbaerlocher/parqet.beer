@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import type { Beverage, BeverageCategory } from './data/beverages';
 import type { Locale } from './i18n';
 import badgesData from './data/badges.json';

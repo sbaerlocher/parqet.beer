@@ -1,23 +1,58 @@
 import { describe, it, expect } from 'vitest';
-import { calculateEquivalents, calculateFunStats, formatNumber } from '../src/lib/calculator';
+import {
+  convertValue,
+  calculateEquivalents,
+  calculateFunStats,
+  formatNumber,
+} from '../src/lib/calculator';
+import { EUR_TO_CHF_RATE } from '../src/lib/fx';
 import type { Beverage } from '../src/lib/data/beverages';
 
+describe('convertValue', () => {
+  it('returns the value unchanged when currencies match', () => {
+    expect(convertValue(100, 'EUR', 'EUR')).toBe(100);
+    expect(convertValue(200, 'CHF', 'CHF')).toBe(200);
+  });
+
+  it('converts EUR to CHF using the shared FX rate', () => {
+    expect(convertValue(100, 'EUR', 'CHF')).toBeCloseTo(100 * EUR_TO_CHF_RATE, 5);
+  });
+
+  it('converts CHF to EUR using the shared FX rate', () => {
+    expect(convertValue(100, 'CHF', 'EUR')).toBeCloseTo(100 / EUR_TO_CHF_RATE, 5);
+  });
+
+  it('falls back to the original value for unknown currency pairs', () => {
+    expect(convertValue(100, 'GBP', 'EUR')).toBe(100);
+    expect(convertValue(100, 'USD', 'CHF')).toBe(100);
+  });
+});
+
 const testBeverages: Beverage[] = [
-  { name: 'Test Beer', size: '330ml', priceEur: 1.0, priceChf: 1.05 },
-  { name: 'Fancy Beer', size: '500ml', priceEur: 2.5, priceChf: 2.63 },
+  { name: 'Test Beer', size: '330ml', price: 1.0, currency: 'EUR', country: 'DE' },
+  { name: 'Fancy Beer', size: '500ml', price: 2.5, currency: 'EUR', country: 'DE' },
+  { name: 'Swiss Beer', size: '330ml', price: 3.0, currency: 'CHF', country: 'CH' },
 ];
 
 describe('calculateEquivalents', () => {
-  it('calculates correct counts in EUR', () => {
+  it('calculates correct counts for same-currency beverages', () => {
     const result = calculateEquivalents(1000, 'EUR', testBeverages);
-    expect(result[0]?.count).toBe(1000);
-    expect(result[1]?.count).toBe(400);
+    expect(result[0]?.count).toBe(1000); // 1000 EUR / 1.0 EUR
+    expect(result[1]?.count).toBe(400); // 1000 EUR / 2.5 EUR
   });
 
-  it('calculates correct counts in CHF', () => {
+  it('converts portfolio to beverage currency for cross-currency', () => {
+    const result = calculateEquivalents(1000, 'EUR', testBeverages);
+    // 1000 EUR → 950 CHF / 3.0 CHF = 316
+    expect(result[2]?.count).toBe(316);
+  });
+
+  it('converts CHF portfolio to EUR beverages', () => {
     const result = calculateEquivalents(1000, 'CHF', testBeverages);
-    expect(result[0]?.count).toBe(952); // 1000 / 1.05
-    expect(result[1]?.count).toBe(380); // 1000 / 2.63
+    // 1000 CHF → 1052.63 EUR / 1.0 EUR = 1052
+    expect(result[0]?.count).toBe(1052);
+    // 1000 CHF / 3.0 CHF = 333
+    expect(result[2]?.count).toBe(333);
   });
 
   it('returns 0 for zero portfolio value', () => {
@@ -30,6 +65,14 @@ describe('calculateEquivalents', () => {
     expect(result[0]?.name).toBe('Test Beer');
     expect(result[0]?.size).toBe('330ml');
     expect(result[0]?.price).toBe(1.0);
+    expect(result[0]?.currency).toBe('EUR');
+    expect(result[0]?.country).toBe('DE');
+  });
+
+  it('preserves Swiss beverage metadata', () => {
+    const result = calculateEquivalents(100, 'EUR', testBeverages);
+    expect(result[2]?.currency).toBe('CHF');
+    expect(result[2]?.country).toBe('CH');
   });
 });
 

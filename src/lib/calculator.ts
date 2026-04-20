@@ -1,8 +1,9 @@
-import type { Beverage, Currency } from './data/beverages';
+// SPDX-License-Identifier: MIT
+import type { Beverage } from './data/beverages';
 import type { Locale } from './i18n';
 import { EUR_TO_CHF_RATE } from './fx';
 
-export function convertValue(value: number, fromCurrency: string, toCurrency: Currency): number {
+export function convertValue(value: number, fromCurrency: string, toCurrency: string): number {
   if (fromCurrency === toCurrency) return value;
   if (fromCurrency === 'EUR' && toCurrency === 'CHF') return value * EUR_TO_CHF_RATE;
   if (fromCurrency === 'CHF' && toCurrency === 'EUR') return value / EUR_TO_CHF_RATE;
@@ -13,6 +14,8 @@ export interface BeverageEquivalent {
   name: string;
   size: string;
   price: number;
+  currency: string;
+  country: string;
   count: number;
 }
 
@@ -25,16 +28,21 @@ export interface FunStats {
 
 export function calculateEquivalents(
   portfolioValue: number,
-  currency: Currency,
+  portfolioCurrency: string,
   beverages: Beverage[]
 ): BeverageEquivalent[] {
   return beverages.map((b) => {
-    const price = currency === 'CHF' ? b.priceChf : b.priceEur;
+    // Convert portfolio value into the beverage's own currency, then divide
+    // by its local price. This gives the real count of how many you could buy
+    // in that beverage's home country.
+    const valueInBevCurrency = convertValue(portfolioValue, portfolioCurrency, b.currency);
     return {
       name: b.name,
       size: b.size,
-      price,
-      count: Math.floor(portfolioValue / price),
+      price: b.price,
+      currency: b.currency,
+      country: b.country,
+      count: Math.floor(valueInBevCurrency / b.price),
     };
   });
 }

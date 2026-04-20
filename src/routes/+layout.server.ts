@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import type { LayoutServerLoad } from './$types';
 
 // SSR locale-handoff: `hooks.server.ts` resolves the `locale` cookie into

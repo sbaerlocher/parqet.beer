@@ -4,171 +4,169 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen)
 
-Humorvolle Web-App, die den Portfoliowert eines Parqet-Nutzers in Bier, Kaffee
-oder Smoothies umrechnet. **Community-Spassprojekt — kein offizielles
-Parqet-Produkt.**
+A humorous web app that converts a Parqet user's portfolio value into beers,
+coffees, or smoothies. **Community fun project — not an official Parqet
+product.**
 
-> _"Endlich eine sinnvolle Kennzahl."_
+> _"Finally a meaningful metric."_
 
 ## Features
 
-- 🍺 Portfoliowert live in Bier/Kaffee/Smoothie umgerechnet
+- 🍺 Portfolio value converted live into beer / coffee / smoothie
 - 🔐 Parqet Connect OAuth 2.0 (PKCE, read-only)
-- 💰 EUR / CHF Umschalter
-- 🌙 Dark Mode
-- 🇩🇪 🇬🇧 Deutsch / English
-- 📊 Fun-Statistiken, Bier des Tages, Milestone-Badges, Dividends-in-Beer
-- 📸 Shareable Bild-Export
+- 💰 EUR / CHF toggle
+- 🌙 Dark mode
+- 🇩🇪 🇬🇧 German / English
+- 📊 Fun stats, beverage of the day, milestone badges, dividends in beer
+- 📸 Shareable image export
 
 ## Tech Stack
 
-- **Framework**: [SvelteKit](https://kit.svelte.dev) (Svelte 5, SSR auf Cloudflare Pages)
+- **Framework**: [SvelteKit](https://kit.svelte.dev) (Svelte 5, SSR on Cloudflare Pages)
 - **Adapter**: `@sveltejs/adapter-cloudflare`
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com)
-- **Auth**: Parqet Connect OAuth 2.0 + PKCE, Sessions via [jose](https://github.com/panva/jose) JWE (httpOnly Cookie)
+- **Auth**: Parqet Connect OAuth 2.0 + PKCE, sessions via [jose](https://github.com/panva/jose) JWE (httpOnly cookie)
 - **Storage**: Cloudflare KV (`PARQET_KV`)
 - **Validation**: Zod
 - **Testing**: Vitest, Playwright (E2E)
 
 ## Setup
 
-Voraussetzungen: [Node.js](https://nodejs.org) (siehe `.nvmrc`), [pnpm](https://pnpm.io).
+Prerequisites: [Node.js](https://nodejs.org) (see `.nvmrc`), [pnpm](https://pnpm.io).
 
 ```bash
-# 1. Repository klonen
+# 1. Clone the repository
 git clone https://github.com/sbaerlocher/parqet.beer.git
 cd parqet.beer
 
-# 2. Dependencies installieren
+# 2. Install dependencies
 pnpm install
 
-# 3. Env-Variablen kopieren und ausfüllen
+# 3. Copy and fill in environment variables
 cp .dev.vars.example .dev.vars
-# PARQET_CLIENT_ID, SESSION_SECRET eintragen
+# Set PARQET_CLIENT_ID and SESSION_SECRET
 
-# 4. Dev-Server starten
+# 4. Start the dev server
 pnpm dev
 ```
 
-Anschliessend im Browser auf `http://localhost:5173`.
+Then open `http://localhost:5173` in your browser.
 
-### Env-Variablen
+### Environment Variables
 
-| Variable           | Beschreibung                                        |
-| ------------------ | --------------------------------------------------- |
-| `PARQET_CLIENT_ID` | OAuth App Client ID aus dem Parqet Developer Portal |
-| `SESSION_SECRET`   | 32+ Byte Random-Secret für JWE Session-Cookies      |
+| Variable           | Description                                          |
+| ------------------ | ---------------------------------------------------- |
+| `PARQET_CLIENT_ID` | OAuth App Client ID from the Parqet Developer Portal |
+| `SESSION_SECRET`   | 32+ byte random secret for JWE session cookies       |
 
-Parqet Connect läuft als Public Client mit PKCE — ein Client Secret ist nicht nötig.
+Parqet Connect runs as a public client with PKCE — no client secret required.
 
-In Produktion werden Secrets über das Cloudflare Dashboard gesetzt, nicht via
+In production, secrets are set via the Cloudflare dashboard, not through
 `wrangler.jsonc`.
 
 ## Scripts
 
 ```bash
 pnpm dev              # Vite dev server (localhost:5173)
-pnpm build            # Build für Cloudflare Pages
-pnpm preview          # Lokaler Cloudflare Pages Preview via wrangler
-pnpm check            # TypeScript + Svelte Check
+pnpm build            # Build for Cloudflare Pages
+pnpm preview          # Local Cloudflare Pages preview via wrangler
+pnpm check            # TypeScript + Svelte check
 pnpm test             # Vitest (unit tests)
 pnpm lint             # Prettier check
 pnpm format           # Prettier write
-pnpm generate:assets  # SVG → PNG (Favicon, OG-Image) neu rendern
+pnpm generate:assets  # SVG → PNG (favicon, OG image) re-render
 ```
 
 ## Deployment (Cloudflare Pages)
 
-> **Fork-Hinweis**: `wrangler.jsonc` enthält nur Platzhalter-IDs. Bevor du
-> deployen kannst, musst du deine eigenen Cloudflare-Ressourcen (KV-Namespace,
-> Secrets Store) anlegen und die IDs eintragen. Das Setup-Script automatisiert
-> diesen Flow.
+> **Fork note**: `wrangler.jsonc` contains only placeholder IDs. Before you can
+> deploy, you need to create your own Cloudflare resources (KV namespace,
+> Secrets Store) and fill in the IDs. The setup script automates this flow.
 
-### Automatisiertes Setup (empfohlen)
+### Automated setup (recommended)
 
 ```bash
 ./scripts/setup-fork.sh
 ```
 
-Das Script legt KV-Namespaces (preview + production), einen Secrets Store und
-ein Session-Secret an und patcht `wrangler.jsonc` mit den generierten IDs.
+The script creates KV namespaces (preview + production), a Secrets Store, and
+a session secret, then patches `wrangler.jsonc` with the generated IDs.
 
-### Manueller Flow
+### Manual flow
 
-Wer es Schritt für Schritt machen will, findet die Einzel-Commands in
-[scripts/setup-fork.sh](scripts/setup-fork.sh) oder
+For a step-by-step approach, see the individual commands in
+[scripts/setup-fork.sh](scripts/setup-fork.sh) or
 [scripts/README.md](scripts/README.md).
 
-Anschliessend **Parqet Client ID** in `wrangler.jsonc` unter
-`vars.PARQET_CLIENT_ID` durch deine eigene OAuth-App-ID aus dem Parqet
-Developer Portal ersetzen. Die eingetragene Redirect-URI der Parqet-App muss
-mit deiner Deploy-Domain übereinstimmen.
+Then replace the **Parqet Client ID** in `wrangler.jsonc` under
+`vars.PARQET_CLIENT_ID` with your own OAuth app ID from the Parqet Developer
+Portal. The redirect URI configured in your Parqet app must match your deploy
+domain.
 
-Deploy via Git-Integration (Push auf `main`) oder manuell:
+Deploy via Git integration (push to `main`) or manually:
 
 ```bash
 pnpm build
 pnpm exec wrangler pages deploy .svelte-kit/cloudflare
 ```
 
-## Projekt-Struktur
+## Project Structure
 
 ```text
 src/
-├── app.html                  # Root HTML mit Meta-Tags
-├── app.css                   # Tailwind + Farbschema
-├── hooks.server.ts           # Session-Check, Rate-Limiting
+├── app.html                  # Root HTML with meta tags
+├── app.css                   # Tailwind + colour scheme
+├── hooks.server.ts           # Session check, rate limiting
 ├── lib/
-│   ├── calculator.ts         # Portfolio → Beverage Logik
-│   ├── components/           # Svelte-Komponenten
-│   ├── data/                 # Beverages & Badges (JSON)
-│   ├── fun.ts                # Fun-Stats, Beverage-of-the-Day
-│   ├── i18n.ts               # DE/EN Translations
+│   ├── calculator.ts         # Portfolio → beverage logic
+│   ├── components/           # Svelte components
+│   ├── data/                 # Beverages & badges (JSON)
+│   ├── fun.ts                # Fun stats, beverage of the day
+│   ├── i18n.ts               # DE/EN translations
 │   ├── server/               # Server-only: auth, parqet-client, kv-cache
-│   └── stores/               # Svelte-Stores (locale, theme)
+│   └── stores/               # Svelte stores (locale, theme)
 └── routes/
     ├── +layout.svelte
     ├── +page.svelte          # Landing
     ├── +error.svelte         # 404/500
     ├── api/                  # OAuth, portfolios, performance, preferences
-    ├── dashboard/            # Auth-geschützt
+    ├── dashboard/            # Auth-protected
     └── privacy/
 tests/                        # Vitest unit & integration tests
-static/                       # Favicon, OG-Image, etc.
+static/                       # Favicon, OG image, etc.
 ```
 
-## Daten-Quellen
+## Data Sources
 
-- **Bierpreise**: Coop.ch, Rewe, Edeka, supermarktcheck.de — gepflegt in
+- **Beer prices**: Coop.ch, Rewe, Edeka, supermarktcheck.de — maintained in
   [src/lib/data/beer.json](src/lib/data/beer.json)
-- **Kaffee & Smoothies**: Café-/Ladenpreise, manuell gepflegt
-- Alle Preise sind Community-kuratiert. **Pull Requests willkommen!**
+- **Coffee & smoothies**: cafe / shop prices, manually curated
+- All prices are community-curated. **Pull requests welcome!**
 
-## Weitere Dokumentation
+## Further Documentation
 
-- [AGENTS.md](AGENTS.md) — Kurzreferenz für Contributor/Tools
-- [CHANGELOG.md](CHANGELOG.md) — Änderungshistorie
+- [AGENTS.md](AGENTS.md) — Quick reference for contributors / tools
+- [CHANGELOG.md](CHANGELOG.md) — Change history
 
 ## Community
 
-- [CONTRIBUTING.md](CONTRIBUTING.md) — Wie du beitragen kannst
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Community-Regeln
-- [SECURITY.md](SECURITY.md) — Sicherheitslücken verantwortungsvoll melden
+- [CONTRIBUTING.md](CONTRIBUTING.md) — How to contribute
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — Community guidelines
+- [SECURITY.md](SECURITY.md) — Responsible vulnerability disclosure
 
-## Rechtliches
+## Legal
 
-Dieses Projekt ist ein unabhängiges, community-getriebenes Tool und steht in
-**keiner Verbindung** zu, wird nicht unterstützt von und ist in keiner Form
-offiziell verbunden mit:
+This project is an independent, community-driven tool and is **not affiliated**
+with, endorsed by, or in any way officially connected to:
 
-- der Parqet Fintech GmbH oder deren Tochtergesellschaften
-- den genannten Brauereien, Cafés oder Getränkemarken
+- Parqet Fintech GmbH or its subsidiaries
+- any of the breweries, cafes, or beverage brands mentioned
 
-Alle Marken- und Produktnamen sind Eigentum ihrer jeweiligen Inhaber und werden
-hier nur zu Illustrationszwecken verwendet.
+All trademarks and product names are the property of their respective owners
+and are used here for illustrative purposes only.
 
-Keine Anlageberatung. Alle Angaben ohne Gewähr.
+Not financial advice. No warranty.
 
-## Lizenz
+## License
 
-MIT — siehe [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).

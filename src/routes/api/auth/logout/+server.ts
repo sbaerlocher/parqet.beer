@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { redirect, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { clearSessionCookie, clearUserKv } from '$lib/server/auth';

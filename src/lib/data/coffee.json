@@ -1,38 +1,184 @@
 [
-  { "name": "Starbucks Caramel Macchiato", "size": "Grande", "priceEur": 5.29, "priceChf": 6.4 },
-  { "name": "Starbucks Caffè Latte", "size": "Grande", "priceEur": 4.79, "priceChf": 5.9 },
-  { "name": "Starbucks Espresso", "size": "Doppio", "priceEur": 3.19, "priceChf": 4.2 },
-  { "name": "The Barn Cappuccino", "size": "180ml", "priceEur": 4.9, "priceChf": 6.1 },
-  { "name": "The Barn Flat White", "size": "180ml", "priceEur": 4.7, "priceChf": 5.9 },
-  { "name": "Five Elephant Cappuccino", "size": "180ml", "priceEur": 3.9, "priceChf": 4.9 },
-  { "name": "Bonanza Coffee Cappuccino", "size": "180ml", "priceEur": 3.8, "priceChf": 4.8 },
-  { "name": "Bonanza Coffee Flat White", "size": "180ml", "priceEur": 4.1, "priceChf": 5.1 },
-  { "name": "19grams Cappuccino", "size": "180ml", "priceEur": 3.7, "priceChf": 4.6 },
-  { "name": "Röststätte Flat White", "size": "180ml", "priceEur": 4.2, "priceChf": 5.3 },
-  { "name": "Nord Coast Flat White", "size": "180ml", "priceEur": 3.3, "priceChf": 4.1 },
-  { "name": "Elbgold Cappuccino", "size": "180ml", "priceEur": 3.6, "priceChf": 4.5 },
-  { "name": "Man Versus Machine Cappuccino", "size": "180ml", "priceEur": 4.0, "priceChf": 5.0 },
-  { "name": "Man Versus Machine Flat White", "size": "180ml", "priceEur": 4.2, "priceChf": 5.3 },
-  { "name": "Standl 20 Cappuccino", "size": "180ml", "priceEur": 3.9, "priceChf": 4.9 },
-  { "name": "MAME Cappuccino", "size": "180ml", "priceEur": 5.3, "priceChf": 6.5 },
-  { "name": "MAME Flat White", "size": "180ml", "priceEur": 5.3, "priceChf": 6.5 },
-  { "name": "Rose Coffee Cappuccino", "size": "180ml", "priceEur": 5.55, "priceChf": 6.8 },
-  { "name": "Miró Coffee Cappuccino", "size": "180ml", "priceEur": 4.5, "priceChf": 5.5 },
-  { "name": "ViCAFE Flat White", "size": "180ml", "priceEur": 4.1, "priceChf": 5.0 },
-  { "name": "Stoll Kaffee Cappuccino", "size": "180ml", "priceEur": 4.1, "priceChf": 5.0 },
   {
-    "name": "Kaffeemacher Café frühling Cappuccino",
-    "size": "180ml",
-    "priceEur": 4.5,
-    "priceChf": 5.5
+    "name": "Starbucks Caramel Macchiato",
+    "size": "Grande",
+    "price": 5.29,
+    "currency": "EUR",
+    "country": "DE"
   },
-  { "name": "Bean in Progress Flat White", "size": "180ml", "priceEur": 4.5, "priceChf": 5.5 },
-  { "name": "Rösterei Blaser Cappuccino", "size": "180ml", "priceEur": 4.4, "priceChf": 5.4 },
-  { "name": "Adrianos Cappuccino", "size": "180ml", "priceEur": 4.3, "priceChf": 5.3 },
-  { "name": "Friend or Foe Flat White", "size": "180ml", "priceEur": 4.5, "priceChf": 5.5 },
-  { "name": "Balzac Coffee Flat White", "size": "200ml", "priceEur": 3.9, "priceChf": 4.8 },
-  { "name": "Coffee Fellows Latte", "size": "300ml", "priceEur": 4.5, "priceChf": 5.6 },
-  { "name": "Baristaz Flat White", "size": "200ml", "priceEur": 4.1, "priceChf": 5.1 },
-  { "name": "Bakery Bakery Cappuccino", "size": "200ml", "priceEur": 4.2, "priceChf": 4.8 },
-  { "name": "Bakery Bakery Flat White", "size": "200ml", "priceEur": 4.6, "priceChf": 5.3 }
+  {
+    "name": "Starbucks Caffè Latte",
+    "size": "Grande",
+    "price": 4.79,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Starbucks Espresso",
+    "size": "Doppio",
+    "price": 3.19,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "The Barn Cappuccino",
+    "size": "180ml",
+    "price": 4.5,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "The Barn Flat White",
+    "size": "180ml",
+    "price": 4.7,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Five Elephant Cappuccino",
+    "size": "180ml",
+    "price": 4.0,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Bonanza Coffee Cappuccino",
+    "size": "180ml",
+    "price": 4.0,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Bonanza Coffee Flat White",
+    "size": "180ml",
+    "price": 4.3,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "19grams Cappuccino",
+    "size": "180ml",
+    "price": 3.9,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Röststätte Flat White",
+    "size": "180ml",
+    "price": 4.2,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Nord Coast Flat White",
+    "size": "180ml",
+    "price": 3.9,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Elbgold Cappuccino",
+    "size": "180ml",
+    "price": 3.9,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Man Versus Machine Cappuccino",
+    "size": "180ml",
+    "price": 4.0,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Man Versus Machine Flat White",
+    "size": "180ml",
+    "price": 4.4,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Standl 20 Cappuccino",
+    "size": "180ml",
+    "price": 3.9,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Balzac Coffee Flat White",
+    "size": "200ml",
+    "price": 3.9,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Coffee Fellows Latte",
+    "size": "300ml",
+    "price": 4.5,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Baristaz Flat White",
+    "size": "200ml",
+    "price": 4.1,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "MAME Cappuccino",
+    "size": "180ml",
+    "price": 5.5,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "MAME Flat White",
+    "size": "180ml",
+    "price": 6.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Miró Coffee Cappuccino",
+    "size": "180ml",
+    "price": 5.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "ViCAFE Flat White",
+    "size": "180ml",
+    "price": 5.5,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Stoll Kaffee Cappuccino",
+    "size": "180ml",
+    "price": 5.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Café Frühling Cappuccino",
+    "size": "180ml",
+    "price": 5.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Rösterei Blaser Cappuccino",
+    "size": "180ml",
+    "price": 5.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Adrianos Cappuccino",
+    "size": "180ml",
+    "price": 5.5,
+    "currency": "CHF",
+    "country": "CH"
+  }
 ]

@@ -4,6 +4,8 @@ import beer from '../src/lib/data/beer.json';
 import coffee from '../src/lib/data/coffee.json';
 import smoothie from '../src/lib/data/smoothie.json';
 
+const validItem = { name: 'Test', size: '0.5l', price: 1.5, currency: 'EUR', country: 'DE' };
+
 describe.each([
   ['beer.json', beer],
   ['coffee.json', coffee],
@@ -29,47 +31,46 @@ describe('beverageListSchema rejects invalid data', () => {
   });
 
   it('rejects a missing required field', () => {
-    const result = beverageListSchema.safeParse([
-      { name: 'Only a name', size: '0.5l', priceEur: 1.5 }, // priceChf missing
-    ]);
+    const result = beverageListSchema.safeParse([{ name: 'Only a name', size: '0.5l' }]);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.some((i) => i.path.includes('priceChf'))).toBe(true);
+      expect(result.error.issues.some((i) => i.path.includes('price'))).toBe(true);
     }
   });
 
   it('rejects a non-numeric price', () => {
     const result = beverageListSchema.safeParse([
-      { name: 'Bad', size: '0.5l', priceEur: 'free' as unknown as number, priceChf: 2 },
+      { ...validItem, price: 'free' as unknown as number },
     ]);
     expect(result.success).toBe(false);
   });
 
   it('rejects a negative price', () => {
-    const result = beverageListSchema.safeParse([
-      { name: 'Bad', size: '0.5l', priceEur: -1, priceChf: 2 },
-    ]);
+    const result = beverageListSchema.safeParse([{ ...validItem, price: -1 }]);
     expect(result.success).toBe(false);
   });
 
   it('rejects an infinite price', () => {
     const result = beverageListSchema.safeParse([
-      { name: 'Bad', size: '0.5l', priceEur: Number.POSITIVE_INFINITY, priceChf: 2 },
+      { ...validItem, price: Number.POSITIVE_INFINITY },
     ]);
     expect(result.success).toBe(false);
   });
 
   it('rejects an empty name', () => {
-    const result = beverageListSchema.safeParse([
-      { name: '', size: '0.5l', priceEur: 1.5, priceChf: 2 },
-    ]);
+    const result = beverageListSchema.safeParse([{ ...validItem, name: '' }]);
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects an invalid currency', () => {
+    const result = beverageListSchema.safeParse([{ ...validItem, currency: 'USD' }]);
     expect(result.success).toBe(false);
   });
 
   it('rejects duplicate beverage names (case-insensitive)', () => {
     const result = beverageListSchema.safeParse([
-      { name: 'Pilsner', size: '0.5l', priceEur: 1.5, priceChf: 2 },
-      { name: 'PILSNER', size: '0.33l', priceEur: 1.2, priceChf: 1.8 },
+      { ...validItem, name: 'Pilsner' },
+      { ...validItem, name: 'PILSNER', size: '0.33l' },
     ]);
     expect(result.success).toBe(false);
     if (!result.success) {

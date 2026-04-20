@@ -1,0 +1,33 @@
+---
+name: Security Scan
+
+'on':
+  schedule:
+    - cron: '0 2 * * 1' # Weekly Monday 02:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: write
+  actions: read
+
+jobs:
+  code-analysis:
+    name: SAST (CodeQL)
+    uses: sbaerlocher/.github/.github/workflows/security-code.yml@2026-04-11
+    with:
+      languages: '["javascript-typescript"]'
+      node-version-file: .nvmrc
+      package-manager: pnpm
+
+  dependency-scan:
+    name: Dependencies & Licenses
+    uses: sbaerlocher/.github/.github/workflows/security-deps.yml@2026-04-11
+    with:
+      language: 'javascript'
+      enable-license-check: true
+
+  secret-detection:
+    name: Secret Detection
+    uses: sbaerlocher/.github/.github/workflows/security-secrets.yml@2026-04-11

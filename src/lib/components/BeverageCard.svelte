@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import type { BeverageEquivalent } from '$lib/calculator';
   import { formatNumber } from '$lib/calculator';

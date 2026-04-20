@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 

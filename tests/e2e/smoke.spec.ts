@@ -3,8 +3,12 @@ import { test, expect } from '@playwright/test';
 test.describe('parqet.beer smoke', () => {
   test('landing page renders with connect button', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: /parqet\.beer/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Parqet/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    // Target the CTA by its href, not its text — the footer also contains a
+    // "Parqet" link, and the CTA's label changes with locale ("Mit Parqet
+    // verbinden" / "Connect with Parqet"). The `/api/auth/login` href is the
+    // stable contract for this element.
+    await expect(page.locator('a[href="/api/auth/login"]')).toBeVisible();
   });
 
   test('landing page exposes OG meta tags', async ({ page }) => {
@@ -28,10 +32,15 @@ test.describe('parqet.beer smoke', () => {
 
   test('locale toggle persists across reload', async ({ page }) => {
     await page.goto('/');
-    // Switch to EN.
+    // Svelte 5 attaches `onclick` handlers during hydration, which completes
+    // after the `load` event Playwright waits for. Clicking before hydration
+    // is a silent no-op. `html[data-hydrated]` is set by a client-only
+    // `$effect` in +layout.svelte, so waiting on it guarantees handlers are
+    // live before we interact.
+    await page.locator('html[data-hydrated]').waitFor();
     await page.getByRole('button', { name: 'EN' }).click();
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('locale'))).toBe('en');
     await page.reload();
-    // The store should have picked up 'en' from localStorage.
     const stored = await page.evaluate(() => localStorage.getItem('locale'));
     expect(stored).toBe('en');
   });

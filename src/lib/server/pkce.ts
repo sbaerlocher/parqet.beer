@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * PKCE (Proof Key for Code Exchange) utilities
  */

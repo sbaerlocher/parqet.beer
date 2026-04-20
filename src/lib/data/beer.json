@@ -1,38 +1,212 @@
 [
-  { "name": "Astra Urtyp", "size": "330ml", "priceEur": 0.79, "priceChf": 0.83 },
-  { "name": "Augustiner Helles", "size": "500ml", "priceEur": 1.1, "priceChf": 1.16 },
-  { "name": "Rothaus Tannenzäpfle", "size": "330ml", "priceEur": 1.08, "priceChf": 1.14 },
-  { "name": "Tegernseer Hell", "size": "500ml", "priceEur": 0.9, "priceChf": 0.95 },
-  { "name": "Schneider Weisse TAP 7 Original", "size": "500ml", "priceEur": 1.2, "priceChf": 1.26 },
-  { "name": "Andechser Spezial Hell", "size": "500ml", "priceEur": 1.25, "priceChf": 1.31 },
-  { "name": "Gaffel Kölsch", "size": "330ml", "priceEur": 1.08, "priceChf": 1.13 },
-  { "name": "Früh Kölsch", "size": "500ml", "priceEur": 1.29, "priceChf": 1.35 },
-  { "name": "Uerige Alt", "size": "330ml", "priceEur": 1.15, "priceChf": 1.21 },
-  { "name": "Mahrs Bräu aU Kellerbier", "size": "500ml", "priceEur": 1.4, "priceChf": 1.47 },
+  {
+    "name": "Astra Urtyp",
+    "size": "330ml",
+    "price": 0.79,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Augustiner Helles",
+    "size": "500ml",
+    "price": 1.09,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Rothaus Tannenzäpfle",
+    "size": "330ml",
+    "price": 1.05,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Tegernseer Hell",
+    "size": "500ml",
+    "price": 1.0,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Schneider Weisse TAP 7 Original",
+    "size": "500ml",
+    "price": 1.29,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Andechser Spezial Hell",
+    "size": "500ml",
+    "price": 1.29,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Gaffel Kölsch",
+    "size": "330ml",
+    "price": 0.99,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Früh Kölsch",
+    "size": "500ml",
+    "price": 1.39,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Uerige Alt",
+    "size": "330ml",
+    "price": 1.1,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Mahrs Bräu aU Kellerbier",
+    "size": "500ml",
+    "price": 1.4,
+    "currency": "EUR",
+    "country": "DE"
+  },
   {
     "name": "Aecht Schlenkerla Rauchbier Märzen",
     "size": "500ml",
-    "priceEur": 1.84,
-    "priceChf": 1.93
+    "price": 1.84,
+    "currency": "EUR",
+    "country": "DE"
   },
-  { "name": "Störtebeker Atlantik-Ale", "size": "500ml", "priceEur": 2.19, "priceChf": 2.3 },
-  { "name": "BRLO Helles", "size": "330ml", "priceEur": 1.8, "priceChf": 1.89 },
-  { "name": "BRLO Pale Ale", "size": "330ml", "priceEur": 2.5, "priceChf": 2.63 },
-  { "name": "ÜberQuell Bambule Pils", "size": "330ml", "priceEur": 2.4, "priceChf": 2.52 },
-  { "name": "Riegele Augustus 8", "size": "330ml", "priceEur": 3.5, "priceChf": 3.68 },
-  { "name": "Fuerst Wiacek IPA", "size": "440ml", "priceEur": 6.9, "priceChf": 7.25 },
-  { "name": "Appenzeller Quöllfrisch", "size": "330ml", "priceEur": 1.14, "priceChf": 1.2 },
-  { "name": "Appenzeller Holzfass-Bier", "size": "330ml", "priceEur": 2.43, "priceChf": 2.55 },
-  { "name": "Schützengarten Edelspez", "size": "330ml", "priceEur": 1.38, "priceChf": 1.45 },
-  { "name": "Felsenau Bärner Müntschi", "size": "330ml", "priceEur": 2.38, "priceChf": 2.5 },
-  { "name": "Simmentaler Lager", "size": "330ml", "priceEur": 2.86, "priceChf": 3.0 },
-  { "name": "Unser Bier Lager", "size": "330ml", "priceEur": 2.28, "priceChf": 2.4 },
-  { "name": "Turbinenbräu Goldsprint", "size": "330ml", "priceEur": 2.38, "priceChf": 2.5 },
-  { "name": "Storm & Anchor IPA", "size": "330ml", "priceEur": 4.28, "priceChf": 4.5 },
-  { "name": "BFM La Meule", "size": "330ml", "priceEur": 3.9, "priceChf": 4.1 },
-  { "name": "Wädi-Bräu Bio Lager", "size": "330ml", "priceEur": 2.57, "priceChf": 2.7 },
-  { "name": "Chopfab Draft", "size": "330ml", "priceEur": 1.24, "priceChf": 1.3 },
-  { "name": "Chopfab Amber", "size": "330ml", "priceEur": 2.06, "priceChf": 2.16 },
-  { "name": "Chopfab Pale Ale", "size": "500ml", "priceEur": 2.14, "priceChf": 2.25 },
-  { "name": "Chopfab IPA", "size": "330ml", "priceEur": 2.85, "priceChf": 2.99 }
+  {
+    "name": "Störtebeker Atlantik-Ale",
+    "size": "500ml",
+    "price": 2.19,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "BRLO Helles",
+    "size": "330ml",
+    "price": 1.89,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "BRLO Pale Ale",
+    "size": "330ml",
+    "price": 2.2,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "ÜberQuell Bambule Pils",
+    "size": "330ml",
+    "price": 1.99,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Riegele Augustus 8",
+    "size": "330ml",
+    "price": 3.39,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Fuerst Wiacek IPA",
+    "size": "440ml",
+    "price": 6.49,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Appenzeller Quöllfrisch",
+    "size": "330ml",
+    "price": 1.2,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Appenzeller Holzfass-Bier",
+    "size": "330ml",
+    "price": 2.95,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Schützengarten Edelspez",
+    "size": "330ml",
+    "price": 1.55,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Felsenau Bärner Müntschi",
+    "size": "330ml",
+    "price": 2.1,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Simmentaler Lager",
+    "size": "330ml",
+    "price": 2.95,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Unser Bier Blond",
+    "size": "330ml",
+    "price": 2.4,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Turbinenbräu Goldsprint",
+    "size": "330ml",
+    "price": 1.65,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Storm & Anchor IPA",
+    "size": "330ml",
+    "price": 4.5,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "BFM La Meule",
+    "size": "330ml",
+    "price": 5.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Chopfab Draft",
+    "size": "330ml",
+    "price": 1.2,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Chopfab Amber",
+    "size": "330ml",
+    "price": 2.2,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Chopfab Pale Ale",
+    "size": "330ml",
+    "price": 2.2,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Chopfab IPA",
+    "size": "330ml",
+    "price": 3.0,
+    "currency": "CHF",
+    "country": "CH"
+  }
 ]

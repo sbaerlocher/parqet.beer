@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { z } from 'zod';
 import { EUR_TO_CHF_RATE } from '../fx';
 
@@ -98,11 +99,15 @@ export async function refreshAccessToken(
       }),
     });
 
-    if (!response.ok) return null;
+    if (!response.ok) {
+      console.error('[parqet:refresh] Token refresh rejected:', response.status);
+      return null;
+    }
 
     const data = await response.json();
     return TokenResponseSchema.parse(data);
-  } catch {
+  } catch (err) {
+    console.error('[parqet:refresh] Token refresh error:', err);
     return null;
   }
 }

@@ -1,7 +1,8 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import type { BeverageCategory } from '$lib/data/beverages';
   import { getMilestoneBadge, getNextMilestone, getAllBadges } from '$lib/fun';
-  import { locale } from '$lib/stores/locale';
+  import { locale, t } from '$lib/stores/locale';
   import { formatNumber } from '$lib/calculator';
 
   let { count, category }: { count: number; category: BeverageCategory } = $props();
@@ -23,9 +24,10 @@
 
 {#if badge}
   <div
-    class="bg-white rounded-2xl border-2 {isMax
-      ? 'border-amber-400 shadow-[0_0_15px_rgba(217,119,6,0.15)]'
-      : 'border-amber-300'} p-5 mb-6"
+    class="rounded-2xl p-5 mb-6"
+    style="background: var(--card); border: 2px solid {isMax
+      ? 'var(--accent-hover)'
+      : 'var(--border)'}; {isMax ? 'box-shadow: 0 0 15px rgba(217, 119, 6, 0.15)' : ''}"
   >
     <div class="flex items-center gap-4 mb-4">
       <span class="text-4xl">{badge.icon}</span>
@@ -47,9 +49,8 @@
             {b.icon}
           </span>
           <div
-            class="w-full h-1.5 rounded-full {count >= b.threshold
-              ? 'bg-amber-500'
-              : 'bg-amber-100'}"
+            class="w-full h-1.5 rounded-full transition-colors"
+            style="background: {count >= b.threshold ? 'var(--highlight-soft)' : 'var(--accent)'}"
           ></div>
         </div>
       {/each}
@@ -60,15 +61,15 @@
         <span>{formatNumber(count, $locale)}</span>
         <span>{next.icon} {next.title} ({formatNumber(next.threshold, $locale)})</span>
       </div>
-      <div class="w-full bg-amber-100 rounded-full h-2">
+      <div class="w-full rounded-full h-2" style="background: var(--accent)">
         <div
-          class="bg-amber-500 h-2 rounded-full transition-all duration-500"
-          style="width: {Math.min(progress, 100)}%"
+          class="h-2 rounded-full transition-all duration-500"
+          style="width: {Math.min(progress, 100)}%; background: var(--highlight-soft)"
         ></div>
       </div>
     {:else}
       <p class="text-xs text-amber-500 text-center mt-1">
-        {$locale === 'de' ? 'Höchstes Level erreicht!' : 'Max level reached!'} 👑
+        {$t.maxLevelReached} 👑
       </p>
     {/if}
   </div>

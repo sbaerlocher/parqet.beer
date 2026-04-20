@@ -1,8 +1,10 @@
+// SPDX-License-Identifier: MIT
 import { redirect, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { exchangeCodeForTokens, getUserInfo } from '$lib/server/parqet-client';
 import {
   setSessionCookie,
+  storeTokens,
   resolveSessionSecret,
   OAUTH_STATE_COOKIE,
   OAUTH_VERIFIER_COOKIE,
@@ -42,24 +44,28 @@ export const GET: RequestHandler = async ({ url, cookies, platform }) => {
     error(500, 'Failed to fetch user info');
   }
 
-  // Store user info in KV (1h TTL). Tokens live only in the encrypted
-  // session cookie — there is no second copy in KV.
+  console.log('[auth:callback] Token response:', {
+    hasRefreshToken: !!tokens.refresh_token,
+    expiresIn: tokens.expires_in,
+    expiresInHours: Math.round(tokens.expires_in / 3600),
+    tokenType: tokens.token_type,
+  });
+
+  // Store user info in KV (1h TTL).
   await env.PARQET_KV.put(`user:${userInfo.userId}`, JSON.stringify(userInfo), {
     expirationTtl: 3600,
   });
 
-  // Create session cookie
+  // Store tokens in KV (30-day TTL) — tokens no longer live in the cookie.
+  await storeTokens(env.PARQET_KV, userInfo.userId, {
+    accessToken: tokens.access_token,
+    refreshToken: tokens.refresh_token,
+    expiresAt: Date.now() + tokens.expires_in * 1000,
+  });
+
+  // Session cookie only holds the userId.
   const sessionSecret = await resolveSessionSecret(env);
-  await setSessionCookie(
-    cookies,
-    {
-      userId: userInfo.userId,
-      accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token,
-      expiresAt: Date.now() + tokens.expires_in * 1000,
-    },
-    sessionSecret
-  );
+  await setSessionCookie(cookies, userInfo.userId, sessionSecret);
 
   redirect(302, '/dashboard');
 };

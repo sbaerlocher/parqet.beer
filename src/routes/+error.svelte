@@ -1,6 +1,7 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import { page } from '$app/stores';
-  import { t, locale } from '$lib/stores/locale';
+  import { t } from '$lib/stores/locale';
   import LocaleToggle from '$lib/components/LocaleToggle.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
@@ -18,7 +19,10 @@
   <title>{$page.status} · parqet.beer</title>
 </svelte:head>
 
-<div class="min-h-screen bg-amber-50 flex flex-col items-center px-4 py-16">
+<div
+  class="min-h-screen flex flex-col items-center px-4 py-16"
+  style="background: var(--paper); color: var(--ink)"
+>
   <div class="absolute top-4 right-4 flex items-center gap-2">
     <ThemeToggle />
     <LocaleToggle />
@@ -49,7 +53,8 @@
         <button
           type="button"
           onclick={() => location.reload()}
-          class="inline-flex items-center gap-2 bg-white hover:bg-amber-100 text-amber-800 font-semibold px-6 py-3 rounded-lg border border-amber-300 transition-colors"
+          class="inline-flex items-center gap-2 text-amber-800 font-semibold px-6 py-3 rounded-lg transition-colors"
+          style="background: var(--card); border: 1px solid var(--border)"
         >
           ↻ {$t.errorTryAgain}
         </button>
@@ -60,9 +65,7 @@
   <footer class="mt-12 text-center text-xs text-amber-400 space-y-1 px-4">
     <p>{$t.disclaimer3}</p>
     <div class="flex items-center justify-center gap-3 pt-1 text-amber-300">
-      <a href="/privacy" class="hover:text-amber-500 transition-colors"
-        >{$locale === 'de' ? 'Datenschutz' : 'Privacy'}</a
-      >
+      <a href="/privacy" class="hover:text-amber-500 transition-colors">{$t.privacy}</a>
       <span>·</span>
       <a
         href="https://github.com/sbaerlocher/parqet.beer"

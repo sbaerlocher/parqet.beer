@@ -1,11 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { handle } from '../src/hooks.server';
-import {
-  createSessionCookie,
-  getSessionFromCookie,
-  SESSION_COOKIE,
-  type AuthSession,
-} from '../src/lib/server/auth';
+import { createSessionCookie, SESSION_COOKIE } from '../src/lib/server/auth';
 
 const SESSION_SECRET = 'test-secret-at-least-32-characters-long!';
 
@@ -87,6 +82,30 @@ function buildEvent(opts: BuildEventOpts = {}) {
   return { event, cookies, kv };
 }
 
+/** Seed a session cookie + KV token entry for a user. */
+async function seedSession(
+  cookies: ReturnType<typeof createFakeCookies>,
+  kv: ReturnType<typeof createFakeKv>,
+  opts: {
+    userId: string;
+    accessToken: string;
+    refreshToken?: string;
+    expiresAt: number;
+  }
+) {
+  const cookieValue = await createSessionCookie(opts.userId, SESSION_SECRET);
+  cookies.store.set(SESSION_COOKIE, cookieValue);
+
+  const tokenData = JSON.stringify({
+    accessToken: opts.accessToken,
+    refreshToken: opts.refreshToken,
+    expiresAt: opts.expiresAt,
+  });
+  kv.store.set(`token:${opts.userId}`, tokenData);
+
+  return cookieValue;
+}
+
 const fakeResolve = vi.fn(async () => new Response('ok', { status: 200 }));
 
 async function runHandle(event: ReturnType<typeof buildEvent>['event']) {
@@ -140,18 +159,18 @@ describe('hooks.server handle()', () => {
   });
 
   describe('valid session, far from expiry', () => {
-    it('populates locals.session and does not refresh', async () => {
-      const session: AuthSession = {
+    it('populates locals.session from cookie + KV and does not refresh', async () => {
+      const cookies = createFakeCookies();
+      const kv = createFakeKv();
+      await seedSession(cookies, kv, {
         userId: 'user-1',
         accessToken: 'access-current',
         refreshToken: 'refresh-current',
         expiresAt: Date.now() + 60 * 60 * 1000, // 1h ahead, well outside skew
-      };
-      const cookieValue = await createSessionCookie(session, SESSION_SECRET);
-      const cookies = createFakeCookies({ [SESSION_COOKIE]: cookieValue });
+      });
 
       const fetchSpy = vi.spyOn(globalThis, 'fetch');
-      const ctx = buildEvent({ pathname: '/', cookies });
+      const ctx = buildEvent({ pathname: '/', cookies, kv });
       await runHandle(ctx.event);
 
       expect(ctx.event.locals.session).toEqual({
@@ -163,6 +182,21 @@ describe('hooks.server handle()', () => {
     });
   });
 
+  describe('cookie exists but tokens missing from KV', () => {
+    it('sets locals.session to null', async () => {
+      const cookies = createFakeCookies();
+      const kv = createFakeKv();
+      // Set cookie but do NOT seed KV tokens
+      const cookieValue = await createSessionCookie('user-orphan', SESSION_SECRET);
+      cookies.store.set(SESSION_COOKIE, cookieValue);
+
+      const ctx = buildEvent({ pathname: '/', cookies, kv });
+      await runHandle(ctx.event);
+
+      expect(ctx.event.locals.session).toBeNull();
+    });
+  });
+
   describe('session near expiry → refresh', () => {
     const originalFetch = globalThis.fetch;
 
@@ -170,15 +204,15 @@ describe('hooks.server handle()', () => {
       globalThis.fetch = originalFetch;
     });
 
-    it('refreshes the access token and rewrites the session cookie', async () => {
-      const session: AuthSession = {
+    it('refreshes the access token and writes new tokens to KV', async () => {
+      const cookies = createFakeCookies();
+      const kv = createFakeKv();
+      await seedSession(cookies, kv, {
         userId: 'user-2',
         accessToken: 'access-old',
         refreshToken: 'refresh-old',
         expiresAt: Date.now() + 60 * 1000, // 1 minute — inside the 5min skew
-      };
-      const cookieValue = await createSessionCookie(session, SESSION_SECRET);
-      const cookies = createFakeCookies({ [SESSION_COOKIE]: cookieValue });
+      });
 
       globalThis.fetch = vi.fn().mockResolvedValue(
         new Response(
@@ -192,7 +226,7 @@ describe('hooks.server handle()', () => {
         )
       );
 
-      const ctx = buildEvent({ pathname: '/', cookies });
+      const ctx = buildEvent({ pathname: '/', cookies, kv });
       await runHandle(ctx.event);
 
       // locals reflect the refreshed access token.
@@ -204,52 +238,44 @@ describe('hooks.server handle()', () => {
       // Refresh lock was acquired.
       expect(ctx.kv.store.has('refresh_lock:user-2')).toBe(true);
 
-      // Cookie store was rewritten with the new session — decrypt and check.
-      const updatedCookie = cookies.store.get(SESSION_COOKIE);
-      expect(updatedCookie).toBeDefined();
-      expect(updatedCookie).not.toBe(cookieValue);
-      const decoded = await getSessionFromCookie(updatedCookie!, SESSION_SECRET);
-      expect(decoded?.accessToken).toBe('access-new');
-      expect(decoded?.refreshToken).toBe('refresh-new');
-
-      // Tokens are NOT mirrored to KV — only the refresh lock should be there.
-      expect(ctx.kv.store.has('token:user-2')).toBe(false);
+      // Tokens were written to KV.
+      const storedRaw = ctx.kv.store.get('token:user-2');
+      expect(storedRaw).toBeDefined();
+      const stored = JSON.parse(storedRaw!);
+      expect(stored.accessToken).toBe('access-new');
+      expect(stored.refreshToken).toBe('refresh-new');
     });
 
     it('falls back to the existing session when the refresh request fails', async () => {
-      const session: AuthSession = {
+      const cookies = createFakeCookies();
+      const kv = createFakeKv();
+      await seedSession(cookies, kv, {
         userId: 'user-3',
         accessToken: 'access-stale',
         refreshToken: 'refresh-stale',
         expiresAt: Date.now() + 60 * 1000,
-      };
-      const cookieValue = await createSessionCookie(session, SESSION_SECRET);
-      const cookies = createFakeCookies({ [SESSION_COOKIE]: cookieValue });
+      });
 
       globalThis.fetch = vi.fn().mockResolvedValue(new Response('nope', { status: 401 }));
 
-      const ctx = buildEvent({ pathname: '/', cookies });
+      const ctx = buildEvent({ pathname: '/', cookies, kv });
       await runHandle(ctx.event);
 
       expect(ctx.event.locals.session).toEqual({
         userId: 'user-3',
         accessToken: 'access-stale',
       });
-      // Cookie was NOT rewritten on failure.
-      expect(cookies.store.get(SESSION_COOKIE)).toBe(cookieValue);
     });
 
     it('skips the refresh entirely when another request holds the lock', async () => {
-      const session: AuthSession = {
+      const cookies = createFakeCookies();
+      const kv = createFakeKv();
+      await seedSession(cookies, kv, {
         userId: 'user-4',
         accessToken: 'access-current',
         refreshToken: 'refresh-current',
         expiresAt: Date.now() + 60 * 1000,
-      };
-      const cookieValue = await createSessionCookie(session, SESSION_SECRET);
-      const cookies = createFakeCookies({ [SESSION_COOKIE]: cookieValue });
-
-      const kv = createFakeKv();
+      });
       kv.store.set('refresh_lock:user-4', '1'); // Lock already held.
 
       const fetchSpy = vi.fn();
@@ -260,8 +286,6 @@ describe('hooks.server handle()', () => {
 
       expect(fetchSpy).not.toHaveBeenCalled();
       expect(ctx.event.locals.session?.accessToken).toBe('access-current');
-      // Cookie left untouched — the other request will rewrite it.
-      expect(cookies.store.get(SESSION_COOKIE)).toBe(cookieValue);
     });
   });
 
@@ -295,15 +319,14 @@ describe('hooks.server handle()', () => {
     });
 
     it('returns 429 on /api/* once the user-keyed bucket is full', async () => {
-      const session: AuthSession = {
+      const cookies = createFakeCookies();
+      const kv = createFakeKv();
+      await seedSession(cookies, kv, {
         userId: 'user-rl',
         accessToken: 'tok',
         expiresAt: Date.now() + 60 * 60 * 1000,
-      };
-      const cookieValue = await createSessionCookie(session, SESSION_SECRET);
-      const cookies = createFakeCookies({ [SESSION_COOKIE]: cookieValue });
+      });
 
-      const kv = createFakeKv();
       const windowMs = 60 * 1000;
       const windowStart = Math.floor(Date.now() / windowMs) * windowMs;
       kv.store.set(`ratelimit:api:user-rl:${windowStart}`, '999');

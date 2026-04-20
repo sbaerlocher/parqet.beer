@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 interface CachedValue<T> {
   data: T;
   fetchedAt: number;

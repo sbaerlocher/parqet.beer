@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import type { FunStats as FunStatsType } from '$lib/calculator';
   import CountUp from '$lib/components/CountUp.svelte';

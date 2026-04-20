@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 /**
  * Simple fixed-window rate limiter backed by Cloudflare KV.
  *

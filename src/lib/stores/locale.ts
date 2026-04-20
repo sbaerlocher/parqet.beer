@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 import { writable, derived, get } from 'svelte/store';
 import { browser } from '$app/environment';
 import { translations, type Locale } from '$lib/i18n';
@@ -39,15 +40,19 @@ function createLocaleStore() {
     rawSet(value);
   }
 
-  // Seed the store from SSR-provided data. Idempotent: only updates if the
-  // server-resolved locale differs from what the client just computed, and
-  // writes the cookie so subsequent SSR requests agree with the client.
+  // Seed the store from SSR-provided data. Idempotent and non-destructive:
+  // must never clobber an explicit user choice (localStorage/cookie already
+  // set). The layout calls this from `$effect.pre`, which can re-run on
+  // subsequent renders — if this wrote the SSR default back unconditionally,
+  // it would undo `locale.set(...)` immediately after the user toggled.
   function init(value: Locale | undefined | null) {
     if (!isLocale(value)) return;
     if (get(store) !== value) {
       rawSet(value);
     }
-    if (browser) {
+    if (browser && localStorage.getItem(STORAGE_KEY) === null) {
+      // First visit with no prior choice — pin the SSR-resolved locale so
+      // future SSR requests and the client agree without extra round-trips.
       localStorage.setItem(STORAGE_KEY, value);
       writeCookie(value);
     }

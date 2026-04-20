@@ -1,8 +1,33 @@
+<!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import { t } from '$lib/stores/locale';
   import { locale } from '$lib/stores/locale';
   import LocaleToggle from '$lib/components/LocaleToggle.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+  import RotatingTagline from '$lib/components/RotatingTagline.svelte';
+
+  // Live ticker state for R3 flash effect
+  const tickerBase = [
+    { ticker: 'ASTRA', px: 0.79 },
+    { ticker: 'AUGUS', px: 1.1 },
+    { ticker: 'IPA.WR', px: 6.9 },
+    { ticker: 'BEER_IDX', px: 287.42, composite: true },
+  ];
+  let tick = $state(0);
+  let tickerData = $state(tickerBase.map((x) => ({ ...x, px: x.px, prevPx: x.px, chg: 0 })));
+
+  $effect(() => {
+    const id = setInterval(() => {
+      tick++;
+      tickerData = tickerBase.map((x, i) => {
+        const drift = Math.sin(tick * 0.7 + i) * 0.05;
+        const px = +(x.px + drift).toFixed(2);
+        const prev = tickerData[i]?.px ?? px;
+        return { ...x, px, prevPx: prev, chg: +drift.toFixed(2) };
+      });
+    }, 2800);
+    return () => clearInterval(id);
+  });
 
   const taglinesDe = [
     'Endlich eine sinnvolle Kennzahl.',
@@ -10,8 +35,6 @@
     'Vergiss KGV — zähl lieber Bier.',
     'Lieber Kaffee? Können wir auch.',
     'Auf Gesundheit? Dann halt Smoothie.',
-    'Die wichtigste Zahl in deinem Portfolio.',
-    'Bier, Kaffee oder Smoothie — du entscheidest.',
     'Warren Buffett rechnet auch in Bier. Wahrscheinlich.',
     'Dein Portfolio-Sommelier.',
     'Sparplan? Trinkplan!',
@@ -22,168 +45,243 @@
     'Your portfolio in the only currency that matters.',
     'Forget P/E ratio — count beers instead.',
     'More of a coffee person? We got you.',
-    'Health-conscious? Smoothies it is.',
-    'The most important number in your portfolio.',
-    'Beer, coffee or smoothie — your call.',
     'Warren Buffett counts in beers too. Probably.',
     'Your portfolio sommelier.',
-    'Savings plan? Drinking plan!',
   ];
 
-  let index = $state(0);
-  let visible = $state(true);
-
   const taglines = $derived($locale === 'de' ? taglinesDe : taglinesEn);
-  const currentTagline = $derived(taglines[index % taglines.length]);
-
-  $effect(() => {
-    const interval = setInterval(() => {
-      visible = false;
-      setTimeout(() => {
-        index = (index + 1) % taglines.length;
-        visible = true;
-      }, 400);
-    }, 3000);
-    return () => clearInterval(interval);
-  });
 </script>
 
-<div class="min-h-screen bg-amber-50 flex flex-col items-center px-4 py-16">
-  <div class="absolute top-4 right-4 flex items-center gap-2">
-    <ThemeToggle />
-    <LocaleToggle />
-  </div>
+<div class="min-h-screen" style="background: var(--paper); color: var(--ink)">
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-7 py-6 pb-15">
+    <!-- top bar -->
+    <div class="flex justify-between items-center mb-10 sm:mb-15">
+      <div class="flex items-center gap-2.5">
+        <span
+          class="w-7 h-7 rounded-[7px] inline-flex items-center justify-center font-extrabold text-[13px] font-mono"
+          style="border: 1.5px solid var(--highlight); background: var(--card); color: var(--highlight); box-shadow: inset 0 0 0 2px var(--card), 0 0 0 1.5px var(--highlight); letter-spacing: -0.03em"
+        >
+          🍺
+        </span>
+        <span class="font-display font-bold text-lg"
+          >parqet<span class="text-amber-600">.beer</span></span
+        >
+        <span
+          class="hidden sm:inline font-mono text-[11px] text-amber-700 py-0.5 px-2 rounded ml-2"
+          style="background: var(--accent)"
+        >
+        </span>
+      </div>
+      <div class="flex items-center gap-2">
+        <ThemeToggle />
+        <LocaleToggle />
+      </div>
+    </div>
 
-  <div class="max-w-lg text-center flex-1 flex flex-col justify-center">
-    <h1 class="text-6xl font-bold text-amber-900 mb-3">🍺 parqet.beer</h1>
+    <!-- hero -->
+    <div class="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-10 sm:gap-15 items-center">
+      <div>
+        <div class="font-mono text-xs text-amber-700 mb-3.5">
+          // {$t.heroEyebrow}
+        </div>
 
+        <h1
+          class="font-display font-bold text-amber-950 leading-[0.9] tracking-[-0.045em]"
+          style="font-size: clamp(56px, 8vw, 96px)"
+        >
+          Count<br />
+          <span class="text-amber-600">beers</span>,<br />
+          not P/E.
+        </h1>
+
+        <div class="mt-7 max-w-[460px] text-lg leading-relaxed" style="color: var(--ink-soft)">
+          <RotatingTagline {taglines} />
+        </div>
+
+        <div class="mt-8 flex gap-3 items-center flex-wrap">
+          <a
+            href="/api/auth/login"
+            class="btn btn-primary"
+            style="padding: 14px 22px; font-size: 15px; border-radius: 10px"
+          >
+            <img
+              src="https://developer.parqet.com/img/parqet-icon-trans.svg"
+              alt=""
+              aria-hidden="true"
+              style="width: 20px; height: 20px"
+            />
+            {$t.connectButton} →
+          </a>
+          <span class="font-mono text-xs text-amber-700">
+            🔒 {$t.readOnly}
+          </span>
+        </div>
+
+        <!-- live terminal strip -->
+        <div
+          class="mt-12 rounded-[10px] overflow-hidden"
+          style="border: 1px solid var(--border); background: var(--card)"
+        >
+          <div
+            class="px-3.5 py-2 flex justify-between items-center"
+            style="background: var(--accent); border-bottom: 1px solid var(--border)"
+          >
+            <span class="font-mono text-[11px] text-amber-800 tracking-widest">
+              {$t.eyebrowBeerIndex}
+            </span>
+            <span class="font-mono text-[10px] text-amber-700">
+              <span
+                class="inline-block w-1.5 h-1.5 rounded-full mr-1 ticker-pulse"
+                style="background: var(--success)"
+              ></span>
+              {$t.marketsOpen}
+            </span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 ticker-grid">
+            {#each tickerData as row, _i (row.ticker)}
+              {@const flash = row.px !== row.prevPx ? (row.px > row.prevPx ? 'up' : 'down') : null}
+              <div
+                class="px-3 sm:px-3.5 py-2.5"
+                style={row.composite ? 'background: var(--accent)' : ''}
+              >
+                <div class="font-mono text-[11px] text-amber-700">
+                  {row.ticker}{row.composite ? ' ·' : ''}
+                </div>
+                <div class="font-mono text-base text-amber-950 font-bold">
+                  <span
+                    class="inline-block px-0.5 rounded transition-colors duration-300"
+                    style="background: {flash === 'up'
+                      ? 'var(--flash-up)'
+                      : flash === 'down'
+                        ? 'var(--flash-down)'
+                        : 'transparent'}"
+                  >
+                    €{row.px.toFixed(2)}
+                  </span>
+                </div>
+                <div
+                  class="font-mono text-[11px]"
+                  style="color: {row.chg > 0
+                    ? 'var(--success)'
+                    : row.chg < 0
+                      ? '#dc2626'
+                      : 'var(--muted)'}"
+                >
+                  {row.chg > 0 ? '+' : ''}{row.chg.toFixed(2)}
+                </div>
+              </div>
+            {/each}
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero preview card -->
+      <div
+        class="relative rounded-2xl p-5 sm:p-7"
+        style="background: var(--card); border: 1px solid var(--border); box-shadow: var(--shadow-hero)"
+      >
+        <div class="flex justify-between items-center mb-4.5">
+          <span class="font-mono text-[11px] text-amber-700">// live preview</span>
+          <span
+            class="font-mono text-[10px] text-amber-800 py-0.5 px-2 rounded-full"
+            style="background: var(--accent)"
+          >
+            DEMO
+          </span>
+        </div>
+        <div class="font-mono text-xs" style="color: var(--muted)">portfolio.value →</div>
+        <div
+          class="font-display font-bold tabular-nums text-amber-950 tracking-tight text-4xl sm:text-5xl"
+        >
+          48.720 <span class="text-lg sm:text-[22px] text-amber-600">EUR</span>
+        </div>
+        <div class="h-px my-4.5" style="background: var(--border)"></div>
+        <div class="font-mono text-xs" style="color: var(--muted)">portfolio.value.in_beer →</div>
+        <div
+          class="font-display font-bold tabular-nums text-amber-700 tracking-[-0.035em]"
+          style="font-size: clamp(40px, 8vw, 64px)"
+        >
+          44.291 🍺
+        </div>
+        <div class="mt-3.5 flex gap-1.5 flex-wrap">
+          {#each ['🍺 Hopfen-Held', '🌅 121× Jahre Feierabend', '🎪 9× Oktoberfest', '🍻 7.382 Sixpacks'] as pill (pill)}
+            <span
+              class="font-mono text-[11px] py-1 px-2 rounded text-amber-800"
+              style="background: var(--accent); border: 1px solid var(--border)"
+            >
+              {pill}
+            </span>
+          {/each}
+        </div>
+      </div>
+    </div>
+
+    <!-- how it works -->
+    <div class="mt-[70px]">
+      <div class="font-mono text-[11px] text-amber-700 tracking-widest mb-3.5">
+        // {$t.howItWorks}
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {#each [{ n: '01', title: $t.step01Title, body: $t.step01Body }, { n: '02', title: $t.step02Title, body: $t.step02Body }, { n: '03', title: $t.step03Title, body: $t.step03Body }] as step (step.n)}
+          <div class="bier-card p-5.5 relative">
+            <div class="font-mono font-bold text-[40px] leading-none tracking-tight text-amber-300">
+              {step.n}
+            </div>
+            <div class="font-display font-bold text-lg mt-2">{step.title}</div>
+            <div class="text-[13px] leading-relaxed mt-1" style="color: var(--muted)">
+              {step.body}
+            </div>
+          </div>
+        {/each}
+      </div>
+    </div>
+
+    <!-- value props -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-7">
+      {#each [{ emoji: '🍺', title: $t.featureLiveTitle, body: $t.featureLiveBody }, { emoji: '🏆', title: $t.featureBadgesTitle, body: $t.featureBadgesBody }, { emoji: '🔒', title: $t.featureSecurityTitle, body: $t.featureSecurityBody }] as card (card.emoji)}
+        <div class="bier-card p-5.5">
+          <div class="text-[28px] mb-2.5">{card.emoji}</div>
+          <div class="font-display font-bold text-lg mb-1.5">{card.title}</div>
+          <div class="text-[13px] leading-relaxed" style="color: var(--muted)">{card.body}</div>
+        </div>
+      {/each}
+    </div>
+
+    <!-- legal bar -->
     <div
-      class="inline-flex items-center gap-1.5 bg-amber-100 border border-amber-300 text-amber-800 text-xs font-medium px-3 py-1 rounded-full mb-4"
+      class="mt-15 px-5.5 py-4.5 rounded-[10px]"
+      style="background: var(--accent); border: 1px dashed var(--accent-hover)"
     >
-      <span>🍻</span>
-      <span
-        >{$locale === 'de'
-          ? 'Ein Community-Spassprojekt — nicht von Parqet'
-          : 'A community fun project — not by Parqet'}</span
-      >
+      <div class="font-mono text-[10px] text-amber-800 tracking-widest mb-1.5">
+        {$t.eyebrowLegalDisclaimer}
+      </div>
+      <div class="text-xs text-amber-900 leading-relaxed">
+        {$locale === 'de'
+          ? 'Dieses Projekt ist ein unabhängiges, community-getriebenes Tool. Es steht in keiner geschäftlichen Beziehung zu Parqet Fintech GmbH oder den genannten Brauereien, Cafés oder Marken.'
+          : 'This project is an independent, community-driven tool. It is not affiliated with Parqet Fintech GmbH or any of the mentioned breweries, cafés or brands.'}
+      </div>
     </div>
 
-    <p
-      class="text-xl text-amber-700 mb-2 h-8 transition-all duration-300 {visible
-        ? 'opacity-100 translate-y-0'
-        : 'opacity-0 -translate-y-2'}"
-    >
-      {currentTagline}
-    </p>
-
-    <p class="text-amber-600 mb-8">{$t.landingDescription}</p>
-
-    <a href="/api/auth/login" class="connect-with-parqet connect-with-parqet--xl">
-      <img
-        src="https://developer.parqet.com/img/parqet-icon-trans.svg"
-        alt=""
-        aria-hidden="true"
-        class="connect-with-parqet__icon"
-      />
-      {$t.connectButton}
-    </a>
-
-    <p class="text-sm text-amber-500 mt-6">{$t.readOnly}</p>
-
+    <!-- footer -->
     <div
-      class="mt-8 p-4 bg-white/60 border border-amber-200 rounded-xl text-left text-xs text-amber-700 space-y-2"
+      class="mt-7 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs"
+      style="color: var(--muted)"
     >
-      <p class="font-semibold text-amber-800">
-        {$locale === 'de' ? 'Rechtlicher Hinweis' : 'Legal notice'}
-      </p>
-      <p>
-        {$locale === 'de'
-          ? 'Dieses Projekt ist ein unabhängiges, community-getriebenes Tool. Es steht in keiner geschäftlichen, rechtlichen oder sonstigen offiziellen Beziehung zu den nachfolgend genannten Unternehmen und wird von ihnen weder unterstützt, gesponsert, autorisiert noch in anderer Weise gefördert:'
-          : 'This project is an independent, community-driven tool. It is not affiliated with, endorsed, sponsored, or authorized by any of the entities listed below, nor is there any commercial, legal, or other official relationship:'}
-      </p>
-      <ul class="list-disc list-inside space-y-0.5 text-amber-600">
-        <li>
-          {$locale === 'de'
-            ? 'der Parqet Fintech GmbH oder deren Tochtergesellschaften'
-            : 'Parqet Fintech GmbH or any of its subsidiaries'}
-        </li>
-        <li>
-          {$locale === 'de'
-            ? 'den genannten Brauereien, Cafés oder Getränkemarken'
-            : 'any of the mentioned breweries, cafés or beverage brands'}
-        </li>
-      </ul>
-      <p class="text-amber-500">
-        {$locale === 'de'
-          ? 'Alle genannten Marken-, Produkt- und Firmennamen sind Eigentum ihrer jeweiligen Inhaber. Ihre Nennung erfolgt ausschliesslich zu beschreibenden und illustrativen Zwecken (nominative Nutzung) und begründet keine geschäftliche Verbindung.'
-          : 'All trademarks, product names, and company names are the property of their respective owners. Their mention is solely for descriptive and illustrative purposes (nominative fair use) and does not imply any commercial affiliation.'}
-      </p>
+      <div class="font-mono text-center sm:text-left">
+        © 2026 · parqet.beer · Not affiliated with Parqet Fintech GmbH
+      </div>
+      <div class="flex gap-3.5 shrink-0">
+        <a
+          href="/privacy"
+          class="text-amber-700 no-underline hover:text-amber-900 transition-colors">{$t.privacy}</a
+        >
+        <a
+          href="https://github.com/sbaerlocher/parqet.beer"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-amber-700 no-underline hover:text-amber-900 transition-colors">GitHub ↗</a
+        >
+      </div>
     </div>
   </div>
-
-  <footer class="mt-12 text-center text-xs text-amber-400 space-y-1 px-4">
-    <p>{$t.disclaimer1}</p>
-    <p>{$t.disclaimer2}</p>
-    <p>{$t.disclaimer3}</p>
-    <div class="flex items-center justify-center gap-3 pt-1 text-amber-300">
-      <a href="/privacy" class="hover:text-amber-500 transition-colors"
-        >{$locale === 'de' ? 'Datenschutz' : 'Privacy'}</a
-      >
-      <span>·</span>
-      <a
-        href="https://www.parqet.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="hover:text-amber-500 transition-colors">Parqet</a
-      >
-      <span>·</span>
-      <a
-        href="https://github.com/sbaerlocher/parqet.beer"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="hover:text-amber-500 transition-colors">GitHub</a
-      >
-      <span>·</span>
-      <span>{$locale === 'de' ? 'Gebaut mit' : 'Built with'} 🍺</span>
-    </div>
-  </footer>
 </div>
-
-<style>
-  .connect-with-parqet {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5em;
-    background-color: #009991;
-    color: white;
-    text-decoration: none;
-    cursor: pointer;
-    font-weight: 600;
-    white-space: nowrap;
-    border-radius: 0.375rem;
-    border: none;
-    transition: background-color 0.15s;
-  }
-
-  .connect-with-parqet:hover {
-    background-color: #5bcec2;
-  }
-
-  .connect-with-parqet:focus-visible {
-    outline: 2px solid #009991;
-    outline-offset: 2px;
-  }
-
-  .connect-with-parqet--xl {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-  }
-
-  .connect-with-parqet__icon {
-    width: 1.6em;
-    height: 1.6em;
-    margin-block: -0.25em;
-    flex-shrink: 0;
-  }
-</style>

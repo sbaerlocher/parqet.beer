@@ -1,39 +1,96 @@
+// SPDX-License-Identifier: MIT
 export type Locale = 'de' | 'en';
 
 export const translations = {
   de: {
     // Landing
     tagline: 'Dein Portfolio in Bier umgerechnet.',
-    landingDescription:
-      'Verbinde dein Parqet-Konto und erfahre, wie viele Bier, Kaffee oder Smoothies dein Portfolio wert ist.',
     connectButton: 'Mit Parqet verbinden',
     readOnly: 'Read-only Zugriff. Wir können nichts an deinem Portfolio ändern.',
-    funProject: 'Ein Spass-Projekt. Keine Anlageberatung.',
 
     // Dashboard
     logout: 'Abmelden',
     loading: 'Lade Portfolio...',
+    loadingMessages: [
+      'Dein Bier wird gezapft...',
+      'Fass wird angestochen...',
+      'Schaum setzt sich...',
+      'Bestellung wird zubereitet...',
+      'Braumeister rechnet nach...',
+      'Bierdeckel wird beschrieben...',
+      'Kühlschrank wird geöffnet...',
+      'Kronkorken fliegt...',
+    ],
     back: 'Zurück',
     yourPortfolio: 'Dein Portfolio',
     allPortfolios: 'Alle Portfolios',
     portfoliosOf: (selected: number, total: number) => `${selected} von ${total} Portfolios`,
-    thatsEquivalentTo: 'Das sind',
-    allVarieties: (category: string) => `Alle ${category}-Sorten`,
     perDay: 'pro Tag',
     perWeek: 'pro Woche',
     perMonth: 'pro Monat',
     perYear: 'pro Jahr',
-    funStatsLabel: (name: string) => `${name} pro Zeiteinheit, ein ganzes Jahr lang`,
 
     // Categories
     beer: 'Bier',
     coffee: 'Kaffee',
     smoothie: 'Smoothie',
 
+    // Category intros
+    catIntroBeer: 'Prost!',
+    catIntroCoffee: 'Lieber Kaffee?',
+    catIntroSmoothie: 'Oder doch etwas Gesundes?',
+
+    // Landing
+    heroEyebrow: 'Die einzige Kennzahl, die zählt',
+    marketsOpen: 'Märkte offen',
+    howItWorks: 'So funktionierts',
+    step01Title: 'Parqet verbinden',
+    step01Body: 'OAuth 2.0 mit PKCE. Wir bekommen read-only Zugriff — mehr nicht.',
+    step02Title: 'Depot wird gezählt',
+    step02Body: 'Wert durch Bierpreis. Fertig. Keine Magie, keine Datenkrake.',
+    step03Title: 'Bier-Status sichern',
+    step03Body: '„Hopfen-Held" auf der Visitenkarte? Nur hier möglich.',
+    featureLiveTitle: 'Live-Umrechnung',
+    featureLiveBody: '31 Biere, 10 Kaffees, 8 Smoothies. EUR/CHF in Echtzeit.',
+    featureBadgesTitle: 'Milestone Badges',
+    featureBadgesBody: 'Stammgast, Hopfen-Held, Bierkönig. Vom Feierabend zur Legende.',
+    featureSecurityTitle: 'Read-only · PKCE',
+    featureSecurityBody: 'OAuth 2.0 mit PKCE. Wir sehen nur, was du siehst.',
+    privacy: 'Datenschutz',
+
+    // Dashboard eyebrows
+    eyebrowPortfolioValue: 'Portfoliowert',
+    eyebrowFillLevel: 'Füllstand',
+    eyebrowRunRate: 'Laufende Rate',
+    eyebrowRankStatus: 'Dein Rang',
+    eyebrowBeverageOfDay: 'Getränk des Tages',
+    eyebrowFunComparisons: 'Lustige Vergleiche',
+    eyebrowBeverageTable: 'Alle Sorten',
+    eyebrowLegalDisclaimer: 'Rechtlicher Hinweis',
+    eyebrowBeerIndex: 'Bier-Index · Live',
+
+    // Dashboard extras
+    asOfNow: 'stand jetzt',
+    noRank: 'Noch kein Rang.',
+    allVarieties: 'Alle Sorten',
+    dividendsFreeBeer: 'Deine Dividenden = Freibier',
+    dividendsOnTab: 'auf Kosten deiner Aktien',
+    noFreeBeer: 'Noch kein Freibier',
+    noFreeBeerHint: 'Sobald Dividenden eintrudeln, gibt\u2019s hier die Rechnung.',
+    pricesWrong: 'Preise stimmen nicht? Jeder kann sie auf ',
+    pricesWrongSuffix: ' anpassen!',
+    shareLabel: 'TEILEN',
+
+    // Components
+    units: 'Stück',
+    newRecommendation: "Morgen gibt's eine neue Empfehlung",
+    yourDividends: 'Deine Dividenden',
+    dividendsSubtitle: 'Ausschüttungen der letzten 12 Monate',
+    onTheHouse: 'gratis dazu',
+    maxLevelReached: 'Höchstes Level erreicht!',
+
     // Disclaimer
     disclaimer1: 'Ein Spass-Projekt. Keine Anlageberatung. Alle Angaben ohne Gewähr.',
-    disclaimer2:
-      'Preise basieren auf Supermarkt- und Café-Durchschnittspreisen. Wechselkurse sind Näherungswerte. Preise stimmen nicht? Jeder kann sie auf GitHub anpassen!',
     disclaimer3: 'parqet.beer ist kein offizielles Produkt von Parqet.',
 
     // Error page
@@ -55,8 +112,7 @@ export const translations = {
     shareGenerating: 'Generiere...',
     shareAction: 'Teilen',
     shareCancel: 'Abbrechen',
-    shareCardSubtitle: 'Mein Portfolio umgerechnet',
-    shareCardPortfolioValue: (value: string) => `Portfoliowert: ${value}`,
+    shareCardEyebrow: 'PORTFOLIOWERT',
     shareCardDisclaimer: 'Keine Anlageberatung',
     shareTitle: (count: string, beverageName: string, emoji: string) =>
       `${count} ${beverageName} ${emoji} — parqet.beer`,
@@ -67,36 +123,92 @@ export const translations = {
   en: {
     // Landing
     tagline: 'Your portfolio converted into beer.',
-    landingDescription:
-      'Connect your Parqet account and find out how many beers, coffees or smoothies your portfolio is worth.',
     connectButton: 'Connect with Parqet',
     readOnly: "Read-only access. We can't change anything in your portfolio.",
-    funProject: 'A fun project. Not financial advice.',
 
     // Dashboard
     logout: 'Log out',
     loading: 'Loading portfolio...',
+    loadingMessages: [
+      'Your beer is being poured...',
+      'Tapping the keg...',
+      'Letting the foam settle...',
+      'Preparing your order...',
+      'Brewmaster is calculating...',
+      'Scribbling on the beer mat...',
+      'Opening the fridge...',
+      'Bottle cap is flying...',
+    ],
     back: 'Back',
     yourPortfolio: 'Your Portfolio',
     allPortfolios: 'All Portfolios',
     portfoliosOf: (selected: number, total: number) => `${selected} of ${total} portfolios`,
-    thatsEquivalentTo: "That's",
-    allVarieties: (category: string) => `All ${category} varieties`,
     perDay: 'per day',
     perWeek: 'per week',
     perMonth: 'per month',
     perYear: 'per year',
-    funStatsLabel: (name: string) => `${name} per time unit, for a whole year`,
 
     // Categories
     beer: 'Beer',
     coffee: 'Coffee',
     smoothie: 'Smoothie',
 
+    // Category intros
+    catIntroBeer: 'Cheers!',
+    catIntroCoffee: 'More of a coffee person?',
+    catIntroSmoothie: 'Or something healthy?',
+
+    // Landing
+    heroEyebrow: 'The only metric that matters',
+    marketsOpen: 'markets open',
+    howItWorks: 'How it works',
+    step01Title: 'Connect Parqet',
+    step01Body: 'OAuth 2.0 with PKCE. We get read-only access — nothing more.',
+    step02Title: 'Portfolio is counted',
+    step02Body: 'Value divided by beer price. Done. No magic, no data mining.',
+    step03Title: 'Claim your status',
+    step03Body: '"Hops Hero" on the business card? Only here.',
+    featureLiveTitle: 'Live conversion',
+    featureLiveBody: '31 beers, 10 coffees, 8 smoothies. EUR/CHF in real time.',
+    featureBadgesTitle: 'Milestone badges',
+    featureBadgesBody: 'Regular, Hops Hero, Beer Royalty. From after-work to legend.',
+    featureSecurityTitle: 'Read-only · PKCE',
+    featureSecurityBody: 'OAuth 2.0 with PKCE. We only see what you see.',
+    privacy: 'Privacy',
+
+    // Dashboard eyebrows
+    eyebrowPortfolioValue: 'Portfolio value',
+    eyebrowFillLevel: 'Fill level',
+    eyebrowRunRate: 'Run rate',
+    eyebrowRankStatus: 'Your rank',
+    eyebrowBeverageOfDay: 'Beverage of the day',
+    eyebrowFunComparisons: 'Fun comparisons',
+    eyebrowBeverageTable: 'All varieties',
+    eyebrowLegalDisclaimer: 'Legal disclaimer',
+    eyebrowBeerIndex: 'Beer Index · Live',
+
+    // Dashboard extras
+    asOfNow: 'as of now',
+    noRank: 'No rank yet.',
+    allVarieties: 'All varieties',
+    dividendsFreeBeer: 'Your dividends = free beer',
+    dividendsOnTab: "on your stocks' tab",
+    noFreeBeer: 'No free beer yet',
+    noFreeBeerHint: 'Once dividends arrive, we\u2019ll post the tab here.',
+    pricesWrong: 'Prices wrong? Anyone can update them on ',
+    pricesWrongSuffix: '!',
+    shareLabel: 'SHARE',
+
+    // Components
+    units: 'units',
+    newRecommendation: 'New recommendation tomorrow',
+    yourDividends: 'Your dividends',
+    dividendsSubtitle: 'Distributions over the last 12 months',
+    onTheHouse: 'on the house',
+    maxLevelReached: 'Max level reached!',
+
     // Disclaimer
     disclaimer1: 'A fun project. Not financial advice. No guarantees.',
-    disclaimer2:
-      'Prices based on average supermarket and café prices. Exchange rates are approximations. Prices wrong? Anyone can update them on GitHub!',
     disclaimer3: 'parqet.beer is not an official Parqet product.',
 
     // Error page
@@ -118,8 +230,7 @@ export const translations = {
     shareGenerating: 'Generating...',
     shareAction: 'Share',
     shareCancel: 'Cancel',
-    shareCardSubtitle: 'My portfolio converted',
-    shareCardPortfolioValue: (value: string) => `Portfolio value: ${value}`,
+    shareCardEyebrow: 'PORTFOLIO VALUE',
     shareCardDisclaimer: 'Not financial advice',
     shareTitle: (count: string, beverageName: string, emoji: string) =>
       `${count} ${beverageName} ${emoji} — parqet.beer`,

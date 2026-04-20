@@ -17,7 +17,7 @@ export default defineConfig({
     exclude: ['node_modules/**', 'tests/e2e/**'],
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json-summary', 'html'],
+      reporter: ['text', 'json-summary', 'html', 'lcov'],
       include: ['src/lib/**/*.ts'],
       exclude: ['src/lib/**/*.test.ts', 'src/lib/data/**'],
       // Pragmatic floors for the initial OSS release: the suite covers

@@ -1,3 +1,63 @@
+/* --- Local font faces --- */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Inter-Variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/SpaceGrotesk-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/SpaceGrotesk-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/SpaceGrotesk-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/SpaceGrotesk-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/JetBrainsMono-600.woff2') format('woff2');
+}
+
 @import 'tailwindcss';
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -18,59 +78,109 @@
   --color-slate-800: #1e293b;
   --color-gold-400: #c9981a;
   --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
-/* Dark mode: stone-based neutral surfaces, amber stays as brand accent.
- * We can't invert the amber CSS variables because the same shade (e.g.
- * amber-600) is used as both a branded fill (`bg-amber-600` header) and a
- * text accent (`text-amber-600` labels) — those need different colors in
- * dark mode. So we override per-class instead. */
+/* --- Bierdeckel design tokens --- */
+:root {
+  --paper: #faf5ea;
+  --card: #fffdf7;
+  --ink: #2b1d0e;
+  --ink-soft: #4a3418;
+  --border: #e9d9b1;
+  --muted: #8a6d3b;
+  --accent: #fef3c7;
+  --accent-hover: #fde68a;
+  --highlight: #92400e;
+  --highlight-soft: #b45309;
+  --glass-stroke: #b45309;
+  --glass-bg: rgba(255, 255, 255, 0.3);
+  --steam: #d6d3d1;
+  --success: #16a34a;
+  --flash-up: rgba(22, 163, 74, 0.2);
+  --flash-down: rgba(220, 38, 38, 0.2);
+  --header-bg: rgba(255, 253, 247, 0.92);
+  --gradient-hero-from: #fffdf7;
+  --gradient-hero-to: #fef3c7;
+  --bar-bg: rgba(252, 211, 77, 0.15);
+  --parqet: #009991;
+  --parqet-dark: #007a74;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 1px 0 rgba(120, 53, 15, 0.06), 0 1px 2px rgba(120, 53, 15, 0.08);
+  --shadow-md: 0 4px 14px rgba(120, 53, 15, 0.08), 0 1px 2px rgba(120, 53, 15, 0.06);
+  --shadow-hero: 0 20px 50px rgba(120, 53, 15, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  overflow-x: hidden;
+}
+
+body {
+  font-family:
+    'Space Grotesk',
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Dark mode */
 .dark {
   color-scheme: dark;
-  background-color: #0c0a09;
-  color: #e7e5e4;
+  --paper: #0c0a09;
+  --card: #1c1917;
+  --ink: #e7e5e4;
+  --ink-soft: #d6d3d1;
+  --border: #292524;
+  --muted: #a8a29e;
+  --accent: #292524;
+  --accent-hover: #44403c;
+  --highlight: #fef3c7;
+  --highlight-soft: #fde68a;
+  --glass-stroke: #78716c;
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --steam: #57534e;
+  --success: #22c55e;
+  --flash-up: rgba(34, 197, 94, 0.15);
+  --flash-down: rgba(248, 113, 113, 0.15);
+  --header-bg: rgba(28, 25, 23, 0.92);
+  --gradient-hero-from: #1c1917;
+  --gradient-hero-to: #292524;
+  --bar-bg: rgba(180, 83, 9, 0.2);
+  --shadow-sm: 0 1px 0 rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-hero: 0 20px 50px rgba(0, 0, 0, 0.4);
+  background-color: var(--paper);
+  color: var(--ink);
 }
 
-/* --- Page + card surfaces --- */
+/* Dark mode Tailwind overrides */
 .dark .bg-amber-50 {
-  background-color: #0c0a09; /* stone-950 — page background */
+  background-color: #0c0a09;
 }
 .dark .bg-amber-100 {
-  background-color: #1c1917; /* stone-900 — subtle raised surface */
-}
-.dark .bg-white {
-  background-color: #1c1917; /* stone-900 — card */
-}
-.dark .bg-white\/60 {
-  background-color: rgba(28, 25, 23, 0.6);
-}
-.dark .bg-white\/10 {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-.dark .hover\:bg-amber-50:hover {
   background-color: #1c1917;
 }
-.dark .hover\:bg-amber-100:hover {
-  background-color: #292524; /* stone-800 */
-}
-
-/* --- Branded amber fills: stay dark amber, never bright yellow --- */
-.dark .bg-amber-500 {
-  background-color: #b45309; /* amber-700 */
+.dark .bg-white {
+  background-color: #1c1917;
 }
 .dark .bg-amber-600 {
-  background-color: #92400e; /* amber-800 — branded buttons / header */
+  background-color: #92400e;
 }
-.dark .hover\:bg-amber-700:hover {
-  background-color: #78350f; /* amber-900 */
-}
-
-/* --- Amber text accents: lift toward the light end --- */
 .dark .text-amber-400 {
   color: #fbbf24;
 }
 .dark .text-amber-500 {
-  color: #fcd34d;
+  color: #f59e0b;
 }
 .dark .text-amber-600 {
   color: #fcd34d;
@@ -82,18 +192,9 @@
 .dark .text-amber-900 {
   color: #fef3c7;
 }
-/* text-amber-100/200/300 already sit on dark amber bg (header) — unchanged */
-.dark .hover\:text-amber-500:hover,
-.dark .hover\:text-amber-600:hover {
-  color: #fde68a;
+.dark .text-amber-950 {
+  color: #fffbeb;
 }
-.dark .hover\:text-amber-700:hover,
-.dark .hover\:text-amber-800:hover,
-.dark .hover\:text-amber-900:hover {
-  color: #fef3c7;
-}
-
-/* --- Borders: neutral stone so cards don't glow amber --- */
 .dark .border-amber-200 {
   border-color: #292524;
 }
@@ -103,62 +204,209 @@
 .dark .border-amber-400 {
   border-color: #57534e;
 }
-
-/* --- Slate text (primary values) needs to invert --- */
 .dark .text-slate-700 {
   color: #e2e8f0;
 }
 .dark .text-slate-800 {
   color: #f1f5f9;
 }
-
-/* --- Gradients --- */
-.dark .from-amber-100 {
-  --tw-gradient-from: #1c1917;
+.dark .text-red-600 {
+  color: #fca5a5;
 }
-.dark .from-amber-400 {
-  --tw-gradient-from: #92400e;
+.dark .text-red-700 {
+  color: #fca5a5;
 }
-.dark .from-amber-600 {
-  --tw-gradient-from: #78350f; /* amber-900 */
+.dark .bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.2);
 }
-.dark .to-amber-50 {
-  --tw-gradient-to: #0c0a09;
+.dark .border-red-200 {
+  border-color: #7f1d1d;
 }
-.dark .to-amber-600 {
-  --tw-gradient-to: #78350f;
-}
-.dark .to-amber-700 {
-  --tw-gradient-to: #451a03; /* amber-950 — header gradient tail */
-}
-.dark .from-green-50 {
-  --tw-gradient-from: #052e16;
-}
-
-/* --- Green (dividends) — keep readable in dark --- */
-.dark .bg-green-50 {
-  background-color: #052e16;
-}
-.dark .text-green-700,
-.dark .text-green-800 {
-  color: #86efac;
-}
-.dark .text-green-500,
-.dark .text-green-600,
 .dark .text-green-400 {
   color: #4ade80;
+}
+.dark .text-green-500 {
+  color: #22c55e;
+}
+.dark .text-green-600 {
+  color: #4ade80;
+}
+.dark .text-green-700 {
+  color: #86efac;
+}
+.dark .text-green-800 {
+  color: #bbf7d0;
 }
 .dark .border-green-300 {
   border-color: #14532d;
 }
-
-/* --- Red errors remain readable --- */
-.dark .text-red-600 {
-  color: #fca5a5;
+.dark .bg-amber-500 {
+  background-color: #b45309;
+}
+.dark .bg-amber-100 {
+  background-color: #1c1917;
+}
+.dark .hover\:bg-amber-100:hover {
+  background-color: #292524;
+}
+.dark .hover\:bg-amber-50:hover {
+  background-color: #1c1917;
 }
 
+/* --- Utility classes --- */
 .font-display {
   font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+  font-feature-settings: 'ss01';
+}
+
+.num-tab {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Bierdeckel card */
+.bier-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 0 0 1px rgba(120, 53, 15, 0.02);
+}
+
+/* Bierdeckel eyebrow label */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--highlight);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 150ms ease;
+  text-decoration: none;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--parqet);
+  color: white;
+  border-color: var(--parqet);
+}
+.btn-primary:hover {
+  background: var(--parqet-dark);
+  border-color: var(--parqet-dark);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--highlight);
+}
+.btn-ghost:hover {
+  background: rgba(180, 83, 9, 0.08);
+}
+.dark .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-outline {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--highlight);
+}
+.btn-outline:hover {
+  border-color: var(--accent-hover);
+}
+
+/* Focus */
+:focus-visible {
+  outline: 2px solid var(--parqet);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Beer glass animations */
+@keyframes sway {
+  0%,
+  100% {
+    transform: translateX(-2%) scaleY(1);
+  }
+  50% {
+    transform: translateX(2%) scaleY(1.02);
+  }
+}
+@keyframes bubble {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-180px) scale(1.1);
+    opacity: 0;
+  }
+}
+@keyframes foam-wobble {
+  0%,
+  100% {
+    transform: translateX(-2%);
+  }
+  50% {
+    transform: translateX(2%);
+  }
+}
+
+/* Ticker pulse for live indicator */
+@keyframes ticker-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.15);
+  }
+}
+.ticker-pulse {
+  animation: ticker-pulse 1.6s infinite;
+}
+
+/* Ticker grid borders — 2-col mobile, 4-col sm+ */
+.ticker-grid > * {
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.ticker-grid > *:nth-child(2n) {
+  border-right: none;
+}
+.ticker-grid > *:nth-child(n + 3) {
+  border-bottom: none;
+}
+@media (min-width: 640px) {
+  .ticker-grid > * {
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+  }
+  .ticker-grid > *:last-child {
+    border-right: none;
+  }
 }
 
 .scrollbar-hide {

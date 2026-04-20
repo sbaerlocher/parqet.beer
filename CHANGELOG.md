@@ -4,7 +4,56 @@ All notable changes documented here. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-20
+
 ### Added
+
+- Animated SVG glass components (`BeerGlass`, `CoffeeGlass`, `SmoothieGlass`)
+  with Svelte 5 `Tween`-driven fill level that interpolates between badge tiers.
+- Expanded milestone badges from 4–6 to 12 per category with finer steps
+  under 100k and larger steps above (100 → 500 → 1k → … → 1M).
+- Mobile-optimised dashboard and landing page: responsive padding, card layout
+  for beverage table, horizontal scroll for portfolio buttons, 2×2 ticker grid,
+  hero number with `clamp()`.
+- Rank badge pill rendered on the canvas share card image.
+- Beverage category selection persisted to `localStorage`.
+- `RotatingTagline` component for the landing page.
+- Local self-hosted fonts (Inter, Space Grotesk, JetBrains Mono) with
+  `static/fonts/LICENSE` (SIL OFL 1.1).
+- ~30 new i18n keys covering all previously inline-hardcoded strings across
+  landing, dashboard, share dialog, and component files.
+
+### Changed
+
+- All inline `$locale === 'de' ? … : …` checks replaced with `$t.*` keys
+  from the centralised i18n store (except tagline array selection and
+  decorative eyebrow labels).
+- Privacy page refactored from per-sentence ternaries to clean
+  `{#if $locale === 'de'}` / `{:else}` content blocks.
+- `localStorage` access made SSR-safe for Cloudflare Workers: guard changed
+  from `typeof localStorage` to `typeof window`, reads moved into `$effect`
+  with loaded flags to prevent hydration mismatches.
+- Share preview dialog centred and enlarged (`max-w-2xl`, fixed inset with
+  flex centering).
+- Logout button shows icon on mobile instead of text to save width.
+
+### Removed
+
+- Google Fonts CDN preconnect and stylesheet links (fonts already served
+  locally).
+- 8 unused i18n translation keys (`landingDescription`, `funProject`,
+  `thatsEquivalentTo`, `allVarieties`, `funStatsLabel`, `disclaimer2`,
+  `shareCardSubtitle`, `shareCardPortfolioValue`).
+
+### Fixed
+
+- Glass fill level now responds to portfolio value changes instead of
+  staying at a fixed height.
+- Badge display no longer shows "—" when the maximum badge level is reached.
+- Horizontal overflow on mobile caused by wide elements.
+- FOUC (flash of old design) from redundant Google Fonts CDN.
+- `localStorage` SSR crash on Cloudflare Workers.
+- SSR/CSR hydration mismatch for `showValue` and `favorites` state.
 
 - `scripts/setup-fork.sh` bootstrap flow for fresh forks (KV namespaces,
   SESSION_SECRET_DEV, next-step checklist).
@@ -70,6 +119,13 @@ All notable changes documented here. Format: [Keep a Changelog](https://keepacha
   the request cookie on the server, not just on client hydration.
 - E2E health smoke test: contract matches the handler's
   `{ status, timestamp }` response shape.
+- `"license": "MIT"` field in `package.json`.
+- `.gitattributes` with `* text=auto` for line-ending normalisation.
+- SPDX-License-Identifier headers (`MIT`) in all `.ts` and `.svelte`
+  source files.
+- Consolidated duplicate `Beverage` type: single source of truth in
+  `src/lib/data/schema.ts` (Zod inferred), re-exported from
+  `src/lib/data/beverages.ts`.
 
 ## [0.1.0] - 2026-04-13
 
