@@ -6,11 +6,12 @@ import {
   setSessionCookie,
   storeTokens,
   resolveSessionSecret,
+  resolveOrigin,
   OAUTH_STATE_COOKIE,
   OAUTH_VERIFIER_COOKIE,
 } from '$lib/server/auth';
 
-export const GET: RequestHandler = async ({ url, cookies, platform }) => {
+export const GET: RequestHandler = async ({ url, cookies, platform, request }) => {
   const env = platform!.env;
 
   const code = url.searchParams.get('code');
@@ -30,7 +31,7 @@ export const GET: RequestHandler = async ({ url, cookies, platform }) => {
     error(400, 'Invalid state parameter');
   }
 
-  const redirectUri = `${url.origin}/api/auth/callback`;
+  const redirectUri = `${resolveOrigin(url, request)}/api/auth/callback`;
 
   // Exchange code for tokens
   const tokens = await exchangeCodeForTokens(code, redirectUri, env, codeVerifier);

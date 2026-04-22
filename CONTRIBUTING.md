@@ -21,6 +21,32 @@ By participating in this project you agree to abide by our
 
 ## Setup
 
+### With DDE (recommended)
+
+You will need:
+
+- **[DDE](https://dde.sh)** — Docker-based development environment
+
+Then:
+
+```bash
+cp .dev.vars.example .dev.vars   # fill in PARQET_CLIENT_ID and SESSION_SECRET
+dde project:up                   # https://parqet-beer.test
+```
+
+Other useful commands:
+
+```bash
+dde exec pnpm check        # TypeScript + svelte-check
+dde exec pnpm test         # Vitest
+dde exec pnpm test:e2e     # Playwright
+dde exec pnpm lint         # Prettier --check (CI enforced)
+dde exec pnpm format       # Prettier write
+dde exec pnpm build        # Build for Cloudflare Pages
+```
+
+### Without DDE
+
 You will need:
 
 - **Node.js** as pinned in [`.nvmrc`](./.nvmrc) (use `nvm use` or an

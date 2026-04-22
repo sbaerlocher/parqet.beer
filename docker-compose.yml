@@ -1,0 +1,23 @@
+---
+services:
+  worker:
+    image: node:24-slim
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules # anonymous volumes — run `dde project:down -v` to clear after lockfile changes
+      - /app/.svelte-kit
+      - /app/.pnpm-store
+    command: ['pnpm', 'dev', '--host', '0.0.0.0']
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.parqet-beer-worker.rule=Host(`parqet-beer.test`)'
+      - 'traefik.http.routers.parqet-beer-worker.tls=true'
+      - 'traefik.http.services.parqet-beer-worker.loadbalancer.server.port=5173'
+    env_file:
+      - .dev.vars
+
+networks:
+  default:
+    name: dde
+    external: true

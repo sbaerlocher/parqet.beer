@@ -56,6 +56,25 @@ Cloudflare KV
 
 ## Development
 
+### With DDE (recommended)
+
+```bash
+dde project:up                    # Start container (runs pnpm install via adapter)
+dde exec pnpm dev --host 0.0.0.0 # Dev server (already runs via docker-compose command)
+dde exec pnpm build               # Build for CF Pages
+dde exec pnpm preview             # Wrangler against .svelte-kit/cloudflare — requires build first
+dde exec pnpm check               # TypeScript + Svelte check
+dde exec pnpm check:watch         # svelte-check in watch mode
+dde exec pnpm test                # Vitest
+dde exec pnpm test:watch          # Vitest watch
+dde exec pnpm test:e2e            # Playwright
+dde exec pnpm lint                # Prettier --check (CI enforced)
+dde exec pnpm format              # Prettier
+dde exec pnpm generate:assets     # OG image / favicons from scripts/generate-assets.mjs
+```
+
+### Without DDE
+
 ```bash
 pnpm install
 pnpm dev              # Dev server on localhost:5173

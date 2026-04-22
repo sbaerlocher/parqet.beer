@@ -3,6 +3,7 @@ import {
   createSessionCookie,
   getUserIdFromCookie,
   resolveSessionSecret,
+  resolveOrigin,
   clearUserKv,
   storeTokens,
   getTokens,
@@ -83,6 +84,32 @@ describe('resolveSessionSecret', () => {
       SESSION_SECRET_DEV: '',
     } as unknown as App.Platform['env'];
     await expect(resolveSessionSecret(env)).rejects.toThrow('no secret');
+  });
+});
+
+describe('resolveOrigin', () => {
+  it('returns plain HTTP origin for localhost', () => {
+    const url = new URL('http://localhost:5173/api/auth/login');
+    expect(resolveOrigin(url)).toBe('http://localhost:5173');
+  });
+
+  it('returns HTTPS when X-Forwarded-Proto is https', () => {
+    const url = new URL('http://parqet-beer.test:5173/api/auth/login');
+    const request = new Request(url, {
+      headers: { 'x-forwarded-proto': 'https' },
+    });
+    expect(resolveOrigin(url, request)).toBe('https://parqet-beer.test:5173');
+  });
+
+  it('falls back to url.protocol when no request is provided', () => {
+    const url = new URL('https://parqet.beer/api/auth/login');
+    expect(resolveOrigin(url)).toBe('https://parqet.beer');
+  });
+
+  it('falls back to url.protocol when header is missing', () => {
+    const url = new URL('http://localhost:5173/api/auth/login');
+    const request = new Request(url);
+    expect(resolveOrigin(url, request)).toBe('http://localhost:5173');
   });
 });
 

@@ -2,9 +2,9 @@
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { generateCodeVerifier, generateCodeChallenge, generateState } from '$lib/server/pkce';
-import { OAUTH_STATE_COOKIE, OAUTH_VERIFIER_COOKIE } from '$lib/server/auth';
+import { OAUTH_STATE_COOKIE, OAUTH_VERIFIER_COOKIE, resolveOrigin } from '$lib/server/auth';
 
-export const GET: RequestHandler = async ({ platform, cookies, url }) => {
+export const GET: RequestHandler = async ({ platform, cookies, url, request }) => {
   const env = platform!.env;
 
   const codeVerifier = generateCodeVerifier();
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ platform, cookies, url }) => {
     path: '/',
   });
 
-  const redirectUri = `${url.origin}/api/auth/callback`;
+  const redirectUri = `${resolveOrigin(url, request)}/api/auth/callback`;
 
   const params = new URLSearchParams({
     response_type: 'code',
