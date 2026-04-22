@@ -3,10 +3,12 @@ import * as jose from 'jose';
 import { z } from 'zod';
 import type { Cookies } from '@sveltejs/kit';
 
-/** Resolve the public-facing origin. Behind Traefik (*.test) the internal
- *  connection is plain HTTP, but the client-facing side is always HTTPS. */
-export function resolveOrigin(url: URL): string {
-  return url.hostname.endsWith('.test') ? `https://${url.host}` : url.origin;
+/** Resolve the public-facing origin. Behind a TLS-terminating reverse proxy
+ *  (e.g. Traefik) the internal connection is plain HTTP, but the client-facing
+ *  side is HTTPS — reflected in the X-Forwarded-Proto header. */
+export function resolveOrigin(url: URL, request?: Request): string {
+  const proto = request?.headers.get('x-forwarded-proto') ?? url.protocol.replace(':', '');
+  return `${proto}://${url.host}`;
 }
 
 // `__Host-` prefix enforces Secure, no Domain, Path=/ — blocks sub-domain overwrites.

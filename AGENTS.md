@@ -79,10 +79,15 @@ dde exec pnpm generate:assets     # OG image / favicons from scripts/generate-as
 pnpm install
 pnpm dev              # Dev server on localhost:5173
 pnpm build            # Build for CF Pages
+pnpm preview          # Wrangler against .svelte-kit/cloudflare — requires `pnpm build` first
 pnpm check            # TypeScript + Svelte check
+pnpm check:watch      # svelte-check in watch mode
 pnpm test             # Vitest
-pnpm lint             # Prettier --check
+pnpm test:watch       # Vitest watch
+pnpm test:e2e         # Playwright
+pnpm lint             # Prettier --check (CI enforced)
 pnpm format           # Prettier
+pnpm generate:assets  # OG image / favicons from scripts/generate-assets.mjs
 ```
 
 ## Gotchas

@@ -11,7 +11,7 @@ import {
   OAUTH_VERIFIER_COOKIE,
 } from '$lib/server/auth';
 
-export const GET: RequestHandler = async ({ url, cookies, platform }) => {
+export const GET: RequestHandler = async ({ url, cookies, platform, request }) => {
   const env = platform!.env;
 
   const code = url.searchParams.get('code');
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async ({ url, cookies, platform }) => {
     error(400, 'Invalid state parameter');
   }
 
-  const redirectUri = `${resolveOrigin(url)}/api/auth/callback`;
+  const redirectUri = `${resolveOrigin(url, request)}/api/auth/callback`;
 
   // Exchange code for tokens
   const tokens = await exchangeCodeForTokens(code, redirectUri, env, codeVerifier);

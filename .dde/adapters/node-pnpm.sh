@@ -7,7 +7,7 @@ detect() {
 configure() {
     export CI=true
     corepack enable
-    corepack prepare pnpm@10.33.0 --activate
+    corepack prepare --activate
     pnpm install --frozen-lockfile --ignore-scripts
     for dir in /home/dde/.cache /app/node_modules; do
         [ -d "$dir" ] && chown -R dde:dde "$dir" 2>/dev/null || true
