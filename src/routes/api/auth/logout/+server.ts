@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: MIT
 import { redirect, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { clearSessionCookie, clearUserKv } from '$lib/server/auth';
+import { clearSessionCookie, clearUserKv, resolveOrigin } from '$lib/server/auth';
 
 export const POST: RequestHandler = async ({ cookies, platform, locals, request, url }) => {
   // Defence in depth on top of SvelteKit's built-in form-POST CSRF check.
   // Browsers send `Origin` on cross-origin POSTs, so mismatches are a clear
   // signal to block. If the header is absent we fall through — modern
   // browsers send it reliably for POST and SvelteKit's Content-Type guard
-  // still applies.
+  // still applies. Compare against `resolveOrigin` (not `url.origin`) so the
+  // check survives a TLS-terminating reverse proxy, where `url.protocol` is
+  // `http:` while the browser sent the request as `https:`.
   const origin = request.headers.get('origin');
-  if (origin && origin !== url.origin) {
+  if (origin && origin !== resolveOrigin(url, request)) {
     error(403, 'Forbidden');
   }
 

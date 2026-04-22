@@ -4,7 +4,14 @@ import type { RequestHandler } from './$types';
 import { generateCodeVerifier, generateCodeChallenge, generateState } from '$lib/server/pkce';
 import { OAUTH_STATE_COOKIE, OAUTH_VERIFIER_COOKIE, resolveOrigin } from '$lib/server/auth';
 
-export const GET: RequestHandler = async ({ platform, cookies, url, request }) => {
+export const GET: RequestHandler = async ({ platform, cookies, url, request, locals }) => {
+  // Already authenticated — skip the Parqet round-trip. Avoids burning a PKCE
+  // verifier, a rate-limit slot, and an authorize request just to land back
+  // where the user clicked from.
+  if (locals.session) {
+    redirect(302, '/dashboard');
+  }
+
   const env = platform!.env;
 
   const codeVerifier = generateCodeVerifier();

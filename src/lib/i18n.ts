@@ -6,6 +6,7 @@ export const translations = {
     // Landing
     tagline: 'Dein Portfolio in Bier umgerechnet.',
     connectButton: 'Mit Parqet verbinden',
+    openDashboardButton: 'Dashboard öffnen',
     readOnly: 'Read-only Zugriff. Wir können nichts an deinem Portfolio ändern.',
 
     // Dashboard
@@ -124,6 +125,7 @@ export const translations = {
     // Landing
     tagline: 'Your portfolio converted into beer.',
     connectButton: 'Connect with Parqet',
+    openDashboardButton: 'Open dashboard',
     readOnly: "Read-only access. We can't change anything in your portfolio.",
 
     // Dashboard

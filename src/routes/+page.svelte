@@ -1,10 +1,13 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
+  import { page } from '$app/state';
   import { t } from '$lib/stores/locale';
   import { locale } from '$lib/stores/locale';
   import LocaleToggle from '$lib/components/LocaleToggle.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
   import RotatingTagline from '$lib/components/RotatingTagline.svelte';
+
+  const authenticated = $derived(page.data.authenticated === true);
 
   // Live ticker state for R3 flash effect
   const tickerBase = [
@@ -100,7 +103,8 @@
 
         <div class="mt-8 flex gap-3 items-center flex-wrap">
           <a
-            href="/api/auth/login"
+            href={authenticated ? '/dashboard' : '/api/auth/login'}
+            data-testid="hero-cta"
             class="btn btn-primary"
             style="padding: 14px 22px; font-size: 15px; border-radius: 10px"
           >
@@ -110,7 +114,7 @@
               aria-hidden="true"
               style="width: 20px; height: 20px"
             />
-            {$t.connectButton} →
+            {authenticated ? $t.openDashboardButton : $t.connectButton} →
           </a>
           <span class="font-mono text-xs text-amber-700">
             🔒 {$t.readOnly}
