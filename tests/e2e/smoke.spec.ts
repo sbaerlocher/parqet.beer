@@ -4,11 +4,10 @@ test.describe('parqet.beer smoke', () => {
   test('landing page renders with connect button', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    // Target the CTA by its href, not its text — the footer also contains a
-    // "Parqet" link, and the CTA's label changes with locale ("Mit Parqet
-    // verbinden" / "Connect with Parqet"). The `/api/auth/login` href is the
-    // stable contract for this element.
-    await expect(page.locator('a[href="/api/auth/login"]')).toBeVisible();
+    // Target the CTA by `data-testid` — the href is dynamic (flips between
+    // `/api/auth/login` and `/dashboard` depending on session state) and the
+    // label varies by locale.
+    await expect(page.getByTestId('hero-cta')).toBeVisible();
   });
 
   test('landing page exposes OG meta tags', async ({ page }) => {

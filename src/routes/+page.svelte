@@ -7,7 +7,7 @@
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
   import RotatingTagline from '$lib/components/RotatingTagline.svelte';
 
-  const authenticated = $derived(page.data['authenticated'] === true);
+  const authenticated = $derived(page.data.authenticated === true);
 
   // Live ticker state for R3 flash effect
   const tickerBase = [
@@ -104,6 +104,7 @@
         <div class="mt-8 flex gap-3 items-center flex-wrap">
           <a
             href={authenticated ? '/dashboard' : '/api/auth/login'}
+            data-testid="hero-cta"
             class="btn btn-primary"
             style="padding: 14px 22px; font-size: 15px; border-radius: 10px"
           >

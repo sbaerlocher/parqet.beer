@@ -9,6 +9,11 @@ declare global {
       locale: 'de' | 'en';
     }
 
+    interface PageData {
+      locale?: 'de' | 'en';
+      authenticated?: boolean;
+    }
+
     interface Platform {
       env: {
         PARQET_KV: KVNamespace;
