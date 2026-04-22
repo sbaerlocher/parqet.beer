@@ -32,6 +32,27 @@ product.**
 
 ## Setup
 
+### With DDE (recommended)
+
+Prerequisites: [DDE](https://dde.sh).
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/sbaerlocher/parqet.beer.git
+cd parqet.beer
+
+# 2. Copy and fill in environment variables
+cp .dev.vars.example .dev.vars
+# Set PARQET_CLIENT_ID and SESSION_SECRET
+
+# 3. Start the project (installs dependencies automatically)
+dde project:up
+```
+
+Then open `https://parqet-beer.test` in your browser.
+
+### Without DDE
+
 Prerequisites: [Node.js](https://nodejs.org) (see `.nvmrc`), [pnpm](https://pnpm.io).
 
 ```bash
@@ -65,6 +86,18 @@ In production, secrets are set via the Cloudflare dashboard, not through
 `wrangler.jsonc`.
 
 ## Scripts
+
+With DDE, prefix commands with `dde exec`:
+
+```bash
+dde exec pnpm build            # Build for Cloudflare Pages
+dde exec pnpm check            # TypeScript + Svelte check
+dde exec pnpm test             # Vitest (unit tests)
+dde exec pnpm lint             # Prettier check
+dde exec pnpm format           # Prettier write
+```
+
+Without DDE:
 
 ```bash
 pnpm dev              # Vite dev server (localhost:5173)

@@ -3,6 +3,12 @@ import * as jose from 'jose';
 import { z } from 'zod';
 import type { Cookies } from '@sveltejs/kit';
 
+/** Resolve the public-facing origin. Behind Traefik (*.test) the internal
+ *  connection is plain HTTP, but the client-facing side is always HTTPS. */
+export function resolveOrigin(url: URL): string {
+  return url.hostname.endsWith('.test') ? `https://${url.host}` : url.origin;
+}
+
 // `__Host-` prefix enforces Secure, no Domain, Path=/ — blocks sub-domain overwrites.
 export const SESSION_COOKIE = '__Host-auth_session';
 export const OAUTH_STATE_COOKIE = '__Host-oauth_state';
