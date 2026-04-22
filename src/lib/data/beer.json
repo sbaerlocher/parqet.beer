@@ -119,6 +119,20 @@
     "country": "DE"
   },
   {
+    "name": "Gampert Bräu Förster Pils",
+    "size": "500ml",
+    "price": 1.5,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Kulmbacher Edelherb",
+    "size": "500ml",
+    "price": 1.09,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
     "name": "Appenzeller Quöllfrisch",
     "size": "330ml",
     "price": 1.2,
