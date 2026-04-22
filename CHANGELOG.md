@@ -4,6 +4,28 @@ All notable changes documented here. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-22
+
+### Added
+
+- DDE development environment with Docker, Traefik (`parqet-beer.test`),
+  and node-pnpm adapter for containerised local development.
+- `resolveOrigin()` helper using `X-Forwarded-Proto` for OAuth redirects
+  behind TLS-terminating reverse proxies.
+- DDE setup instructions in README, CONTRIBUTING, and AGENTS docs.
+- Gampert Bräu Förster Pils (500ml, DE) and Kulmbacher Edelherb (500ml, DE)
+  to beer data.
+
+### Changed
+
+- pnpm version in DDE adapter reads from `package.json` via
+  `corepack prepare --activate` (single source of truth).
+
+### Removed
+
+- Redundant DDE plugins (`build`, `check`, `lint`, `lint-fix`, `test`,
+  `shell`) replaced by `dde exec pnpm <command>`.
+
 ## [0.2.0] - 2026-04-20
 
 ### Added
