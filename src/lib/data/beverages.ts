@@ -21,7 +21,7 @@ export const BEVERAGES: Record<BeverageCategory, Beverage[]> = {
   whisky: WHISKY_PRICES,
 };
 
-export const BEVERAGE_CATEGORIES = Object.keys(BEVERAGES) as BeverageCategory[];
+export const BEVERAGE_CATEGORIES: BeverageCategory[] = ['beer', 'coffee', 'smoothie', 'whisky'];
 
 // Canonical glyph per category. `emoji` is the tab/header mark; `dividendEmoji`
 // is the variant used in the "free dividend" context (beer gets 🍻 there).
