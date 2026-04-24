@@ -5,6 +5,8 @@ import {
   getTokens,
   storeTokens,
   resolveSessionSecret,
+  clearSessionCookie,
+  SESSION_COOKIE,
   type FullSession,
 } from '$lib/server/auth';
 import { refreshAccessToken } from '$lib/server/parqet-client';
@@ -134,6 +136,14 @@ export const handle: Handle = async ({ event, resolve }) => {
     // is an async binding in production and a plain string in local dev.
     const sessionSecret = await resolveSessionSecret(env);
 
+    // A session cookie that can't be resolved into a live session is "phantom"
+    // state — the browser keeps presenting it, but every server check returns
+    // null. Actively clear it so the client stops carrying dead authentication
+    // state and the UI shows the correct logged-out affordances immediately.
+    // Three cases end up here: undecryptable cookie (e.g. SESSION_SECRET was
+    // rotated), decrypted userId but no KV token (30d TTL expired or cache
+    // wiped), and malformed KV payload (Zod reject inside `getTokens`).
+    const hasSessionCookie = event.cookies.get(SESSION_COOKIE) !== undefined;
     const userId = await getUserId(event.cookies, sessionSecret);
     if (userId) {
       const tokenData = await getTokens(env.PARQET_KV, userId);
@@ -147,11 +157,12 @@ export const handle: Handle = async ({ event, resolve }) => {
         const session = await maybeRefreshSession(full, env);
         event.locals.session = { userId: session.userId, accessToken: session.accessToken };
       } else {
-        // Cookie exists but tokens are gone from KV (expired after 30d).
         event.locals.session = null;
+        clearSessionCookie(event.cookies);
       }
     } else {
       event.locals.session = null;
+      if (hasSessionCookie) clearSessionCookie(event.cookies);
     }
 
     // adapter-cloudflare resolves this from cf-connecting-ip, so no manual

@@ -183,7 +183,7 @@ describe('hooks.server handle()', () => {
   });
 
   describe('cookie exists but tokens missing from KV', () => {
-    it('sets locals.session to null', async () => {
+    it('sets locals.session to null and clears the phantom cookie', async () => {
       const cookies = createFakeCookies();
       const kv = createFakeKv();
       // Set cookie but do NOT seed KV tokens
@@ -194,6 +194,39 @@ describe('hooks.server handle()', () => {
       await runHandle(ctx.event);
 
       expect(ctx.event.locals.session).toBeNull();
+      // Cookie is stripped from the response so the browser stops presenting it.
+      expect(cookies.store.has(SESSION_COOKIE)).toBe(false);
+    });
+  });
+
+  describe('cookie is undecryptable (e.g. SESSION_SECRET rotated)', () => {
+    it('sets locals.session to null and clears the dead cookie', async () => {
+      const cookies = createFakeCookies();
+      const kv = createFakeKv();
+      // Cookie encrypted with a different secret — current secret can't decrypt.
+      const foreignCookie = await createSessionCookie(
+        'user-foreign',
+        'a-different-secret-long-enough-to-pass!'
+      );
+      cookies.store.set(SESSION_COOKIE, foreignCookie);
+
+      const ctx = buildEvent({ pathname: '/', cookies, kv });
+      await runHandle(ctx.event);
+
+      expect(ctx.event.locals.session).toBeNull();
+      expect(cookies.store.has(SESSION_COOKIE)).toBe(false);
+    });
+
+    it('does not emit Set-Cookie when there was no session cookie to begin with', async () => {
+      const cookies = createFakeCookies();
+      const deleteSpy = vi.spyOn(cookies.cookies, 'delete');
+
+      const ctx = buildEvent({ pathname: '/', cookies });
+      await runHandle(ctx.event);
+
+      expect(ctx.event.locals.session).toBeNull();
+      expect(deleteSpy).not.toHaveBeenCalledWith(SESSION_COOKIE, expect.anything());
+      deleteSpy.mockRestore();
     });
   });
 
