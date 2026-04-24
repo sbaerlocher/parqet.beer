@@ -2,7 +2,13 @@
 <script lang="ts">
   import { fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
-  import { BEVERAGES, type BeverageCategory, type Currency } from '$lib/data/beverages';
+  import {
+    BEVERAGES,
+    BEVERAGE_CATEGORIES,
+    CATEGORY_EMOJI,
+    type BeverageCategory,
+    type Currency,
+  } from '$lib/data/beverages';
   import {
     calculateEquivalents,
     calculateFunStats,
@@ -14,9 +20,11 @@
   import BeerGlass from '$lib/components/BeerGlass.svelte';
   import CoffeeGlass from '$lib/components/CoffeeGlass.svelte';
   import SmoothieGlass from '$lib/components/SmoothieGlass.svelte';
+  import WhiskyGlass from '$lib/components/WhiskyGlass.svelte';
   import LocaleToggle from '$lib/components/LocaleToggle.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
   import ShareButton from '$lib/components/ShareButton.svelte';
+  import NoteBadge from '$lib/components/NoteBadge.svelte';
   import { t, locale } from '$lib/stores/locale';
   import {
     getBeverageOfTheDay,
@@ -25,6 +33,17 @@
     getMilestoneBadge,
     getNextMilestone,
   } from '$lib/fun';
+
+  const GLASS_COMPONENTS = {
+    beer: BeerGlass,
+    coffee: CoffeeGlass,
+    smoothie: SmoothieGlass,
+    whisky: WhiskyGlass,
+  } as const;
+
+  function isBeverageCategory(value: unknown): value is BeverageCategory {
+    return typeof value === 'string' && (BEVERAGE_CATEGORIES as string[]).includes(value);
+  }
 
   interface Portfolio {
     id: string;
@@ -77,7 +96,7 @@
     if (categoryLoaded) return;
     categoryLoaded = true;
     const stored = localStorage.getItem(CATEGORY_KEY);
-    if (stored === 'beer' || stored === 'coffee' || stored === 'smoothie') {
+    if (isBeverageCategory(stored)) {
       activeCategory = stored;
     }
   });
@@ -88,12 +107,9 @@
   });
 
   const FAVORITES_KEY = 'parqet-beer:favorites';
-  type Favorites = { beer: Set<string>; coffee: Set<string>; smoothie: Set<string> };
-  const emptyFavorites = (): Favorites => ({
-    beer: new Set(),
-    coffee: new Set(),
-    smoothie: new Set(),
-  });
+  type Favorites = Record<BeverageCategory, Set<string>>;
+  const emptyFavorites = (): Favorites =>
+    Object.fromEntries(BEVERAGE_CATEGORIES.map((k) => [k, new Set<string>()])) as Favorites;
   let favorites = $state<Favorites>(emptyFavorites());
   let favoritesLoaded = false;
 
@@ -102,11 +118,9 @@
     favoritesLoaded = true;
     try {
       const raw = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '{}');
-      favorites = {
-        beer: new Set<string>(Array.isArray(raw.beer) ? raw.beer : []),
-        coffee: new Set<string>(Array.isArray(raw.coffee) ? raw.coffee : []),
-        smoothie: new Set<string>(Array.isArray(raw.smoothie) ? raw.smoothie : []),
-      };
+      favorites = Object.fromEntries(
+        BEVERAGE_CATEGORIES.map((k) => [k, new Set<string>(Array.isArray(raw[k]) ? raw[k] : [])])
+      ) as Favorites;
     } catch {
       /* storage unavailable */
     }
@@ -124,11 +138,7 @@
     try {
       localStorage.setItem(
         FAVORITES_KEY,
-        JSON.stringify({
-          beer: [...favorites.beer],
-          coffee: [...favorites.coffee],
-          smoothie: [...favorites.smoothie],
-        })
+        JSON.stringify(Object.fromEntries(BEVERAGE_CATEGORIES.map((k) => [k, [...favorites[k]]])))
       );
     } catch {
       /* storage unavailable */
@@ -163,33 +173,11 @@
     portfolioValue !== null ? convertValue(portfolioValue, portfolioCurrency, currency) : null
   );
 
-  const beerEquivs = $derived(
-    portfolioValue !== null
-      ? calculateEquivalents(portfolioValue, portfolioCurrency, BEVERAGES.beer)
-      : []
-  );
-  const coffeeEquivs = $derived(
-    portfolioValue !== null
-      ? calculateEquivalents(portfolioValue, portfolioCurrency, BEVERAGES.coffee)
-      : []
-  );
-  const smoothieEquivs = $derived(
-    portfolioValue !== null
-      ? calculateEquivalents(portfolioValue, portfolioCurrency, BEVERAGES.smoothie)
-      : []
-  );
-
   const dayIndex = Math.floor(Date.now() / 86400000);
 
   const displayDividends = $derived(convertValue(dividends, portfolioCurrency, currency));
 
-  const activeList = $derived(
-    activeCategory === 'beer'
-      ? BEVERAGES.beer
-      : activeCategory === 'coffee'
-        ? BEVERAGES.coffee
-        : BEVERAGES.smoothie
-  );
+  const activeList = $derived(BEVERAGES[activeCategory]);
 
   const beverageOfTheDay = $derived(getBeverageOfTheDay(activeList, $locale, activeCategory));
   const botdPrice = $derived(beverageOfTheDay ? beverageOfTheDay.beverage.price : 0);
@@ -240,11 +228,9 @@
   );
 
   const sortenEquivsRaw = $derived(
-    activeCategory === 'beer'
-      ? beerEquivs
-      : activeCategory === 'coffee'
-        ? coffeeEquivs
-        : smoothieEquivs
+    portfolioValue !== null
+      ? calculateEquivalents(portfolioValue, portfolioCurrency, activeList)
+      : []
   );
   const activeFavs = $derived(favorites[activeCategory]);
   const sortenEquivs = $derived(
@@ -255,30 +241,16 @@
     })
   );
 
-  const catLabel = $derived(
-    activeCategory === 'beer' ? $t.beer : activeCategory === 'coffee' ? $t.coffee : $t.smoothie
-  );
-  const catEmoji = $derived(
-    activeCategory === 'beer' ? '🍺' : activeCategory === 'coffee' ? '☕' : '🥤'
-  );
+  const catLabel = $derived($t[activeCategory]);
+  const catEmoji = $derived(CATEGORY_EMOJI[activeCategory]);
+  const ActiveGlass = $derived(GLASS_COMPONENTS[activeCategory]);
 
   const catCards = $derived([
-    {
-      key: 'beer' as BeverageCategory,
-      emoji: '🍺',
-      intro: $t.catIntroBeer,
-    },
-    {
-      key: 'coffee' as BeverageCategory,
-      emoji: '☕',
-      intro: $t.catIntroCoffee,
-    },
-    {
-      key: 'smoothie' as BeverageCategory,
-      emoji: '🥤',
-      intro: $t.catIntroSmoothie,
-    },
-  ]);
+    { key: 'beer', emoji: CATEGORY_EMOJI.beer, intro: $t.catIntroBeer },
+    { key: 'coffee', emoji: CATEGORY_EMOJI.coffee, intro: $t.catIntroCoffee },
+    { key: 'smoothie', emoji: CATEGORY_EMOJI.smoothie, intro: $t.catIntroSmoothie },
+    { key: 'whisky', emoji: CATEGORY_EMOJI.whisky, intro: $t.catIntroWhisky },
+  ] as const);
 
   async function loadPortfolios() {
     try {
@@ -495,7 +467,7 @@
       </div>
 
       <!-- Category cards -->
-      <div class="grid grid-cols-3 gap-2 sm:gap-3.5 mb-6">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3.5 mb-6">
         {#each catCards as card (card.key)}
           <button
             type="button"
@@ -590,13 +562,7 @@
         >
           <div class="eyebrow self-start mb-2">{$t.eyebrowFillLevel}</div>
           <div class="flex-1 flex items-center">
-            {#if activeCategory === 'beer'}
-              <BeerGlass fill={glassFill} size={130} />
-            {:else if activeCategory === 'coffee'}
-              <CoffeeGlass fill={glassFill} size={130} />
-            {:else}
-              <SmoothieGlass fill={glassFill} size={130} />
-            {/if}
+            <ActiveGlass fill={glassFill} size={130} />
           </div>
           <div class="font-mono text-sm text-amber-800 text-center mt-2">
             {#if badge}
@@ -685,8 +651,13 @@
             <div class="text-[13px] text-amber-700 italic mb-2.5">{beverageOfTheDay.quote}</div>
             <div class="flex items-center justify-between gap-5">
               <div>
-                <div class="font-display font-bold text-[20px] sm:text-[26px] text-amber-950">
-                  {beverageOfTheDay.beverage.name}
+                <div
+                  class="font-display font-bold text-[20px] sm:text-[26px] text-amber-950 flex items-center gap-2 flex-wrap"
+                >
+                  <span>{beverageOfTheDay.beverage.name}</span>
+                  {#if beverageOfTheDay.beverage.note}
+                    <NoteBadge note={beverageOfTheDay.beverage.note} variant="prominent" />
+                  {/if}
                 </div>
                 <div class="font-mono text-xs mt-1" style="color: var(--muted)">
                   {countryFlag(beverageOfTheDay.beverage.country)}
@@ -816,7 +787,10 @@
                             style="background: var(--amber-600, #d97706); color: white">BOTD</span
                           >
                         {/if}
-                        {b.name}
+                        <span class="truncate">{b.name}</span>
+                        {#if b.note}
+                          <NoteBadge note={b.note} variant="icon" />
+                        {/if}
                       </div>
                       <div class="font-mono text-[10px]" style="color: var(--muted)">
                         {b.size} · {b.price.toFixed(2)}
@@ -911,6 +885,9 @@
                     >
                   {/if}
                   {b.name}
+                  {#if b.note}
+                    <NoteBadge note={b.note} variant="full" />
+                  {/if}
                 </div>
               </div>
               <div

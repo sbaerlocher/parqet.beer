@@ -19,6 +19,11 @@ export default ts.config(
     languageOptions: { parserOptions: { parser: ts.parser } },
   },
   {
+    // `.svelte.ts` — rune-using TS module, parsed as TypeScript.
+    files: ['**/*.svelte.ts'],
+    languageOptions: { parser: ts.parser },
+  },
+  {
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],

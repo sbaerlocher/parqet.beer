@@ -36,6 +36,16 @@ const quotesDe: Record<BeverageCategory, string[]> = {
     'Detox-Empfehlung:',
     'Passt zu deinem Lifestyle:',
   ],
+  whisky: [
+    'Der Whisky des Tages:',
+    'Der Master Blender empfiehlt:',
+    'Dein Portfolio schenkt ein:',
+    'Perfekt für den Dram:',
+    'Der Algorithmus empfiehlt:',
+    'Heute im Glas:',
+    'Slàinte Mhath!',
+    'Passt zu deinem Portfolio:',
+  ],
 };
 
 const quotesEn: Record<BeverageCategory, string[]> = {
@@ -68,6 +78,16 @@ const quotesEn: Record<BeverageCategory, string[]> = {
     "Today's blend:",
     'Detox pick:',
     'Pairs well with your lifestyle:',
+  ],
+  whisky: [
+    "Today's whisky pick:",
+    'The master blender recommends:',
+    'Your portfolio is pouring:',
+    'Perfect for a dram:',
+    'The algorithm recommends:',
+    "Today's dram:",
+    'Slàinte Mhath!',
+    'Pairs well with your portfolio:',
   ],
 };
 
@@ -169,6 +189,60 @@ function buildComparisonsDe(count: number, category: BeverageCategory, fmt: Fmt)
         label: 'ml Bier insgesamt',
         highlight: false,
         matched: count >= 10,
+      },
+    ];
+  }
+  if (category === 'whisky') {
+    return [
+      {
+        emoji: '🥃',
+        number: fmt(Math.floor(count * 17)),
+        label: 'Drams (4cl)',
+        highlight: false,
+        matched: count >= 5,
+      },
+      {
+        emoji: '🌅',
+        number: fmt(Math.floor((count * 17) / 365)),
+        label: 'Jahre täglicher Dram',
+        highlight: true,
+        matched: count >= 22,
+      },
+      {
+        emoji: '📦',
+        number: fmt(Math.floor(count / 6)),
+        label: 'Kisten (6 Flaschen)',
+        highlight: false,
+        matched: count >= 6,
+      },
+      {
+        emoji: '🏛️',
+        number: fmt(Math.floor(count / 30)),
+        label: 'Privatbar-Regale',
+        highlight: false,
+        matched: count >= 30,
+      },
+      {
+        emoji: '🛢️',
+        number: fmt(Math.floor(count / 250)),
+        label: 'Fässer (à 250 Flaschen)',
+        highlight: true,
+        matched: count >= 250,
+      },
+      {
+        // Whisky-Adventskalender: typisch 24 Miniaturen à 3cl ≈ 72cl ≈ 1 Flasche.
+        emoji: '🎁',
+        number: fmt(Math.floor(count)),
+        label: 'Whisky-Adventskalender',
+        highlight: false,
+        matched: count >= 10,
+      },
+      {
+        emoji: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+        number: fmt(Math.floor(count / 50)),
+        label: 'Islay-Pilgerreisen',
+        highlight: false,
+        matched: count >= 50,
       },
     ];
   }
@@ -329,6 +403,60 @@ function buildComparisonsEn(count: number, category: BeverageCategory, fmt: Fmt)
         label: 'ml of beer total',
         highlight: false,
         matched: count >= 10,
+      },
+    ];
+  }
+  if (category === 'whisky') {
+    return [
+      {
+        emoji: '🥃',
+        number: fmt(Math.floor(count * 17)),
+        label: 'drams (4cl)',
+        highlight: false,
+        matched: count >= 5,
+      },
+      {
+        emoji: '🌅',
+        number: fmt(Math.floor((count * 17) / 365)),
+        label: 'years of a daily dram',
+        highlight: true,
+        matched: count >= 22,
+      },
+      {
+        emoji: '📦',
+        number: fmt(Math.floor(count / 6)),
+        label: 'cases (6-bottle)',
+        highlight: false,
+        matched: count >= 6,
+      },
+      {
+        emoji: '🏛️',
+        number: fmt(Math.floor(count / 30)),
+        label: 'home bar shelves',
+        highlight: false,
+        matched: count >= 30,
+      },
+      {
+        emoji: '🛢️',
+        number: fmt(Math.floor(count / 250)),
+        label: 'casks (~250 bottles)',
+        highlight: true,
+        matched: count >= 250,
+      },
+      {
+        // Whisky advent calendar: ~24 miniatures = ~1 bottle worth.
+        emoji: '🎁',
+        number: fmt(Math.floor(count)),
+        label: 'whisky advent calendars',
+        highlight: false,
+        matched: count >= 10,
+      },
+      {
+        emoji: '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+        number: fmt(Math.floor(count / 50)),
+        label: 'Islay pilgrimages',
+        highlight: false,
+        matched: count >= 50,
       },
     ];
   }

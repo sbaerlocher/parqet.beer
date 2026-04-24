@@ -1,0 +1,136 @@
+[
+  {
+    "name": "Säntis Malt Edition Dreifaltigkeit",
+    "size": "500ml",
+    "price": 65.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Säntis Malt Edition Sigel",
+    "size": "500ml",
+    "price": 55.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Langatun Old Deer Classic",
+    "size": "700ml",
+    "price": 88.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Langatun Old Bear Classic",
+    "size": "700ml",
+    "price": 92.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Macardo Swiss Single Malt",
+    "size": "500ml",
+    "price": 79.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Orma Single Malt",
+    "size": "700ml",
+    "price": 110.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Hollen Single Malt",
+    "size": "500ml",
+    "price": 95.0,
+    "currency": "CHF",
+    "country": "CH"
+  },
+  {
+    "name": "Glenfiddich 15 Years",
+    "size": "700ml",
+    "price": 49.9,
+    "currency": "EUR",
+    "country": "GB",
+    "note": { "de": "Sumits Liebling", "en": "Sumit's favourite" }
+  },
+  {
+    "name": "Kilchoman Machir Bay",
+    "size": "700ml",
+    "price": 45.0,
+    "currency": "EUR",
+    "country": "GB"
+  },
+  {
+    "name": "Springbank 10",
+    "size": "700ml",
+    "price": 85.0,
+    "currency": "EUR",
+    "country": "GB"
+  },
+  {
+    "name": "Bruichladdich The Classic Laddie",
+    "size": "700ml",
+    "price": 43.0,
+    "currency": "EUR",
+    "country": "GB"
+  },
+  {
+    "name": "GlenDronach 12",
+    "size": "700ml",
+    "price": 40.0,
+    "currency": "EUR",
+    "country": "GB"
+  },
+  {
+    "name": "Arran 10",
+    "size": "700ml",
+    "price": 38.0,
+    "currency": "EUR",
+    "country": "GB"
+  },
+  {
+    "name": "Redbreast 12",
+    "size": "700ml",
+    "price": 50.0,
+    "currency": "EUR",
+    "country": "IE"
+  },
+  {
+    "name": "Nikka From The Barrel",
+    "size": "500ml",
+    "price": 38.0,
+    "currency": "EUR",
+    "country": "JP"
+  },
+  {
+    "name": "Slyrs Classic",
+    "size": "700ml",
+    "price": 42.0,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Slyrs Fifty One",
+    "size": "700ml",
+    "price": 69.0,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "St. Kilian Signature Edition Peated",
+    "size": "500ml",
+    "price": 49.0,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
+    "name": "Stork Club Single Malt",
+    "size": "700ml",
+    "price": 35.0,
+    "currency": "EUR",
+    "country": "DE"
+  }
+]

@@ -47,7 +47,7 @@
           <h2 class="font-display font-bold text-xl text-amber-950 mb-3">1. Was wir tun</h2>
           <p class="leading-relaxed" style="color: var(--ink-soft)">
             Wir verbinden uns via OAuth 2.0 mit deinem Parqet-Konto, lesen deinen Portfoliowert aus
-            und rechnen ihn in Getränke (Bier, Kaffee, Smoothie) um. Mehr nicht.
+            und rechnen ihn in Getränke (Bier, Kaffee, Smoothie, Whisky) um. Mehr nicht.
           </p>
         </section>
 
@@ -164,7 +164,7 @@
           <h2 class="font-display font-bold text-xl text-amber-950 mb-3">1. What we do</h2>
           <p class="leading-relaxed" style="color: var(--ink-soft)">
             We connect to your Parqet account via OAuth 2.0, read your portfolio value and convert
-            it into beverages (beer, coffee, smoothie). Nothing more.
+            it into beverages (beer, coffee, smoothie, whisky). Nothing more.
           </p>
         </section>
 

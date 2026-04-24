@@ -1,15 +1,13 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { Tween } from 'svelte/motion';
-  import { cubicOut } from 'svelte/easing';
+  import { useGlassFill } from './glass-motion.svelte';
 
   let { fill = 0.68, size = 140 }: { fill?: number; size?: number } = $props();
 
-  const f = $derived(Math.max(0.05, Math.min(0.95, fill)));
-  const animatedF = new Tween(0.68, { duration: 800, easing: cubicOut });
+  const motion = useGlassFill(() => fill);
 
   $effect(() => {
-    animatedF.set(f);
+    motion.update();
   });
 </script>
 
@@ -37,11 +35,11 @@
   <!-- layers -->
   <g clip-path="url(#smoo-clip)">
     <!-- purple base -->
-    <rect x="25" y={60 + (1 - animatedF.current) * 90} width="95" height="120" fill="#7c3aed" />
+    <rect x="25" y={60 + (1 - motion.fill) * 90} width="95" height="120" fill="#7c3aed" />
     <!-- pink middle -->
-    <rect x="25" y={85 + (1 - animatedF.current) * 60} width="95" height="60" fill="#ec4899" />
+    <rect x="25" y={85 + (1 - motion.fill) * 60} width="95" height="60" fill="#ec4899" />
     <!-- green top -->
-    <rect x="25" y={110 + (1 - animatedF.current) * 30} width="95" height="50" fill="#84cc16" />
+    <rect x="25" y={110 + (1 - motion.fill) * 30} width="95" height="50" fill="#84cc16" />
   </g>
 
   <!-- straw -->

@@ -74,6 +74,28 @@ describe('calculateEquivalents', () => {
     expect(result[2]?.currency).toBe('CHF');
     expect(result[2]?.country).toBe('CH');
   });
+
+  it('passes through a localized `note` when present', () => {
+    const noted: Beverage[] = [
+      {
+        name: 'Noted Beer',
+        size: '330ml',
+        price: 1.0,
+        currency: 'EUR',
+        country: 'DE',
+        note: { de: 'Lieblings-Bier', en: 'Favourite beer' },
+      },
+    ];
+    const result = calculateEquivalents(100, 'EUR', noted);
+    expect(result[0]?.note).toEqual({ de: 'Lieblings-Bier', en: 'Favourite beer' });
+  });
+
+  it('omits the `note` key entirely when the source beverage has none', () => {
+    const result = calculateEquivalents(100, 'EUR', testBeverages);
+    // `note` should not be present at all (exactOptionalPropertyTypes),
+    // so `in` returns false rather than note === undefined.
+    expect('note' in result[0]!).toBe(false);
+  });
 });
 
 describe('calculateFunStats', () => {

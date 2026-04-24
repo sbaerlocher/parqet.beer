@@ -107,6 +107,41 @@ describe('getFunComparisons', () => {
     expect(result.every((c) => c.matched)).toBe(true);
   });
 
+  it('returns only matched comparisons for whisky (de)', () => {
+    const result = getFunComparisons(300, 'whisky', 'de');
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.every((c) => c.matched)).toBe(true);
+  });
+
+  it('returns only matched comparisons for whisky (en)', () => {
+    const result = getFunComparisons(300, 'whisky', 'en');
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.every((c) => c.matched)).toBe(true);
+  });
+
+  it('whisky Drams formula scales as count * 17 (70cl bottle / 4cl dram)', () => {
+    const result = getFunComparisons(100, 'whisky', 'en');
+    const drams = result.find((c) => c.label.startsWith('drams'));
+    expect(drams).toBeDefined();
+    // 100 bottles × 17 drams/bottle = 1,700 drams, formatted with EN grouping.
+    expect(drams!.number.replace(/,/g, '')).toBe('1700');
+  });
+
+  it('whisky cask comparison only matches at 250 bottles', () => {
+    expect(getFunComparisons(249, 'whisky', 'de').some((c) => c.label.startsWith('Fässer'))).toBe(
+      false
+    );
+    expect(getFunComparisons(250, 'whisky', 'de').some((c) => c.label.startsWith('Fässer'))).toBe(
+      true
+    );
+  });
+
+  it('whisky DE and EN labels diverge', () => {
+    const de = getFunComparisons(300, 'whisky', 'de').map((c) => c.label);
+    const en = getFunComparisons(300, 'whisky', 'en').map((c) => c.label);
+    expect(de).not.toEqual(en);
+  });
+
   it('returns empty array when count is too low', () => {
     const result = getFunComparisons(1, 'beer', 'de');
     expect(result).toEqual([]);

@@ -328,5 +328,115 @@
         "en": "1,000,000+ smoothies — You are photosynthesis"
       }
     }
+  ],
+  "whisky": [
+    {
+      "threshold": 100,
+      "icon": "🥃",
+      "title": { "de": "Amateur-Verkoster", "en": "Amateur Taster" },
+      "description": {
+        "de": "100+ Flaschen im Portfolio",
+        "en": "100+ bottles in your portfolio"
+      }
+    },
+    {
+      "threshold": 500,
+      "icon": "🥃",
+      "title": { "de": "Neat-Trinker", "en": "Neat Drinker" },
+      "description": {
+        "de": "500+ Flaschen — Ohne Eis, bitte",
+        "en": "500+ bottles — No ice, please"
+      }
+    },
+    {
+      "threshold": 1000,
+      "icon": "🎖️",
+      "title": { "de": "Malt Connoisseur", "en": "Malt Connoisseur" },
+      "description": {
+        "de": "1'000+ Flaschen — Du erkennst Sherry Cask blind",
+        "en": "1,000+ bottles — You spot a sherry cask blindfolded"
+      }
+    },
+    {
+      "threshold": 2500,
+      "icon": "🎖️",
+      "title": { "de": "Cask Strength Fanatiker", "en": "Cask Strength Fanatic" },
+      "description": {
+        "de": "2'500+ Flaschen — Unter 55% ist Limonade",
+        "en": "2,500+ bottles — Below 55% is just lemonade"
+      }
+    },
+    {
+      "threshold": 5000,
+      "icon": "🏅",
+      "title": { "de": "Peat-Freak", "en": "Peat Freak" },
+      "description": {
+        "de": "5'000+ Flaschen — Torf ist eine Lebenseinstellung",
+        "en": "5,000+ bottles — Peat is a lifestyle"
+      }
+    },
+    {
+      "threshold": 10000,
+      "icon": "🏆",
+      "title": { "de": "10K Whisky Club", "en": "10K Whisky Club" },
+      "description": {
+        "de": "Willkommen im exklusiven 10'000 Flaschen Club",
+        "en": "Welcome to the exclusive 10,000 bottle club"
+      }
+    },
+    {
+      "threshold": 25000,
+      "icon": "🏭",
+      "title": { "de": "Brennerei-Verwalter", "en": "Distillery Keeper" },
+      "description": {
+        "de": "25'000+ Flaschen — Du kennst jeden Stillman beim Vornamen",
+        "en": "25,000+ bottles — You know every stillman by first name"
+      }
+    },
+    {
+      "threshold": 50000,
+      "icon": "👑",
+      "title": { "de": "Whisky-Baron", "en": "Whisky Baron" },
+      "description": {
+        "de": "50'000+ Flaschen — Deine Privatbar ist ein Museum",
+        "en": "50,000+ bottles — Your private bar is a museum"
+      }
+    },
+    {
+      "threshold": 100000,
+      "icon": "🏰",
+      "title": { "de": "Highland-Laird", "en": "Highland Laird" },
+      "description": {
+        "de": "100'000+ Flaschen — Du besitzt ein Schloss mit Brennerei",
+        "en": "100,000+ bottles — You own a castle with its own distillery"
+      }
+    },
+    {
+      "threshold": 250000,
+      "icon": "⚜️",
+      "title": { "de": "Single-Malt-Imperator", "en": "Single Malt Emperor" },
+      "description": {
+        "de": "250'000+ Flaschen — Auktionshäuser rufen dich zuerst an",
+        "en": "250,000+ bottles — Auction houses call you first"
+      }
+    },
+    {
+      "threshold": 500000,
+      "icon": "🌍",
+      "title": { "de": "Welt-Master-Blender", "en": "World Master Blender" },
+      "description": {
+        "de": "500'000+ Flaschen — Jede Brennerei der Welt fragt dich um Rat",
+        "en": "500,000+ bottles — Every distillery on Earth asks your advice"
+      }
+    },
+    {
+      "threshold": 1000000,
+      "icon": "💎",
+      "title": { "de": "Whisky-Gottheit", "en": "Whisky Deity" },
+      "description": {
+        "de": "1'000'000+ Flaschen — Du bist Whisky",
+        "en": "1,000,000+ bottles — You are whisky"
+      }
+    }
   ]
 }

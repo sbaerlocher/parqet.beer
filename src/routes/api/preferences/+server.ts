@@ -5,7 +5,7 @@ import type { RequestHandler } from './$types';
 
 const PreferencesSchema = z.object({
   currency: z.enum(['EUR', 'CHF']),
-  category: z.enum(['beer', 'coffee', 'smoothie']),
+  category: z.enum(['beer', 'coffee', 'smoothie', 'whisky']),
 });
 
 export type UserPreferences = z.infer<typeof PreferencesSchema>;

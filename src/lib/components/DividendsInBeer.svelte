@@ -1,6 +1,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import type { Beverage, BeverageCategory } from '$lib/data/beverages';
+  import { CATEGORY_DIVIDEND_EMOJI } from '$lib/data/beverages';
   import { convertValue, formatNumber } from '$lib/calculator';
   import { locale, t } from '$lib/stores/locale';
 
@@ -15,12 +16,6 @@
     beverage: Beverage;
     category: BeverageCategory;
   } = $props();
-
-  const categoryEmoji: Record<BeverageCategory, string> = {
-    beer: '🍻',
-    coffee: '☕',
-    smoothie: '🥤',
-  };
 
   const count = $derived(
     Math.floor(convertValue(dividends, dividendsCurrency, beverage.currency) / beverage.price)
@@ -56,7 +51,7 @@
           </span>
         </p>
       </div>
-      <span class="text-4xl">{categoryEmoji[category]}</span>
+      <span class="text-4xl">{CATEGORY_DIVIDEND_EMOJI[category]}</span>
     </div>
   </div>
 {/if}
