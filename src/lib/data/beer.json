@@ -133,6 +133,13 @@
     "country": "DE"
   },
   {
+    "name": "Schönramer Hell",
+    "size": "500ml",
+    "price": 1.5,
+    "currency": "EUR",
+    "country": "DE"
+  },
+  {
     "name": "Appenzeller Quöllfrisch",
     "size": "330ml",
     "price": 1.2,
