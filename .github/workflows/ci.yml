@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   ci:
-    uses: sbaerlocher/.github/.github/workflows/ci-js.yml@2026-04-11
+    uses: sbaerlocher/.github/.github/workflows/ci-js.yml@2026-04-25
     secrets: inherit
 
   e2e:
