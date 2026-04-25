@@ -6,8 +6,16 @@
   import LocaleToggle from '$lib/components/LocaleToggle.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
   import RotatingTagline from '$lib/components/RotatingTagline.svelte';
+  import { BEVERAGES } from '$lib/data/beverages';
 
   const authenticated = $derived(page.data.authenticated === true);
+
+  const beverageCounts = {
+    beer: BEVERAGES.beer.length,
+    coffee: BEVERAGES.coffee.length,
+    smoothie: BEVERAGES.smoothie.length,
+    whisky: BEVERAGES.whisky.length,
+  };
 
   // Live ticker state for R3 flash effect
   const tickerBase = [
@@ -38,6 +46,7 @@
     'Vergiss KGV — zähl lieber Bier.',
     'Lieber Kaffee? Können wir auch.',
     'Auf Gesundheit? Dann halt Smoothie.',
+    'Oder lieber ein Dram?',
     'Warren Buffett rechnet auch in Bier. Wahrscheinlich.',
     'Dein Portfolio-Sommelier.',
     'Sparplan? Trinkplan!',
@@ -48,6 +57,7 @@
     'Your portfolio in the only currency that matters.',
     'Forget P/E ratio — count beers instead.',
     'More of a coffee person? We got you.',
+    'Or perhaps a dram?',
     'Warren Buffett counts in beers too. Probably.',
     'Your portfolio sommelier.',
   ];
@@ -242,7 +252,7 @@
 
     <!-- value props -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-7">
-      {#each [{ emoji: '🍺', title: $t.featureLiveTitle, body: $t.featureLiveBody }, { emoji: '🏆', title: $t.featureBadgesTitle, body: $t.featureBadgesBody }, { emoji: '🔒', title: $t.featureSecurityTitle, body: $t.featureSecurityBody }] as card (card.emoji)}
+      {#each [{ emoji: '🍺', title: $t.featureLiveTitle, body: $t.featureLiveBody(beverageCounts) }, { emoji: '🏆', title: $t.featureBadgesTitle, body: $t.featureBadgesBody }, { emoji: '🔒', title: $t.featureSecurityTitle, body: $t.featureSecurityBody }] as card (card.emoji)}
         <div class="bier-card p-5.5">
           <div class="text-[28px] mb-2.5">{card.emoji}</div>
           <div class="font-display font-bold text-lg mb-1.5">{card.title}</div>

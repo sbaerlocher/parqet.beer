@@ -35,11 +35,13 @@ export const translations = {
     beer: 'Bier',
     coffee: 'Kaffee',
     smoothie: 'Smoothie',
+    whisky: 'Whisky',
 
     // Category intros
     catIntroBeer: 'Prost!',
     catIntroCoffee: 'Lieber Kaffee?',
     catIntroSmoothie: 'Oder doch etwas Gesundes?',
+    catIntroWhisky: 'Oder lieber ein Dram?',
 
     // Landing
     heroEyebrow: 'Die einzige Kennzahl, die zählt',
@@ -52,7 +54,8 @@ export const translations = {
     step03Title: 'Bier-Status sichern',
     step03Body: '„Hopfen-Held" auf der Visitenkarte? Nur hier möglich.',
     featureLiveTitle: 'Live-Umrechnung',
-    featureLiveBody: '31 Biere, 10 Kaffees, 8 Smoothies. EUR/CHF in Echtzeit.',
+    featureLiveBody: (counts: { beer: number; coffee: number; smoothie: number; whisky: number }) =>
+      `${counts.beer} Biere, ${counts.coffee} Kaffees, ${counts.smoothie} Smoothies, ${counts.whisky} Whiskys. EUR/CHF in Echtzeit.`,
     featureBadgesTitle: 'Milestone Badges',
     featureBadgesBody: 'Stammgast, Hopfen-Held, Bierkönig. Vom Feierabend zur Legende.',
     featureSecurityTitle: 'Read-only · PKCE',
@@ -154,11 +157,13 @@ export const translations = {
     beer: 'Beer',
     coffee: 'Coffee',
     smoothie: 'Smoothie',
+    whisky: 'Whisky',
 
     // Category intros
     catIntroBeer: 'Cheers!',
     catIntroCoffee: 'More of a coffee person?',
     catIntroSmoothie: 'Or something healthy?',
+    catIntroWhisky: 'Or perhaps a dram?',
 
     // Landing
     heroEyebrow: 'The only metric that matters',
@@ -171,7 +176,8 @@ export const translations = {
     step03Title: 'Claim your status',
     step03Body: '"Hops Hero" on the business card? Only here.',
     featureLiveTitle: 'Live conversion',
-    featureLiveBody: '31 beers, 10 coffees, 8 smoothies. EUR/CHF in real time.',
+    featureLiveBody: (counts: { beer: number; coffee: number; smoothie: number; whisky: number }) =>
+      `${counts.beer} beers, ${counts.coffee} coffees, ${counts.smoothie} smoothies, ${counts.whisky} whiskies. EUR/CHF in real time.`,
     featureBadgesTitle: 'Milestone badges',
     featureBadgesBody: 'Regular, Hops Hero, Beer Royalty. From after-work to legend.',
     featureSecurityTitle: 'Read-only · PKCE',

@@ -1,18 +1,16 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { Tween } from 'svelte/motion';
-  import { cubicOut } from 'svelte/easing';
+  import { useGlassFill } from './glass-motion.svelte';
 
   let { fill = 0.68, size = 140 }: { fill?: number; size?: number } = $props();
 
-  const f = $derived(Math.max(0.05, Math.min(0.95, fill)));
-  const animatedY = new Tween(70 + (1 - 0.68) * 110, { duration: 800, easing: cubicOut });
+  const motion = useGlassFill(() => fill);
 
   $effect(() => {
-    animatedY.set(70 + (1 - f) * 110);
+    motion.update();
   });
 
-  const liquidY = $derived(animatedY.current);
+  const liquidY = $derived(70 + (1 - motion.fill) * 110);
 </script>
 
 <svg

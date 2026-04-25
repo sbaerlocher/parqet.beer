@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-import type { Beverage } from './data/beverages';
+import type { Beverage, LocalizedNote } from './data/beverages';
 import type { Locale } from './i18n';
 import { EUR_TO_CHF_RATE } from './fx';
 
@@ -17,6 +17,7 @@ export interface BeverageEquivalent {
   currency: string;
   country: string;
   count: number;
+  note?: LocalizedNote;
 }
 
 export interface FunStats {
@@ -43,6 +44,7 @@ export function calculateEquivalents(
       currency: b.currency,
       country: b.country,
       count: Math.floor(valueInBevCurrency / b.price),
+      ...(b.note !== undefined && { note: b.note }),
     };
   });
 }
