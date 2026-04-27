@@ -7,7 +7,9 @@ import { cubicOut } from 'svelte/easing';
 // projects it into its own SVG coordinates (usually `topY + (1 - fill) * range`).
 // `uid` is per-instance for SVG id suffixes (gradients, clipPaths).
 export function useGlassFill(getFill: () => number, initialFill = 0.68) {
-  const uid = Math.random().toString(36).slice(2, 8);
+  const uid = Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) =>
+    b.toString(16).padStart(2, '0')
+  ).join('');
   const animated = new Tween(initialFill, { duration: 800, easing: cubicOut });
   const clamp = (n: number) => Math.max(0.05, Math.min(0.95, n));
 
