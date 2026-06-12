@@ -44,7 +44,7 @@
     "eslint-plugin-svelte": "3.19.0",
     "globals": "17.6.0",
     "lefthook": "2.1.9",
-    "prettier": "3.8.3",
+    "prettier": "3.8.4",
     "prettier-plugin-svelte": "4.1.0",
     "svelte": "5.56.2",
     "svelte-check": "4.6.0",
