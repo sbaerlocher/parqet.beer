@@ -1,13 +1,18 @@
 // SPDX-License-Identifier: MIT
 import type { Beverage, LocalizedNote } from './data/beverages';
 import type { Locale } from './i18n';
-import { EUR_TO_CHF_RATE } from './fx';
+import { FX_RATES } from './fx';
 
+// Convert via EUR as the pivot currency. `FX_RATES[c]` is "<c> per EUR", so
+// EUR amount = value / fromRate, then target amount = eur * toRate. Unknown
+// currencies fall back to the original value (count stays best-effort rather
+// than rendering NaN).
 export function convertValue(value: number, fromCurrency: string, toCurrency: string): number {
   if (fromCurrency === toCurrency) return value;
-  if (fromCurrency === 'EUR' && toCurrency === 'CHF') return value * EUR_TO_CHF_RATE;
-  if (fromCurrency === 'CHF' && toCurrency === 'EUR') return value / EUR_TO_CHF_RATE;
-  return value; // Fallback for other currencies
+  const fromRate = FX_RATES[fromCurrency];
+  const toRate = FX_RATES[toCurrency];
+  if (fromRate === undefined || toRate === undefined) return value;
+  return (value / fromRate) * toRate;
 }
 
 export interface BeverageEquivalent {

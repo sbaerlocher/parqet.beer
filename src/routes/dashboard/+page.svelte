@@ -7,8 +7,8 @@
     BEVERAGE_CATEGORIES,
     CATEGORY_EMOJI,
     type BeverageCategory,
-    type Currency,
   } from '$lib/data/beverages';
+  import { DISPLAY_CURRENCIES, type DisplayCurrency } from '$lib/fx';
   import {
     calculateEquivalents,
     calculateFunStats,
@@ -21,6 +21,7 @@
   import CoffeeGlass from '$lib/components/CoffeeGlass.svelte';
   import SmoothieGlass from '$lib/components/SmoothieGlass.svelte';
   import WhiskyGlass from '$lib/components/WhiskyGlass.svelte';
+  import WineGlass from '$lib/components/WineGlass.svelte';
   import LocaleToggle from '$lib/components/LocaleToggle.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
   import ShareButton from '$lib/components/ShareButton.svelte';
@@ -33,12 +34,17 @@
     getMilestoneBadge,
     getNextMilestone,
   } from '$lib/fun';
+  import type { PageData } from './$types';
+
+  let { data }: { data: PageData } = $props();
+  const isDemo = $derived(data.demo === true);
 
   const GLASS_COMPONENTS = {
     beer: BeerGlass,
     coffee: CoffeeGlass,
     smoothie: SmoothieGlass,
     whisky: WhiskyGlass,
+    wine: WineGlass,
   } as const;
 
   function isBeverageCategory(value: unknown): value is BeverageCategory {
@@ -79,7 +85,7 @@
     }
   }
 
-  let currency = $state<Currency>('EUR');
+  let currency = $state<DisplayCurrency>('EUR');
   let portfolios: Portfolio[] = $state([]);
   let selectedIds: Set<string> = $state(new Set());
   let portfolioValue: number | null = $state(null);
@@ -250,7 +256,24 @@
     { key: 'coffee', emoji: CATEGORY_EMOJI.coffee, intro: $t.catIntroCoffee },
     { key: 'smoothie', emoji: CATEGORY_EMOJI.smoothie, intro: $t.catIntroSmoothie },
     { key: 'whisky', emoji: CATEGORY_EMOJI.whisky, intro: $t.catIntroWhisky },
+    { key: 'wine', emoji: CATEGORY_EMOJI.wine, intro: $t.catIntroWine },
   ] as const);
+
+  function loadDemo() {
+    // Demo mode: hydrate straight from the server-provided fixture, never
+    // touching /api/* (those require a real session). Read-only showcase.
+    if (!data.demo) return;
+    const d = data.demoData;
+    portfolios = d.portfolios;
+    selectedIds = new Set(d.portfolios.map((p) => p.id));
+    portfolioValue = d.totalValue;
+    dividends = d.dividends;
+    portfolioCurrency = d.currency;
+    if ((DISPLAY_CURRENCIES as readonly string[]).includes(d.currency)) {
+      currency = d.currency as DisplayCurrency;
+    }
+    loading = false;
+  }
 
   async function loadPortfolios() {
     try {
@@ -266,7 +289,12 @@
       selectedIds = stored ?? new Set(data.map((p) => p.id));
       if (data.length > 0) {
         const primaryCurrency = data[0]?.currency;
-        if (primaryCurrency === 'CHF') currency = 'CHF';
+        if (
+          primaryCurrency &&
+          (DISPLAY_CURRENCIES as readonly string[]).includes(primaryCurrency)
+        ) {
+          currency = primaryCurrency as DisplayCurrency;
+        }
       }
       await loadPerformance();
     } catch (e) {
@@ -282,6 +310,7 @@
   });
 
   async function loadPerformance() {
+    if (isDemo) return; // Demo values are fixed; never hit /api/performance.
     if (selectedIds.size === 0) {
       portfolioValue = 0;
       return;
@@ -323,7 +352,8 @@
   }
 
   $effect(() => {
-    loadPortfolios();
+    if (isDemo) loadDemo();
+    else loadPortfolios();
   });
 </script>
 
@@ -373,9 +403,9 @@
           class="inline-flex p-0.5 rounded-md"
           style="background: var(--accent); border: 1px solid var(--border)"
         >
-          {#each ['EUR', 'CHF'] as c (c)}
+          {#each DISPLAY_CURRENCIES as c (c)}
             <button
-              onclick={() => (currency = c as Currency)}
+              onclick={() => (currency = c)}
               class="px-2 sm:px-2.5 py-1 rounded text-[11px] font-bold transition-all font-mono"
               style={currency === c
                 ? 'background: var(--card); color: var(--highlight)'
@@ -400,22 +430,43 @@
         >
           {showValue ? '👁' : '👁‍🗨'}
         </button>
-        <form method="POST" action="/api/auth/logout">
-          <button
-            type="submit"
-            class="btn btn-ghost text-[13px]"
-            style="padding: 6px 8px"
-            title={$t.logout}
-          >
-            <span class="hidden sm:inline">{$t.logout}</span>
-            <span class="sm:hidden text-base">⏻</span>
-          </button>
-        </form>
+        {#if isDemo}
+          <a href="/api/auth/login" class="btn btn-ghost text-[13px]" style="padding: 6px 8px">
+            <span class="hidden sm:inline">{$t.demoConnect}</span>
+            <span class="sm:hidden text-base">🔗</span>
+          </a>
+        {:else}
+          <form method="POST" action="/api/auth/logout">
+            <button
+              type="submit"
+              class="btn btn-ghost text-[13px]"
+              style="padding: 6px 8px"
+              title={$t.logout}
+            >
+              <span class="hidden sm:inline">{$t.logout}</span>
+              <span class="sm:hidden text-base">⏻</span>
+            </button>
+          </form>
+        {/if}
       </div>
     </div>
   </header>
 
   <main class="max-w-[1200px] mx-auto px-4 sm:px-7 py-5 sm:py-7 pb-20">
+    {#if isDemo}
+      <div
+        class="mb-5 flex items-center justify-between gap-3 flex-wrap rounded-[10px] px-4 py-2.5"
+        style="background: var(--accent); border: 1px dashed var(--accent-hover)"
+      >
+        <span class="font-mono text-[11px] sm:text-xs text-amber-800">🧪 {$t.demoBanner}</span>
+        <a
+          href="/api/auth/login"
+          class="font-mono text-[11px] sm:text-xs font-bold text-amber-700 hover:text-amber-900 underline shrink-0"
+        >
+          {$t.demoConnect} →
+        </a>
+      </div>
+    {/if}
     {#if loading}
       <div class="text-center py-20">
         <p class="text-5xl mb-4 animate-pulse">🍺</p>
