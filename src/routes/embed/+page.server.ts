@@ -3,6 +3,7 @@ import type { PageServerLoad } from './$types';
 import { DEMO_DATA } from '$lib/demo';
 import { calculateEquivalents } from '$lib/calculator';
 import { BEVERAGES, CATEGORY_EMOJI, type BeverageCategory } from '$lib/data/beverages';
+import { DISPLAY_CURRENCIES, type DisplayCurrency } from '$lib/fx';
 
 // Read-only embed widget for blogs. No auth, no session — it renders a single
 // "X portfolio = Y beverages" line from either query params or the demo
@@ -24,10 +25,17 @@ function parseValue(raw: string | null): number {
   return Number.isFinite(n) && n > 0 ? n : DEMO_DATA.totalValue;
 }
 
+function parseCurrency(raw: string | null): DisplayCurrency {
+  const upper = raw?.toUpperCase();
+  return upper && (DISPLAY_CURRENCIES as readonly string[]).includes(upper)
+    ? (upper as DisplayCurrency)
+    : (DEMO_DATA.currency as DisplayCurrency);
+}
+
 export const load: PageServerLoad = ({ url }) => {
   const category = parseCategory(url.searchParams.get('category'));
   const value = parseValue(url.searchParams.get('value'));
-  const currency = url.searchParams.get('currency') ?? DEMO_DATA.currency;
+  const currency = parseCurrency(url.searchParams.get('currency'));
   const isDemo = !url.searchParams.has('value');
 
   // Pick the cheapest representative beverage in the category so the headline

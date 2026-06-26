@@ -306,6 +306,10 @@
 
   $effect(() => {
     if (loading) return;
+    // Demo selection uses synthetic IDs (demo-world, …); persisting them would
+    // clobber the real user's saved portfolio subset under the shared key and
+    // wipe it on their next visit. Demo mode must never write this key.
+    if (isDemo) return;
     persistSelection(selectedIds);
   });
 
