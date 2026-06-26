@@ -8,7 +8,7 @@
     CATEGORY_EMOJI,
     type BeverageCategory,
   } from '$lib/data/beverages';
-  import { DISPLAY_CURRENCIES, type DisplayCurrency } from '$lib/fx';
+  import { DISPLAY_CURRENCIES, type DisplayCurrency, FX_FALLBACK_RATES } from '$lib/fx';
   import {
     calculateEquivalents,
     calculateFunStats,
@@ -84,6 +84,9 @@
   }
 
   let currency = $state<DisplayCurrency>('EUR');
+  // Live ECB rates from /api/performance; fall back to the static table until
+  // the first performance response arrives (or on an upstream FX outage).
+  let fxRates = $state<Record<string, number>>(FX_FALLBACK_RATES);
   let portfolios: Portfolio[] = $state([]);
   let selectedIds: Set<string> = $state(new Set());
   let portfolioValue: number | null = $state(null);
@@ -174,12 +177,14 @@
   });
 
   const displayValue = $derived(
-    portfolioValue !== null ? convertValue(portfolioValue, portfolioCurrency, currency) : null
+    portfolioValue !== null
+      ? convertValue(portfolioValue, portfolioCurrency, currency, fxRates)
+      : null
   );
 
   const dayIndex = Math.floor(Date.now() / 86400000);
 
-  const displayDividends = $derived(convertValue(dividends, portfolioCurrency, currency));
+  const displayDividends = $derived(convertValue(dividends, portfolioCurrency, currency, fxRates));
 
   const activeList = $derived(BEVERAGES[activeCategory]);
 
@@ -188,7 +193,9 @@
   const botdCurrency = $derived(beverageOfTheDay ? beverageOfTheDay.beverage.currency : '');
   const botdCount = $derived(
     portfolioValue !== null && botdPrice > 0
-      ? Math.floor(convertValue(portfolioValue, portfolioCurrency, botdCurrency) / botdPrice)
+      ? Math.floor(
+          convertValue(portfolioValue, portfolioCurrency, botdCurrency, fxRates) / botdPrice
+        )
       : 0
   );
 
@@ -227,7 +234,7 @@
   });
   const dividendBeers = $derived(
     botdPrice > 0
-      ? Math.floor(convertValue(dividends, portfolioCurrency, botdCurrency) / botdPrice)
+      ? Math.floor(convertValue(dividends, portfolioCurrency, botdCurrency, fxRates) / botdPrice)
       : 0
   );
 
@@ -330,10 +337,12 @@
         totalValue: number;
         dividends: number;
         currency: string;
+        fxRates?: Record<string, number>;
       };
       portfolioValue = data.totalValue;
       dividends = data.dividends ?? 0;
       portfolioCurrency = data.currency;
+      if (data.fxRates) fxRates = data.fxRates;
     } catch (e) {
       error = e instanceof Error ? e.message : 'Unknown error';
     } finally {

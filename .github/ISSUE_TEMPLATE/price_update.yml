@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Prices drift over time. If a beverage already in `beer.json` (or
-        coffee/smoothie/whisky/wine) is priced wrong, report the corrected
+        coffee/smoothie/whisky) is priced wrong, report the corrected
         price here. Maintainers (or you, via PR) will update the JSON.
 
         **One beverage per issue.** For brand-new beverages, use the
@@ -21,7 +21,6 @@ body:
         - Coffee
         - Smoothie
         - Whisky
-        - Wine
     validations:
       required: true
   - type: input

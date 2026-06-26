@@ -3,14 +3,20 @@ import type { Beverage, LocalizedNote } from './data/beverages';
 import type { Locale } from './i18n';
 import { FX_RATES } from './fx';
 
-// Convert via EUR as the pivot currency. `FX_RATES[c]` is "<c> per EUR", so
+// Convert via EUR as the pivot currency. `rates[c]` is "<c> per EUR", so
 // EUR amount = value / fromRate, then target amount = eur * toRate. Unknown
 // currencies fall back to the original value (count stays best-effort rather
-// than rendering NaN).
-export function convertValue(value: number, fromCurrency: string, toCurrency: string): number {
+// than rendering NaN). `rates` defaults to the static fallback table; the
+// dashboard passes the live ECB rates fetched server-side instead.
+export function convertValue(
+  value: number,
+  fromCurrency: string,
+  toCurrency: string,
+  rates: Record<string, number> = FX_RATES
+): number {
   if (fromCurrency === toCurrency) return value;
-  const fromRate = FX_RATES[fromCurrency];
-  const toRate = FX_RATES[toCurrency];
+  const fromRate = rates[fromCurrency];
+  const toRate = rates[toCurrency];
   if (fromRate === undefined || toRate === undefined) return value;
   return (value / fromRate) * toRate;
 }

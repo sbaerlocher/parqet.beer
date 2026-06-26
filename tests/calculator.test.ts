@@ -5,7 +5,11 @@ import {
   calculateFunStats,
   formatNumber,
 } from '../src/lib/calculator';
-import { EUR_TO_CHF_RATE, EUR_TO_USD_RATE, EUR_TO_GBP_RATE } from '../src/lib/fx';
+import { FX_FALLBACK_RATES } from '../src/lib/fx';
+
+const EUR_TO_CHF_RATE = FX_FALLBACK_RATES['CHF']!;
+const EUR_TO_USD_RATE = FX_FALLBACK_RATES['USD']!;
+const EUR_TO_GBP_RATE = FX_FALLBACK_RATES['GBP']!;
 import type { Beverage } from '../src/lib/data/beverages';
 
 describe('convertValue', () => {

@@ -14,25 +14,26 @@
 export const EUR_TO_CHF_RATE = 0.95;
 
 /**
- * Additional display currencies. Rates are "<currency> per EUR" multipliers,
- * mirroring EUR_TO_CHF_RATE. Long-term rough averages (USD ≈ 1.08, GBP ≈ 0.85
- * per EUR) used only for the fun beverage-count display — not for valuation.
- * USD/GBP are display targets only; beverage reference prices stay in EUR/CHF.
+ * Static FALLBACK multipliers ("<currency> per EUR"), used only when no live
+ * rate is available — the dashboard fetches live ECB rates server-side
+ * (`src/lib/server/fx-live.ts`, frankfurter.app, KV-cached) and threads them
+ * into `convertValue`. These rough long-term averages just keep the UI from
+ * rendering a wildly wrong number on an upstream FX outage. USD/GBP are
+ * display targets only; beverage reference prices stay in EUR/CHF.
  */
-export const EUR_TO_USD_RATE = 1.08;
-export const EUR_TO_GBP_RATE = 0.85;
-
-/**
- * EUR-per-unit multipliers for every supported display currency, keyed by ISO
- * 4217 code. EUR is the pivot: any pair converts via EUR. Single source of
- * truth for `convertValue` and the currency toggles.
- */
-export const FX_RATES: Record<string, number> = {
+export const FX_FALLBACK_RATES: Record<string, number> = {
   EUR: 1,
   CHF: EUR_TO_CHF_RATE,
-  USD: EUR_TO_USD_RATE,
-  GBP: EUR_TO_GBP_RATE,
+  USD: 1.08,
+  GBP: 0.85,
 };
+
+/**
+ * Default rate table for code paths that have no live rates threaded through.
+ * EUR is the pivot: any pair converts via EUR. Live consumers pass the fetched
+ * map into `convertValue` instead of relying on this.
+ */
+export const FX_RATES: Record<string, number> = FX_FALLBACK_RATES;
 
 /** Display currencies the UI lets the user toggle between. */
 export const DISPLAY_CURRENCIES = ['EUR', 'CHF', 'USD', 'GBP'] as const;
