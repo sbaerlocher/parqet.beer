@@ -58,7 +58,7 @@ export function validateBeverageList(list, label = 'data') {
   return errors;
 }
 
-const FILES = ['beer.json', 'coffee.json', 'smoothie.json', 'whisky.json', 'wine.json'];
+const FILES = ['beer.json', 'coffee.json', 'smoothie.json', 'whisky.json'];
 
 /**
  * Validate every data file on disk. Returns a map of file → errors.

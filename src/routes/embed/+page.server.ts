@@ -12,7 +12,7 @@ import { DISPLAY_CURRENCIES, type DisplayCurrency } from '$lib/fx';
 // Query params (all optional):
 //   value     portfolio value (number); falls back to the demo value
 //   currency  EUR | CHF | USD | GBP; falls back to demo currency
-//   category  beer | coffee | smoothie | whisky | wine; defaults to beer
+//   category  beer | coffee | smoothie | whisky; defaults to beer
 const VALID_CATEGORIES = Object.keys(BEVERAGES) as BeverageCategory[];
 
 function parseCategory(raw: string | null): BeverageCategory {

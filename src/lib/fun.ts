@@ -46,16 +46,6 @@ const quotesDe: Record<BeverageCategory, string[]> = {
     'Slàinte Mhath!',
     'Passt zu deinem Portfolio:',
   ],
-  wine: [
-    'Der Wein des Tages:',
-    'Der Sommelier empfiehlt:',
-    'Dein Portfolio dekantiert heute:',
-    'Perfekt zum Abendessen:',
-    'Der Algorithmus empfiehlt:',
-    'Heute im Glas:',
-    'Santé!',
-    'Passt zu deinem Portfolio:',
-  ],
 };
 
 const quotesEn: Record<BeverageCategory, string[]> = {
@@ -97,16 +87,6 @@ const quotesEn: Record<BeverageCategory, string[]> = {
     'The algorithm recommends:',
     "Today's dram:",
     'Slàinte Mhath!',
-    'Pairs well with your portfolio:',
-  ],
-  wine: [
-    "Today's wine pick:",
-    'The sommelier recommends:',
-    'Your portfolio is decanting:',
-    'Perfect with dinner:',
-    'The algorithm recommends:',
-    "Today's glass:",
-    'Santé!',
     'Pairs well with your portfolio:',
   ],
 };
@@ -316,53 +296,6 @@ function buildComparisonsDe(count: number, category: BeverageCategory, fmt: Fmt)
         emoji: '🍪',
         number: fmt(Math.floor(count)),
         label: 'Kekse dazu',
-        highlight: false,
-        matched: count >= 5,
-      },
-    ];
-  }
-  if (category === 'wine') {
-    // 750ml bottle ≈ 6 Gläser à 125ml.
-    return [
-      {
-        emoji: '🍷',
-        number: fmt(Math.floor(count * 6)),
-        label: 'Gläser (125ml)',
-        highlight: false,
-        matched: count >= 2,
-      },
-      {
-        emoji: '📦',
-        number: fmt(Math.floor(count / 6)),
-        label: 'Kisten (6 Flaschen)',
-        highlight: false,
-        matched: count >= 6,
-      },
-      {
-        emoji: '🍽️',
-        number: fmt(Math.floor(count / 2)),
-        label: 'Dinner zu zweit',
-        highlight: true,
-        matched: count >= 10,
-      },
-      {
-        emoji: '🌅',
-        number: fmt(Math.floor(count / 365)),
-        label: 'Jahre tägliche Flasche',
-        highlight: true,
-        matched: count >= 365,
-      },
-      {
-        emoji: '🛢️',
-        number: fmt(Math.floor(count / 300)),
-        label: 'Barriques (à ~300 Flaschen)',
-        highlight: false,
-        matched: count >= 300,
-      },
-      {
-        emoji: '🧀',
-        number: fmt(Math.floor(count)),
-        label: 'Käseplatten dazu',
         highlight: false,
         matched: count >= 5,
       },
@@ -579,53 +512,6 @@ function buildComparisonsEn(count: number, category: BeverageCategory, fmt: Fmt)
         emoji: '🍪',
         number: fmt(Math.floor(count)),
         label: 'cookies on the side',
-        highlight: false,
-        matched: count >= 5,
-      },
-    ];
-  }
-  if (category === 'wine') {
-    // 750ml bottle ≈ 6 glasses of 125ml.
-    return [
-      {
-        emoji: '🍷',
-        number: fmt(Math.floor(count * 6)),
-        label: 'glasses (125ml)',
-        highlight: false,
-        matched: count >= 2,
-      },
-      {
-        emoji: '📦',
-        number: fmt(Math.floor(count / 6)),
-        label: 'cases (6-bottle)',
-        highlight: false,
-        matched: count >= 6,
-      },
-      {
-        emoji: '🍽️',
-        number: fmt(Math.floor(count / 2)),
-        label: 'dinners for two',
-        highlight: true,
-        matched: count >= 10,
-      },
-      {
-        emoji: '🌅',
-        number: fmt(Math.floor(count / 365)),
-        label: 'years of a daily bottle',
-        highlight: true,
-        matched: count >= 365,
-      },
-      {
-        emoji: '🛢️',
-        number: fmt(Math.floor(count / 300)),
-        label: 'barriques (~300 bottles)',
-        highlight: false,
-        matched: count >= 300,
-      },
-      {
-        emoji: '🧀',
-        number: fmt(Math.floor(count)),
-        label: 'cheese boards on the side',
         highlight: false,
         matched: count >= 5,
       },

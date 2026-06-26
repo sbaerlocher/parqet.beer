@@ -123,11 +123,6 @@
         // client secret for this OAuth flow; security comes from PKCE +
         // redirect_uri allowlist on the Parqet Developer app.
         "PARQET_CLIENT_ID": "019d6f34-2b08-7463-a950-ba854b199665",
-        // Cloudflare Web Analytics beacon token (cookieless pageviews).
-        // PUBLIC — safe to commit. Replace with the real token from the CF
-        // dashboard (Analytics & Logs → Web Analytics). Empty string keeps
-        // the beacon disabled. See src/lib/components/Analytics.svelte.
-        "PUBLIC_CF_BEACON_TOKEN": "",
       },
     },
   },

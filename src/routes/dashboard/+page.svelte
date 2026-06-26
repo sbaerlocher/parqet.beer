@@ -21,7 +21,6 @@
   import CoffeeGlass from '$lib/components/CoffeeGlass.svelte';
   import SmoothieGlass from '$lib/components/SmoothieGlass.svelte';
   import WhiskyGlass from '$lib/components/WhiskyGlass.svelte';
-  import WineGlass from '$lib/components/WineGlass.svelte';
   import LocaleToggle from '$lib/components/LocaleToggle.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
   import ShareButton from '$lib/components/ShareButton.svelte';
@@ -44,7 +43,6 @@
     coffee: CoffeeGlass,
     smoothie: SmoothieGlass,
     whisky: WhiskyGlass,
-    wine: WineGlass,
   } as const;
 
   function isBeverageCategory(value: unknown): value is BeverageCategory {
@@ -256,7 +254,6 @@
     { key: 'coffee', emoji: CATEGORY_EMOJI.coffee, intro: $t.catIntroCoffee },
     { key: 'smoothie', emoji: CATEGORY_EMOJI.smoothie, intro: $t.catIntroSmoothie },
     { key: 'whisky', emoji: CATEGORY_EMOJI.whisky, intro: $t.catIntroWhisky },
-    { key: 'wine', emoji: CATEGORY_EMOJI.wine, intro: $t.catIntroWine },
   ] as const);
 
   function loadDemo() {

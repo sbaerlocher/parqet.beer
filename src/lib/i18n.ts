@@ -42,14 +42,12 @@ export const translations = {
     coffee: 'Kaffee',
     smoothie: 'Smoothie',
     whisky: 'Whisky',
-    wine: 'Wein',
 
     // Category intros
     catIntroBeer: 'Prost!',
     catIntroCoffee: 'Lieber Kaffee?',
     catIntroSmoothie: 'Oder doch etwas Gesundes?',
     catIntroWhisky: 'Oder lieber ein Dram?',
-    catIntroWine: 'Oder ein Glas Wein?',
 
     // Landing
     heroEyebrow: 'Die einzige Kennzahl, die zählt',
@@ -172,14 +170,12 @@ export const translations = {
     coffee: 'Coffee',
     smoothie: 'Smoothie',
     whisky: 'Whisky',
-    wine: 'Wine',
 
     // Category intros
     catIntroBeer: 'Cheers!',
     catIntroCoffee: 'More of a coffee person?',
     catIntroSmoothie: 'Or something healthy?',
     catIntroWhisky: 'Or perhaps a dram?',
-    catIntroWine: 'Or a glass of wine?',
 
     // Landing
     heroEyebrow: 'The only metric that matters',

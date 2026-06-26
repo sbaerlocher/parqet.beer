@@ -20,11 +20,11 @@ const config = {
     csp: {
       mode: 'hash',
       directives: {
-        // `static.cloudflareinsights.com` serves the Web Analytics beacon
-        // (see src/lib/components/Analytics.svelte); `cloudflareinsights.com`
-        // is where the cookieless beacon POSTs pageviews. Both are listed
-        // unconditionally — harmless when no beacon token is set, since the
-        // script tag is only emitted then.
+        // Cloudflare Web Analytics is enabled on the CF dashboard and the
+        // beacon is auto-injected by Cloudflare on the served response (no
+        // app-side script). `static.cloudflareinsights.com` serves that
+        // beacon and `cloudflareinsights.com` is where it POSTs pageviews,
+        // so both must be allowed or CSP would block CF's own injection.
         'default-src': ['self'],
         'script-src': ['self', 'https://static.cloudflareinsights.com'],
         'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],

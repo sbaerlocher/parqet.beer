@@ -12,13 +12,3 @@ PARQET_CLIENT_ID=your-parqet-client-id-here
 # wrangler.jsonc). The local Wrangler emulator does not populate that
 # binding, so `resolveSessionSecret` falls back to this variable.
 SESSION_SECRET_DEV=replace-with-32-plus-bytes-of-randomness
-
-# Cloudflare Web Analytics beacon token (PUBLIC — safe to expose in HTML).
-# Cookieless, privacy-friendly pageview analytics. Leave empty to disable
-# (no beacon is injected, no analytics run). Get a token by adding the site
-# under Cloudflare Dashboard → Analytics & Logs → Web Analytics, then copy
-# the value from the `data-cf-beacon='{"token":"..."}'` snippet.
-# In production set this under env.production.vars in wrangler.jsonc.
-# NOTE: CF Web Analytics tracks pageviews + Web Vitals only — no custom
-# events (that needs Zaraz). See src/lib/components/Analytics.svelte.
-PUBLIC_CF_BEACON_TOKEN=
