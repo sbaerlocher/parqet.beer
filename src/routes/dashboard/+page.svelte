@@ -381,9 +381,9 @@
         >
           🍺
         </span>
-        <span class="font-display font-bold text-base shrink-0"
-          >parqet<span class="text-amber-600">.beer</span></span
-        >
+        <h1 class="font-display font-bold text-base shrink-0">
+          parqet<span class="text-amber-600">.beer</span>
+        </h1>
         {#if displayValue !== null}
           <!-- equation chip (R12) -->
           <div
