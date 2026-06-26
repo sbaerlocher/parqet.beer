@@ -20,12 +20,17 @@ const config = {
     csp: {
       mode: 'hash',
       directives: {
+        // `static.cloudflareinsights.com` serves the Web Analytics beacon
+        // (see src/lib/components/Analytics.svelte); `cloudflareinsights.com`
+        // is where the cookieless beacon POSTs pageviews. Both are listed
+        // unconditionally — harmless when no beacon token is set, since the
+        // script tag is only emitted then.
         'default-src': ['self'],
-        'script-src': ['self'],
+        'script-src': ['self', 'https://static.cloudflareinsights.com'],
         'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
         'img-src': ['self', 'data:', 'https:'],
         'font-src': ['self', 'data:', 'https://fonts.gstatic.com'],
-        'connect-src': ['self', 'https://connect.parqet.com'],
+        'connect-src': ['self', 'https://connect.parqet.com', 'https://cloudflareinsights.com'],
         'base-uri': ['self'],
         'form-action': ['self', 'https://connect.parqet.com'],
         'upgrade-insecure-requests': true,

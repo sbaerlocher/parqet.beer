@@ -4,6 +4,7 @@
   import { browser } from '$app/environment';
   import { untrack, type Snippet } from 'svelte';
   import { locale, t } from '$lib/stores/locale';
+  import Analytics from '$lib/components/Analytics.svelte';
   import type { LayoutData } from './$types';
 
   let { data, children }: { data: LayoutData; children: Snippet } = $props();
@@ -48,5 +49,7 @@
   <title>parqet.beer — {$t.tagline}</title>
   <meta name="description" content={$t.tagline} />
 </svelte:head>
+
+<Analytics />
 
 {@render children()}
