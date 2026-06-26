@@ -75,10 +75,16 @@ Then open `http://localhost:5173` in your browser.
 
 ### Environment Variables
 
-| Variable           | Description                                          |
-| ------------------ | ---------------------------------------------------- |
-| `PARQET_CLIENT_ID` | OAuth App Client ID from the Parqet Developer Portal |
-| `SESSION_SECRET`   | 32+ byte random secret for JWE session cookies       |
+| Variable                 | Description                                                             |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `PARQET_CLIENT_ID`       | OAuth App Client ID from the Parqet Developer Portal                    |
+| `SESSION_SECRET`         | 32+ byte random secret for JWE session cookies                          |
+| `PUBLIC_CF_BEACON_TOKEN` | Cloudflare Web Analytics token (cookieless pageviews). Empty = disabled |
+
+Analytics use **Cloudflare Web Analytics** — cookieless and privacy-friendly,
+so no cookie banner is required. It records pageviews and Core Web Vitals only;
+custom events (e.g. per-beverage popularity) would need Cloudflare Zaraz and are
+out of scope. Leave `PUBLIC_CF_BEACON_TOKEN` empty to ship no beacon at all.
 
 Parqet Connect runs as a public client with PKCE — no client secret required.
 
@@ -175,6 +181,30 @@ static/                       # Favicon, OG image, etc.
   [src/lib/data/beer.json](src/lib/data/beer.json)
 - **Coffee & smoothies**: cafe / shop prices, manually curated
 - All prices are community-curated. **Pull requests welcome!**
+
+## Embed Widget
+
+A lightweight, read-only widget lives at `/embed` and is designed to be iframed
+into blogs (e.g. finance blogs). It renders a single "X portfolio = Y beverages"
+badge, links back to parqet.beer, and carries no auth or session. The `/embed`
+route is the only path that opts out of the site's frame-blocking headers.
+
+Copy-paste snippet:
+
+```html
+<iframe
+  src="https://parqet.beer/embed?value=42000&currency=EUR&category=beer"
+  width="360"
+  height="80"
+  style="border:0"
+  loading="lazy"
+  title="parqet.beer widget"
+></iframe>
+```
+
+Query params (all optional): `value` (portfolio amount), `currency`
+(`EUR`/`CHF`/`USD`/`GBP`), `category` (`beer`/`coffee`/`smoothie`/`whisky`/`wine`).
+Omit `value` to show the demo figure.
 
 ## Further Documentation
 
