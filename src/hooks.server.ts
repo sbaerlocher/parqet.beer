@@ -214,8 +214,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   // Apply security headers to every response (HTML, JSON, assets). CSP is
   // tightest on HTML but harmless on JSON; STS/XFO/etc. are universally safe.
-  // The pathname lets `/embed` opt out of frame-blocking so blogs can iframe it.
-  applySecurityHeaders(response.headers, event.url.pathname);
+  applySecurityHeaders(response.headers);
 
   return response;
 };

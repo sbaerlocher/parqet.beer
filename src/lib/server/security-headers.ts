@@ -30,27 +30,8 @@ export const SECURITY_HEADERS: Record<string, string> = {
   'Cross-Origin-Resource-Policy': 'same-origin',
 };
 
-// The embed widget (`/embed`) is meant to be iframed by third-party blogs, so
-// the default frame-blocking headers would defeat it. For that path only we
-// open `frame-ancestors` and drop the legacy `X-Frame-Options` (which has no
-// "allow any" value — its presence alone blocks framing). It stays read-only
-// and carries no auth/session, so opening framing is safe. `same-origin`
-// resource policy would also block cross-origin embedding, so relax it too.
-const EMBED_PREFIX = '/embed';
-
-/** Whether a request path should be allowed to render inside a cross-origin iframe. */
-export function isEmbeddablePath(pathname: string): boolean {
-  return pathname === EMBED_PREFIX || pathname.startsWith(`${EMBED_PREFIX}/`);
-}
-
-export function applySecurityHeaders(headers: Headers, pathname = ''): void {
+export function applySecurityHeaders(headers: Headers): void {
   for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
     headers.set(key, value);
-  }
-
-  if (isEmbeddablePath(pathname)) {
-    headers.set('Content-Security-Policy', 'frame-ancestors *');
-    headers.delete('X-Frame-Options');
-    headers.set('Cross-Origin-Resource-Policy', 'cross-origin');
   }
 }
