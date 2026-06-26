@@ -4,6 +4,7 @@ import beer from '../src/lib/data/beer.json';
 import coffee from '../src/lib/data/coffee.json';
 import smoothie from '../src/lib/data/smoothie.json';
 import whisky from '../src/lib/data/whisky.json';
+import wine from '../src/lib/data/wine.json';
 
 const validItem = { name: 'Test', size: '0.5l', price: 1.5, currency: 'EUR', country: 'DE' };
 
@@ -12,6 +13,7 @@ describe.each([
   ['coffee.json', coffee],
   ['smoothie.json', smoothie],
   ['whisky.json', whisky],
+  ['wine.json', wine],
 ])('%s schema validation', (name, data) => {
   it('matches beverage schema', () => {
     const result = beverageListSchema.safeParse(data);

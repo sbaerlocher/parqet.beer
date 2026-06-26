@@ -8,6 +8,12 @@ export const translations = {
     connectButton: 'Mit Parqet verbinden',
     openDashboardButton: 'Dashboard öffnen',
     readOnly: 'Read-only Zugriff. Wir können nichts an deinem Portfolio ändern.',
+    tryDemo: 'Demo ansehen',
+
+    // Demo mode
+    demoBanner: 'Demo-Modus — Beispieldaten, kein echtes Portfolio.',
+    demoConnect: 'Mit Parqet verbinden',
+    exitDemo: 'Demo verlassen',
 
     // Dashboard
     logout: 'Abmelden',
@@ -36,12 +42,14 @@ export const translations = {
     coffee: 'Kaffee',
     smoothie: 'Smoothie',
     whisky: 'Whisky',
+    wine: 'Wein',
 
     // Category intros
     catIntroBeer: 'Prost!',
     catIntroCoffee: 'Lieber Kaffee?',
     catIntroSmoothie: 'Oder doch etwas Gesundes?',
     catIntroWhisky: 'Oder lieber ein Dram?',
+    catIntroWine: 'Oder ein Glas Wein?',
 
     // Landing
     heroEyebrow: 'Die einzige Kennzahl, die zählt',
@@ -130,6 +138,12 @@ export const translations = {
     connectButton: 'Connect with Parqet',
     openDashboardButton: 'Open dashboard',
     readOnly: "Read-only access. We can't change anything in your portfolio.",
+    tryDemo: 'View demo',
+
+    // Demo mode
+    demoBanner: 'Demo mode — sample data, not a real portfolio.',
+    demoConnect: 'Connect with Parqet',
+    exitDemo: 'Exit demo',
 
     // Dashboard
     logout: 'Log out',
@@ -158,12 +172,14 @@ export const translations = {
     coffee: 'Coffee',
     smoothie: 'Smoothie',
     whisky: 'Whisky',
+    wine: 'Wine',
 
     // Category intros
     catIntroBeer: 'Cheers!',
     catIntroCoffee: 'More of a coffee person?',
     catIntroSmoothie: 'Or something healthy?',
     catIntroWhisky: 'Or perhaps a dram?',
+    catIntroWine: 'Or a glass of wine?',
 
     // Landing
     heroEyebrow: 'The only metric that matters',
