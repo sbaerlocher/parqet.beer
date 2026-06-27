@@ -75,10 +75,16 @@ Then open `http://localhost:5173` in your browser.
 
 ### Environment Variables
 
-| Variable           | Description                                          |
-| ------------------ | ---------------------------------------------------- |
-| `PARQET_CLIENT_ID` | OAuth App Client ID from the Parqet Developer Portal |
-| `SESSION_SECRET`   | 32+ byte random secret for JWE session cookies       |
+| Variable                 | Description                                                             |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `PARQET_CLIENT_ID`       | OAuth App Client ID from the Parqet Developer Portal                    |
+| `SESSION_SECRET`         | 32+ byte random secret for JWE session cookies                          |
+| `PUBLIC_CF_BEACON_TOKEN` | Cloudflare Web Analytics token (cookieless pageviews). Empty = disabled |
+
+Analytics use **Cloudflare Web Analytics** — cookieless and privacy-friendly,
+so no cookie banner is required. It records pageviews and Core Web Vitals only;
+custom events (e.g. per-beverage popularity) would need Cloudflare Zaraz and are
+out of scope. Leave `PUBLIC_CF_BEACON_TOKEN` empty to ship no beacon at all.
 
 Parqet Connect runs as a public client with PKCE — no client secret required.
 

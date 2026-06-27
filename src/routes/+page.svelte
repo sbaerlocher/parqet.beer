@@ -126,6 +126,16 @@
             />
             {authenticated ? $t.openDashboardButton : $t.connectButton} →
           </a>
+          {#if !authenticated}
+            <a
+              href="/dashboard?demo=1"
+              data-testid="hero-demo"
+              class="btn btn-ghost"
+              style="padding: 14px 22px; font-size: 15px; border-radius: 10px"
+            >
+              🧪 {$t.tryDemo}
+            </a>
+          {/if}
           <span class="font-mono text-xs text-amber-700">
             🔒 {$t.readOnly}
           </span>

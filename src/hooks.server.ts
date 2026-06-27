@@ -75,6 +75,12 @@ async function maybeRefreshSession(
 
   const tokens = await refreshAccessToken(session.refreshToken, env);
   if (!tokens) {
+    // Release the lock so the next request can retry immediately. Without this,
+    // a transient Parqet 5xx leaves the lock pinned for its full 60s TTL: every
+    // request in that window short-circuits at the `existing` check above with
+    // the soon-to-expire session, and once it lapses the user is wrongly wiped
+    // into a "session ended" state — a self-DoS even though a retry would work.
+    await env.PARQET_KV.delete(lockKey);
     console.error('[auth:refresh] Refresh failed — token may be expired or revoked');
     return session;
   }

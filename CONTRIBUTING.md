@@ -155,6 +155,32 @@ parqet.beer prefers **specialty over mass-market**. The bar is:
 **Max one entry per brand.** If a brand already has an entry, replace it or
 discuss in an issue first — do not stack SKUs.
 
+### Updating a price (crowdsourcing)
+
+Prices drift, and the dataset is community-maintained. There are two ways to
+contribute a corrected price:
+
+1. **Open an issue** — use the
+   [**Price Update**](https://github.com/sbaerlocher/parqet.beer/issues/new?template=price_update.yml)
+   issue template. Give the beverage name (exactly as in the JSON), the
+   corrected price in its home currency, a source URL, and the date you checked.
+   A maintainer (or another contributor) will fold it into the JSON.
+2. **Open a PR** — edit the relevant file directly
+   (`src/lib/data/{beer,coffee,smoothie,whisky,wine}.json`), then validate
+   locally before pushing:
+
+   ```bash
+   pnpm validate:data   # node script, no build needed
+   pnpm test            # also runs the Zod schema tests
+   ```
+
+   The `validate:data` script checks every data file against the schema
+   (required fields, positive finite prices, EUR/CHF currency, 2-letter country,
+   no duplicate names) and exits non-zero on any problem.
+
+Always include the **source URL** and the **date observed** — prices without a
+provenance trail will be asked for one before merge.
+
 ### Required in the PR body
 
 1. **Source URL** for the price and size (producer page, menu, or a reputable
