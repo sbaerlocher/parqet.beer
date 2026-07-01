@@ -81,15 +81,25 @@ export async function exchangeCodeForTokens(
 }
 
 /**
- * Exchange a refresh token for a fresh access token. Returns null on any
- * failure so the caller can fall back to re-auth.
+ * Result of a refresh attempt. `permanent` distinguishes a dead grant (4xx —
+ * token revoked/expired, re-auth required) from a transient outage (5xx,
+ * network, malformed body — safe to retry on the next request). Callers use
+ * this to avoid pinning a user in a re-auth loop over a blip on Parqet's side.
+ */
+export type RefreshResult = { ok: true; tokens: TokenResponse } | { ok: false; permanent: boolean };
+
+/**
+ * Exchange a refresh token for a fresh access token. A 4xx is treated as a
+ * permanent failure (grant is dead); 5xx, network errors, and unparseable
+ * bodies are transient.
  */
 export async function refreshAccessToken(
   refreshToken: string,
   env: App.Platform['env']
-): Promise<TokenResponse | null> {
+): Promise<RefreshResult> {
+  let response: Response;
   try {
-    const response = await fetch(env.PARQET_TOKEN_URL, {
+    response = await fetch(env.PARQET_TOKEN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
@@ -98,17 +108,25 @@ export async function refreshAccessToken(
         client_id: env.PARQET_CLIENT_ID,
       }),
     });
-
-    if (!response.ok) {
-      console.error('[parqet:refresh] Token refresh rejected:', response.status);
-      return null;
-    }
-
-    const data = await response.json();
-    return TokenResponseSchema.parse(data);
   } catch (err) {
+    // Network/fetch failure — never reached Parqet, so treat as transient.
     console.error('[parqet:refresh] Token refresh error:', err);
-    return null;
+    return { ok: false, permanent: false };
+  }
+
+  if (!response.ok) {
+    console.error('[parqet:refresh] Token refresh rejected:', response.status);
+    // 4xx = dead grant (re-auth needed); 5xx = Parqet blip, retry later.
+    return { ok: false, permanent: response.status >= 400 && response.status < 500 };
+  }
+
+  try {
+    const data = await response.json();
+    return { ok: true, tokens: TokenResponseSchema.parse(data) };
+  } catch (err) {
+    // 2xx but body isn't a valid token response — transient, don't nuke session.
+    console.error('[parqet:refresh] Token refresh parse error:', err);
+    return { ok: false, permanent: false };
   }
 }
 
