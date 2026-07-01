@@ -71,6 +71,16 @@ describe('refreshAccessToken', () => {
     expect(result).toEqual({ ok: false, permanent: true });
   });
 
+  it('reports 429/408 as transient (rate-limit / timeout, not a dead grant)', async () => {
+    for (const status of [429, 408]) {
+      (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+        new Response('slow down', { status })
+      );
+      const result = await refreshAccessToken('any', env);
+      expect(result).toEqual({ ok: false, permanent: false });
+    }
+  });
+
   it('reports a 5xx as a transient failure (retry later)', async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
       new Response('boom', { status: 503 })

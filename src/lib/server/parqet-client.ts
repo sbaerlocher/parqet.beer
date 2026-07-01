@@ -116,8 +116,12 @@ export async function refreshAccessToken(
 
   if (!response.ok) {
     console.error('[parqet:refresh] Token refresh rejected:', response.status);
-    // 4xx = dead grant (re-auth needed); 5xx = Parqet blip, retry later.
-    return { ok: false, permanent: response.status >= 400 && response.status < 500 };
+    // Only auth-failure 4xx (dead grant) is permanent. 408/429 are transient —
+    // a request burst (what this handles) can itself provoke a rate-limit, and
+    // logging the user out over that would be a regression. 5xx retries too.
+    const transient4xx = response.status === 408 || response.status === 429;
+    const is4xx = response.status >= 400 && response.status < 500;
+    return { ok: false, permanent: is4xx && !transient4xx };
   }
 
   try {
