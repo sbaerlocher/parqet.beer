@@ -1,9 +1,13 @@
----
-name: Security Scan
+# Scheduled security scan for parqet.beer.
+#
+# Public repo: runs nightly (GitHub Actions minutes are free for public repos).
+# CodeQL also runs on pull requests as a job in pull-request.yml; this file
+# covers the scheduled sweep plus dependency and secret scanning.
+name: Nightly Security Scan
 
-'on':
+on:
   schedule:
-    - cron: '0 2 * * 1' # Weekly Monday 02:00 UTC
+    - cron: '0 2 * * *' # Daily 02:00 UTC
   workflow_dispatch:
 
 permissions:
