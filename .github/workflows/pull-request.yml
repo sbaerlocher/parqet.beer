@@ -1,32 +1,56 @@
-# Continuous Integration for parqet.beer.
+# Pull Request checks for parqet.beer.
 #
 # Quality/security gates (lint, typecheck, format, unit tests with coverage,
 # build, dependency audit, Trivy) are delegated to the shared reusable
 # workflow in sbaerlocher/.github. The E2E job stays local because the
-# reusable workflow doesn't cover Playwright.
+# reusable workflow doesn't cover Playwright. CodeQL and the AI review run
+# as jobs here (public-repo convention), not as their own files.
 #
 # Deployment is handled by the Cloudflare Workers Git integration (configured
-# in the Cloudflare dashboard), not by GitHub Actions — so this file
-# deliberately has no deploy job and no Cloudflare secrets.
-name: Continuous Integration
+# in the Cloudflare dashboard), not by GitHub Actions — so there is no
+# merge.yml and no deploy job.
+name: Pull Request
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: pull-request-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   ci:
     uses: sbaerlocher/.github/.github/workflows/ci-js.yml@2026-07-08
     secrets: inherit
+
+  code-analysis:
+    name: SAST (CodeQL)
+    uses: sbaerlocher/.github/.github/workflows/security-code.yml@2026-07-08
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    with:
+      languages: '["javascript-typescript"]'
+      node-version-file: .nvmrc
+      package-manager: pnpm
+      concurrency-suffix: code
+
+  claude-review:
+    name: Claude Code Review
+    uses: sbaerlocher/.github/.github/workflows/ai-claude-review.yml@2026-07-08
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
   e2e:
     name: E2E (Playwright)
@@ -62,16 +86,17 @@ jobs:
   status:
     name: All Checks Passed
     runs-on: ubuntu-latest
-    needs: [ci, e2e]
+    needs: [ci, code-analysis, e2e]
     if: always()
     steps:
       - name: Check results
         env:
           CI_RESULT: ${{ needs.ci.result }}
+          CODEQL_RESULT: ${{ needs.code-analysis.result }}
           E2E_RESULT: ${{ needs.e2e.result }}
         run: |
-          if [[ "$CI_RESULT" != "success" || "$E2E_RESULT" != "success" ]]; then
-            echo "CI failed (ci=$CI_RESULT, e2e=$E2E_RESULT)"
+          if [[ "$CI_RESULT" != "success" || "$CODEQL_RESULT" != "success" || "$E2E_RESULT" != "success" ]]; then
+            echo "PR checks failed (ci=$CI_RESULT, codeql=$CODEQL_RESULT, e2e=$E2E_RESULT)"
             exit 1
           fi
           echo "All checks passed"
