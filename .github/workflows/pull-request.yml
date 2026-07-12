@@ -25,12 +25,12 @@ concurrency:
 
 jobs:
   ci:
-    uses: sbaerlocher/.github/.github/workflows/ci-js.yml@2026-07-08
+    uses: sbaerlocher/.github/.github/workflows/ci-js.yml@2026-07-10
     secrets: inherit
 
   code-analysis:
     name: SAST (CodeQL)
-    uses: sbaerlocher/.github/.github/workflows/security-code.yml@2026-07-08
+    uses: sbaerlocher/.github/.github/workflows/security-code.yml@2026-07-10
     permissions:
       contents: read
       security-events: write
@@ -43,7 +43,7 @@ jobs:
 
   claude-review:
     name: Claude Code Review
-    uses: sbaerlocher/.github/.github/workflows/ai-claude-review.yml@2026-07-08
+    uses: sbaerlocher/.github/.github/workflows/ai-claude-review.yml@2026-07-10
     permissions:
       contents: read
       pull-requests: write
