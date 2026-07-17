@@ -28,6 +28,27 @@ jobs:
     uses: sbaerlocher/.github/.github/workflows/ci-js.yml@2026-07-13
     secrets: inherit
 
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      e2e: ${{ steps.filter.outputs.e2e }}
+    steps:
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3
+        id: filter
+        with:
+          filters: |
+            e2e:
+              - 'src/**'
+              - 'tests/e2e/**'
+              - 'playwright.config.ts'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/pull-request.yml'
+
   code-analysis:
     name: SAST (CodeQL)
     uses: sbaerlocher/.github/.github/workflows/security-code.yml@2026-07-13
@@ -55,7 +76,8 @@ jobs:
   e2e:
     name: E2E (Playwright)
     runs-on: ubuntu-latest
-    needs: [ci]
+    needs: [ci, changes]
+    if: needs.changes.outputs.e2e == 'true'
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
@@ -95,7 +117,10 @@ jobs:
           CODEQL_RESULT: ${{ needs.code-analysis.result }}
           E2E_RESULT: ${{ needs.e2e.result }}
         run: |
-          if [[ "$CI_RESULT" != "success" || "$CODEQL_RESULT" != "success" || "$E2E_RESULT" != "success" ]]; then
+          # E2E is skipped when no relevant paths changed (needs.changes gate);
+          # a skipped E2E is a pass, so only success/skipped are acceptable.
+          if [[ "$CI_RESULT" != "success" || "$CODEQL_RESULT" != "success" ]] \
+            || [[ "$E2E_RESULT" != "success" && "$E2E_RESULT" != "skipped" ]]; then
             echo "PR checks failed (ci=$CI_RESULT, codeql=$CODEQL_RESULT, e2e=$E2E_RESULT)"
             exit 1
           fi
