@@ -19,7 +19,7 @@ permissions:
 jobs:
   code-analysis:
     name: SAST (CodeQL)
-    uses: sbaerlocher/.github/.github/workflows/security-code.yml@2026-07-13
+    uses: sbaerlocher/.github/.github/workflows/security-code.yml@2026-07-19
     with:
       languages: '["javascript-typescript"]'
       node-version-file: .nvmrc
@@ -28,7 +28,7 @@ jobs:
 
   dependency-scan:
     name: Dependencies & Licenses
-    uses: sbaerlocher/.github/.github/workflows/security-deps.yml@2026-07-13
+    uses: sbaerlocher/.github/.github/workflows/security-deps.yml@2026-07-19
     with:
       language: 'javascript'
       enable-license-check: true
@@ -36,6 +36,6 @@ jobs:
 
   secret-detection:
     name: Secret Detection
-    uses: sbaerlocher/.github/.github/workflows/security-secrets.yml@2026-07-13
+    uses: sbaerlocher/.github/.github/workflows/security-secrets.yml@2026-07-19
     with:
       concurrency-suffix: secrets
