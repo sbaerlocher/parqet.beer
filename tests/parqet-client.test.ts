@@ -45,10 +45,13 @@ describe('refreshAccessToken', () => {
     const result = await refreshAccessToken('old-refresh', env);
 
     expect(result).toEqual({
-      access_token: 'new-access',
-      refresh_token: 'new-refresh',
-      expires_in: 3600,
-      token_type: 'Bearer',
+      ok: true,
+      tokens: {
+        access_token: 'new-access',
+        refresh_token: 'new-refresh',
+        expires_in: 3600,
+        token_type: 'Bearer',
+      },
     });
 
     const call = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
@@ -60,26 +63,44 @@ describe('refreshAccessToken', () => {
     expect(body.get('client_id')).toBe('test-client');
   });
 
-  it('returns null on a non-ok HTTP response', async () => {
+  it('reports a 4xx as a permanent failure (dead grant)', async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
       new Response('nope', { status: 401 })
     );
     const result = await refreshAccessToken('bad-refresh', env);
-    expect(result).toBeNull();
+    expect(result).toEqual({ ok: false, permanent: true });
   });
 
-  it('returns null when fetch throws', async () => {
+  it('reports 429/408 as transient (rate-limit / timeout, not a dead grant)', async () => {
+    for (const status of [429, 408]) {
+      (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+        new Response('slow down', { status })
+      );
+      const result = await refreshAccessToken('any', env);
+      expect(result).toEqual({ ok: false, permanent: false });
+    }
+  });
+
+  it('reports a 5xx as a transient failure (retry later)', async () => {
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+      new Response('boom', { status: 503 })
+    );
+    const result = await refreshAccessToken('any', env);
+    expect(result).toEqual({ ok: false, permanent: false });
+  });
+
+  it('reports a network error as transient', async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('network down'));
     const result = await refreshAccessToken('any', env);
-    expect(result).toBeNull();
+    expect(result).toEqual({ ok: false, permanent: false });
   });
 
-  it('returns null when the response does not match the schema', async () => {
+  it('reports a schema mismatch on a 2xx as transient', async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
       new Response(JSON.stringify({ wrong: 'shape' }), { status: 200 })
     );
     const result = await refreshAccessToken('any', env);
-    expect(result).toBeNull();
+    expect(result).toEqual({ ok: false, permanent: false });
   });
 });
 
