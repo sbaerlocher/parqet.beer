@@ -5,7 +5,11 @@ import {
   calculateFunStats,
   formatNumber,
 } from '../src/lib/calculator';
-import { EUR_TO_CHF_RATE } from '../src/lib/fx';
+import { FX_FALLBACK_RATES } from '../src/lib/fx';
+
+const EUR_TO_CHF_RATE = FX_FALLBACK_RATES['CHF']!;
+const EUR_TO_USD_RATE = FX_FALLBACK_RATES['USD']!;
+const EUR_TO_GBP_RATE = FX_FALLBACK_RATES['GBP']!;
 import type { Beverage } from '../src/lib/data/beverages';
 
 describe('convertValue', () => {
@@ -22,9 +26,31 @@ describe('convertValue', () => {
     expect(convertValue(100, 'CHF', 'EUR')).toBeCloseTo(100 / EUR_TO_CHF_RATE, 5);
   });
 
-  it('falls back to the original value for unknown currency pairs', () => {
-    expect(convertValue(100, 'GBP', 'EUR')).toBe(100);
-    expect(convertValue(100, 'USD', 'CHF')).toBe(100);
+  it('converts EUR to USD using the shared FX rate', () => {
+    expect(convertValue(100, 'EUR', 'USD')).toBeCloseTo(100 * EUR_TO_USD_RATE, 5);
+  });
+
+  it('converts EUR to GBP using the shared FX rate', () => {
+    expect(convertValue(100, 'EUR', 'GBP')).toBeCloseTo(100 * EUR_TO_GBP_RATE, 5);
+  });
+
+  it('converts USD to GBP via the EUR pivot', () => {
+    // 108 USD → 100 EUR → 85 GBP
+    expect(convertValue(EUR_TO_USD_RATE * 100, 'USD', 'GBP')).toBeCloseTo(100 * EUR_TO_GBP_RATE, 5);
+  });
+
+  it('converts USD to CHF via the EUR pivot', () => {
+    expect(convertValue(EUR_TO_USD_RATE * 100, 'USD', 'CHF')).toBeCloseTo(100 * EUR_TO_CHF_RATE, 5);
+  });
+
+  it('round-trips through EUR without drift', () => {
+    const back = convertValue(convertValue(100, 'EUR', 'GBP'), 'GBP', 'EUR');
+    expect(back).toBeCloseTo(100, 5);
+  });
+
+  it('falls back to the original value for genuinely unknown currencies', () => {
+    expect(convertValue(100, 'JPY', 'EUR')).toBe(100);
+    expect(convertValue(100, 'USD', 'JPY')).toBe(100);
   });
 });
 

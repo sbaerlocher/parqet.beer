@@ -8,6 +8,12 @@ export const translations = {
     connectButton: 'Mit Parqet verbinden',
     openDashboardButton: 'Dashboard öffnen',
     readOnly: 'Read-only Zugriff. Wir können nichts an deinem Portfolio ändern.',
+    tryDemo: 'Demo ansehen',
+
+    // Demo mode
+    demoBanner: 'Demo-Modus — Beispieldaten, kein echtes Portfolio.',
+    demoConnect: 'Mit Parqet verbinden',
+    exitDemo: 'Demo verlassen',
 
     // Dashboard
     logout: 'Abmelden',
@@ -130,6 +136,12 @@ export const translations = {
     connectButton: 'Connect with Parqet',
     openDashboardButton: 'Open dashboard',
     readOnly: "Read-only access. We can't change anything in your portfolio.",
+    tryDemo: 'View demo',
+
+    // Demo mode
+    demoBanner: 'Demo mode — sample data, not a real portfolio.',
+    demoConnect: 'Connect with Parqet',
+    exitDemo: 'Exit demo',
 
     // Dashboard
     logout: 'Log out',

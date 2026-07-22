@@ -1,0 +1,80 @@
+name: Price Update
+description: Report an outdated price for a beverage already in the dataset
+title: '[Price]: '
+labels: ['data', 'price-update']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Prices drift over time. If a beverage already in `beer.json` (or
+        coffee/smoothie/whisky) is priced wrong, report the corrected
+        price here. Maintainers (or you, via PR) will update the JSON.
+
+        **One beverage per issue.** For brand-new beverages, use the
+        **Beverage Data** template instead.
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      options:
+        - Beer
+        - Coffee
+        - Smoothie
+        - Whisky
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Beverage name (exactly as in the JSON)
+      placeholder: Augustiner Helles
+    validations:
+      required: true
+  - type: input
+    id: current-price
+    attributes:
+      label: Current price in the dataset
+      placeholder: '1.09'
+    validations:
+      required: false
+  - type: input
+    id: new-price
+    attributes:
+      label: Corrected price (in the beverage's home currency)
+      placeholder: '1.19'
+    validations:
+      required: true
+  - type: dropdown
+    id: currency
+    attributes:
+      label: Currency
+      options:
+        - EUR
+        - CHF
+    validations:
+      required: true
+  - type: input
+    id: source-url
+    attributes:
+      label: Source URL
+      description: Producer page, menu, or reputable retailer where you saw the price.
+      placeholder: https://www.rewe.de/...
+    validations:
+      required: true
+  - type: input
+    id: observed-date
+    attributes:
+      label: Date observed
+      description: When you checked the price (prices drift — we want a timestamp).
+      placeholder: 2026-06-25
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: This beverage already exists in the dataset (otherwise use the Beverage Data template).
+          required: true
+        - label: The price is the real retail price in the listed currency, not converted.
+          required: true

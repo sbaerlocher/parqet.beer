@@ -7,8 +7,8 @@
     BEVERAGE_CATEGORIES,
     CATEGORY_EMOJI,
     type BeverageCategory,
-    type Currency,
   } from '$lib/data/beverages';
+  import { DISPLAY_CURRENCIES, type DisplayCurrency, FX_FALLBACK_RATES } from '$lib/fx';
   import {
     calculateEquivalents,
     calculateFunStats,
@@ -33,6 +33,10 @@
     getMilestoneBadge,
     getNextMilestone,
   } from '$lib/fun';
+  import type { PageData } from './$types';
+
+  let { data }: { data: PageData } = $props();
+  const isDemo = $derived(data.demo === true);
 
   const GLASS_COMPONENTS = {
     beer: BeerGlass,
@@ -79,7 +83,10 @@
     }
   }
 
-  let currency = $state<Currency>('EUR');
+  let currency = $state<DisplayCurrency>('EUR');
+  // Live ECB rates from /api/performance; fall back to the static table until
+  // the first performance response arrives (or on an upstream FX outage).
+  let fxRates = $state<Record<string, number>>(FX_FALLBACK_RATES);
   let portfolios: Portfolio[] = $state([]);
   let selectedIds: Set<string> = $state(new Set());
   let portfolioValue: number | null = $state(null);
@@ -170,12 +177,14 @@
   });
 
   const displayValue = $derived(
-    portfolioValue !== null ? convertValue(portfolioValue, portfolioCurrency, currency) : null
+    portfolioValue !== null
+      ? convertValue(portfolioValue, portfolioCurrency, currency, fxRates)
+      : null
   );
 
   const dayIndex = Math.floor(Date.now() / 86400000);
 
-  const displayDividends = $derived(convertValue(dividends, portfolioCurrency, currency));
+  const displayDividends = $derived(convertValue(dividends, portfolioCurrency, currency, fxRates));
 
   const activeList = $derived(BEVERAGES[activeCategory]);
 
@@ -184,7 +193,9 @@
   const botdCurrency = $derived(beverageOfTheDay ? beverageOfTheDay.beverage.currency : '');
   const botdCount = $derived(
     portfolioValue !== null && botdPrice > 0
-      ? Math.floor(convertValue(portfolioValue, portfolioCurrency, botdCurrency) / botdPrice)
+      ? Math.floor(
+          convertValue(portfolioValue, portfolioCurrency, botdCurrency, fxRates) / botdPrice
+        )
       : 0
   );
 
@@ -223,7 +234,7 @@
   });
   const dividendBeers = $derived(
     botdPrice > 0
-      ? Math.floor(convertValue(dividends, portfolioCurrency, botdCurrency) / botdPrice)
+      ? Math.floor(convertValue(dividends, portfolioCurrency, botdCurrency, fxRates) / botdPrice)
       : 0
   );
 
@@ -252,6 +263,22 @@
     { key: 'whisky', emoji: CATEGORY_EMOJI.whisky, intro: $t.catIntroWhisky },
   ] as const);
 
+  function loadDemo() {
+    // Demo mode: hydrate straight from the server-provided fixture, never
+    // touching /api/* (those require a real session). Read-only showcase.
+    if (!data.demo) return;
+    const d = data.demoData;
+    portfolios = d.portfolios;
+    selectedIds = new Set(d.portfolios.map((p) => p.id));
+    portfolioValue = d.totalValue;
+    dividends = d.dividends;
+    portfolioCurrency = d.currency;
+    if ((DISPLAY_CURRENCIES as readonly string[]).includes(d.currency)) {
+      currency = d.currency as DisplayCurrency;
+    }
+    loading = false;
+  }
+
   async function loadPortfolios() {
     try {
       const res = await fetch('/api/portfolios?fresh=1');
@@ -266,7 +293,12 @@
       selectedIds = stored ?? new Set(data.map((p) => p.id));
       if (data.length > 0) {
         const primaryCurrency = data[0]?.currency;
-        if (primaryCurrency === 'CHF') currency = 'CHF';
+        if (
+          primaryCurrency &&
+          (DISPLAY_CURRENCIES as readonly string[]).includes(primaryCurrency)
+        ) {
+          currency = primaryCurrency as DisplayCurrency;
+        }
       }
       await loadPerformance();
     } catch (e) {
@@ -278,10 +310,15 @@
 
   $effect(() => {
     if (loading) return;
+    // Demo selection uses synthetic IDs (demo-world, …); persisting them would
+    // clobber the real user's saved portfolio subset under the shared key and
+    // wipe it on their next visit. Demo mode must never write this key.
+    if (isDemo) return;
     persistSelection(selectedIds);
   });
 
   async function loadPerformance() {
+    if (isDemo) return; // Demo values are fixed; never hit /api/performance.
     if (selectedIds.size === 0) {
       portfolioValue = 0;
       return;
@@ -300,10 +337,12 @@
         totalValue: number;
         dividends: number;
         currency: string;
+        fxRates?: Record<string, number>;
       };
       portfolioValue = data.totalValue;
       dividends = data.dividends ?? 0;
       portfolioCurrency = data.currency;
+      if (data.fxRates) fxRates = data.fxRates;
     } catch (e) {
       error = e instanceof Error ? e.message : 'Unknown error';
     } finally {
@@ -323,7 +362,8 @@
   }
 
   $effect(() => {
-    loadPortfolios();
+    if (isDemo) loadDemo();
+    else loadPortfolios();
   });
 </script>
 
@@ -341,9 +381,9 @@
         >
           🍺
         </span>
-        <span class="font-display font-bold text-base shrink-0"
-          >parqet<span class="text-amber-600">.beer</span></span
-        >
+        <h1 class="font-display font-bold text-base shrink-0">
+          parqet<span class="text-amber-600">.beer</span>
+        </h1>
         {#if displayValue !== null}
           <!-- equation chip (R12) -->
           <div
@@ -373,9 +413,9 @@
           class="inline-flex p-0.5 rounded-md"
           style="background: var(--accent); border: 1px solid var(--border)"
         >
-          {#each ['EUR', 'CHF'] as c (c)}
+          {#each DISPLAY_CURRENCIES as c (c)}
             <button
-              onclick={() => (currency = c as Currency)}
+              onclick={() => (currency = c)}
               class="px-2 sm:px-2.5 py-1 rounded text-[11px] font-bold transition-all font-mono"
               style={currency === c
                 ? 'background: var(--card); color: var(--highlight)'
@@ -400,22 +440,43 @@
         >
           {showValue ? '👁' : '👁‍🗨'}
         </button>
-        <form method="POST" action="/api/auth/logout">
-          <button
-            type="submit"
-            class="btn btn-ghost text-[13px]"
-            style="padding: 6px 8px"
-            title={$t.logout}
-          >
-            <span class="hidden sm:inline">{$t.logout}</span>
-            <span class="sm:hidden text-base">⏻</span>
-          </button>
-        </form>
+        {#if isDemo}
+          <a href="/api/auth/login" class="btn btn-ghost text-[13px]" style="padding: 6px 8px">
+            <span class="hidden sm:inline">{$t.demoConnect}</span>
+            <span class="sm:hidden text-base">🔗</span>
+          </a>
+        {:else}
+          <form method="POST" action="/api/auth/logout">
+            <button
+              type="submit"
+              class="btn btn-ghost text-[13px]"
+              style="padding: 6px 8px"
+              title={$t.logout}
+            >
+              <span class="hidden sm:inline">{$t.logout}</span>
+              <span class="sm:hidden text-base">⏻</span>
+            </button>
+          </form>
+        {/if}
       </div>
     </div>
   </header>
 
   <main class="max-w-[1200px] mx-auto px-4 sm:px-7 py-5 sm:py-7 pb-20">
+    {#if isDemo}
+      <div
+        class="mb-5 flex items-center justify-between gap-3 flex-wrap rounded-[10px] px-4 py-2.5"
+        style="background: var(--accent); border: 1px dashed var(--accent-hover)"
+      >
+        <span class="font-mono text-[11px] sm:text-xs text-amber-800">🧪 {$t.demoBanner}</span>
+        <a
+          href="/api/auth/login"
+          class="font-mono text-[11px] sm:text-xs font-bold text-amber-700 hover:text-amber-900 underline shrink-0"
+        >
+          {$t.demoConnect} →
+        </a>
+      </div>
+    {/if}
     {#if loading}
       <div class="text-center py-20">
         <p class="text-5xl mb-4 animate-pulse">🍺</p>
