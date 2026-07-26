@@ -245,12 +245,27 @@
   );
 
   // Feed the achievements store with the numbers it grades against: portfolio
-  // value normalised to EUR (its pivot currency) and how many of the current
-  // beverage the portfolio buys. Highest-count entry ≈ cheapest beverage.
-  const portfolioValueEur = $derived(
-    portfolioValue !== null ? convertValue(portfolioValue, portfolioCurrency, 'EUR') : 0
+  // value normalised to EUR (its pivot currency) and how many beverages the
+  // portfolio buys. Grade against beer's highest count regardless of the active
+  // tab — otherwise the badge depends on which category the user is looking at,
+  // and the `seen` ratchet locks in whatever tab happened to be active.
+  const portfolioValueEur = $derived.by(() => {
+    if (portfolioValue === null) return 0;
+    const eur = convertValue(portfolioValue, portfolioCurrency, 'EUR');
+    // A bad FX rate can yield NaN/Infinity; grade those as 0 rather than
+    // silently unlocking (or never unlocking) the value tiers.
+    return Number.isFinite(eur) ? eur : 0;
+  });
+  const beverageCount = $derived(
+    portfolioValue !== null
+      ? Math.max(
+          0,
+          ...calculateEquivalents(portfolioValue, portfolioCurrency, BEVERAGES.beer)
+            .map((e) => e.count)
+            .filter((c) => Number.isFinite(c))
+        )
+      : 0
   );
-  const beverageCount = $derived(sortenEquivsRaw[0]?.count ?? 0);
   $effect(() => {
     setPortfolioStats(portfolioValueEur, beverageCount);
   });

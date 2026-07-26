@@ -1,13 +1,15 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import { locale } from '$lib/stores/locale';
-  import { all, unlocked } from '$lib/stores/achievements';
+  import { all, unlocked, seenIds } from '$lib/stores/achievements';
   import LocaleToggle from '$lib/components/LocaleToggle.svelte';
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
-  // Only store state — locked portfolio/streak badges unlock once the dashboard
-  // has been visited and fed the store; this page never fetches on its own.
-  const unlockedIds = $derived(new Set($unlocked.map((a) => a.id)));
+  // Currently-true predicates ∪ everything ever unlocked (persisted in
+  // localStorage). The union means a direct load of this page — where the
+  // dashboard's `$effect` never runs to feed the store — still shows earned
+  // portfolio/beverage badges as unlocked, not locked. This page never fetches.
+  const unlockedIds = $derived(new Set([...seenIds, ...$unlocked.map((a) => a.id)]));
 </script>
 
 <svelte:head>

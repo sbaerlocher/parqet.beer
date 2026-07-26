@@ -4,6 +4,13 @@ All notable changes documented here. Format: [Keep a Changelog](https://keepacha
 
 ## [Unreleased]
 
+### Added
+
+- Achievements & Streaks: unlockable milestone badges based on portfolio value
+  and beverage count, plus a daily visit streak (1-day grace). Surfaced as an
+  unlock toast, a streak badge in the dashboard header, and an `/achievements`
+  gallery. Client-only, persisted in localStorage — no server state.
+
 ## [0.3.0] - 2026-04-22
 
 ### Added

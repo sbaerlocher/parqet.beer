@@ -78,6 +78,14 @@ function saveSeen(seen: Set<AchievementId>): void {
 const seen = loadSeen();
 
 /**
+ * Every id ever unlocked, from localStorage. The gallery unions this with the
+ * currently-true predicates so a direct load of `/achievements` (bookmark,
+ * refresh, new tab) doesn't render earned badges as locked just because the
+ * dashboard hasn't fed the store in this session.
+ */
+export const seenIds: ReadonlySet<AchievementId> = seen;
+
+/**
  * The ids unlocked since the last emission that weren't already seen. Emits the
  * fresh ids each time the input changes, then records them as seen so the next
  * derivation for the same unlocks yields an empty list.
