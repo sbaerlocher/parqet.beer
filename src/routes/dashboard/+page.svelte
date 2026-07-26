@@ -25,6 +25,9 @@
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
   import ShareButton from '$lib/components/ShareButton.svelte';
   import NoteBadge from '$lib/components/NoteBadge.svelte';
+  import StreakBadge from '$lib/components/StreakBadge.svelte';
+  import AchievementToast from '$lib/components/AchievementToast.svelte';
+  import { setPortfolioStats } from '$lib/stores/achievements';
   import { t, locale } from '$lib/stores/locale';
   import {
     getBeverageOfTheDay,
@@ -241,6 +244,32 @@
     })
   );
 
+  // Feed the achievements store with the numbers it grades against: portfolio
+  // value normalised to EUR (its pivot currency) and how many beverages the
+  // portfolio buys. Grade against beer's highest count regardless of the active
+  // tab — otherwise the badge depends on which category the user is looking at,
+  // and the `seen` ratchet locks in whatever tab happened to be active.
+  const portfolioValueEur = $derived.by(() => {
+    if (portfolioValue === null) return 0;
+    const eur = convertValue(portfolioValue, portfolioCurrency, 'EUR');
+    // A bad FX rate can yield NaN/Infinity; grade those as 0 rather than
+    // silently unlocking (or never unlocking) the value tiers.
+    return Number.isFinite(eur) ? eur : 0;
+  });
+  const beverageCount = $derived(
+    portfolioValue !== null
+      ? Math.max(
+          0,
+          ...calculateEquivalents(portfolioValue, portfolioCurrency, BEVERAGES.beer)
+            .map((e) => e.count)
+            .filter((c) => Number.isFinite(c))
+        )
+      : 0
+  );
+  $effect(() => {
+    setPortfolioStats(portfolioValueEur, beverageCount);
+  });
+
   const catLabel = $derived($t[activeCategory]);
   const catEmoji = $derived(CATEGORY_EMOJI[activeCategory]);
   const ActiveGlass = $derived(GLASS_COMPONENTS[activeCategory]);
@@ -366,6 +395,7 @@
         {/if}
       </div>
       <div class="flex gap-1.5 sm:gap-2 items-center shrink-0">
+        <StreakBadge />
         <ThemeToggle />
         <LocaleToggle />
         <!-- currency toggle -->
@@ -414,6 +444,8 @@
       </div>
     </div>
   </header>
+
+  <AchievementToast />
 
   <main class="max-w-[1200px] mx-auto px-4 sm:px-7 py-5 sm:py-7 pb-20">
     {#if loading}
@@ -944,6 +976,11 @@
           © 2026 · parqet.beer · Not affiliated with Parqet Fintech GmbH
         </div>
         <div class="flex gap-3.5 shrink-0">
+          <a
+            href="/achievements"
+            class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
+            >{$locale === 'de' ? 'Erfolge' : 'Achievements'}</a
+          >
           <a
             href="/privacy"
             class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
