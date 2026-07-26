@@ -25,6 +25,13 @@ concurrency:
 
 jobs:
   ci:
+    # ci-js's security-scan job requests actions:read + security-events:write
+    # (SARIF upload). A reusable workflow's nested job can only be granted
+    # permissions the calling job holds, so they must be declared here.
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
     uses: sbaerlocher/.github/.github/workflows/ci-js.yml@2026-07-23
     secrets: inherit
 
