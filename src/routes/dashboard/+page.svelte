@@ -962,6 +962,11 @@
         </div>
         <div class="flex gap-3.5 shrink-0">
           <a
+            href="/achievements"
+            class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
+            >{$locale === 'de' ? 'Erfolge' : 'Achievements'}</a
+          >
+          <a
             href="/privacy"
             class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
             >{$t.privacy}</a
