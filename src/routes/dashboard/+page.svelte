@@ -25,6 +25,9 @@
   import ThemeToggle from '$lib/components/ThemeToggle.svelte';
   import ShareButton from '$lib/components/ShareButton.svelte';
   import NoteBadge from '$lib/components/NoteBadge.svelte';
+  import StreakBadge from '$lib/components/StreakBadge.svelte';
+  import AchievementToast from '$lib/components/AchievementToast.svelte';
+  import { setPortfolioStats } from '$lib/stores/achievements';
   import { t, locale } from '$lib/stores/locale';
   import {
     getBeverageOfTheDay,
@@ -241,6 +244,17 @@
     })
   );
 
+  // Feed the achievements store with the numbers it grades against: portfolio
+  // value normalised to EUR (its pivot currency) and how many of the current
+  // beverage the portfolio buys. Highest-count entry ≈ cheapest beverage.
+  const portfolioValueEur = $derived(
+    portfolioValue !== null ? convertValue(portfolioValue, portfolioCurrency, 'EUR') : 0
+  );
+  const beverageCount = $derived(sortenEquivsRaw[0]?.count ?? 0);
+  $effect(() => {
+    setPortfolioStats(portfolioValueEur, beverageCount);
+  });
+
   const catLabel = $derived($t[activeCategory]);
   const catEmoji = $derived(CATEGORY_EMOJI[activeCategory]);
   const ActiveGlass = $derived(GLASS_COMPONENTS[activeCategory]);
@@ -366,6 +380,7 @@
         {/if}
       </div>
       <div class="flex gap-1.5 sm:gap-2 items-center shrink-0">
+        <StreakBadge />
         <ThemeToggle />
         <LocaleToggle />
         <!-- currency toggle -->
@@ -414,6 +429,8 @@
       </div>
     </div>
   </header>
+
+  <AchievementToast />
 
   <main class="max-w-[1200px] mx-auto px-4 sm:px-7 py-5 sm:py-7 pb-20">
     {#if loading}
