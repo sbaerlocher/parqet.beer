@@ -636,7 +636,7 @@
             style="border-top: 1px dashed var(--border)"
           >
             <span
-              data-testid="demo-total"
+              data-testid="hero-formula"
               class="font-mono text-[10px] tracking-wide"
               style="color: var(--muted)"
             >

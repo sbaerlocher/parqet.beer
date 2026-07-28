@@ -32,7 +32,7 @@ test.describe('demo mode', () => {
     // The value also renders in the header chip, but that one is
     // `hidden sm:inline-flex` and invisible on the mobile project. The ticket
     // footer carries it on every viewport, so scope the assertions there.
-    const total = page.getByTestId('demo-total');
+    const total = page.getByTestId('hero-formula');
     await expect(total).toContainText(/42[.,]000/);
 
     await worldPill.click();
