@@ -83,6 +83,7 @@ export const translations = {
     noFreeBeerHint: 'Sobald Dividenden eintrudeln, gibt\u2019s hier die Rechnung.',
     pricesWrong: 'Preise stimmen nicht? Jeder kann sie auf ',
     pricesWrongSuffix: ' anpassen!',
+    dataAsOf: (date: string) => `Preisdaten Stand vom ${date}`,
     shareLabel: 'TEILEN',
 
     // Components
@@ -205,6 +206,7 @@ export const translations = {
     noFreeBeerHint: 'Once dividends arrive, we\u2019ll post the tab here.',
     pricesWrong: 'Prices wrong? Anyone can update them on ',
     pricesWrongSuffix: '!',
+    dataAsOf: (date: string) => `Price data as of ${date}`,
     shareLabel: 'SHARE',
 
     // Components

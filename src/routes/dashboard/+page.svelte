@@ -16,6 +16,7 @@
     formatNumber,
   } from '$lib/calculator';
   import { countryFlag } from '$lib/fx';
+  import { DATA_UPDATED_AT, formatDataDate } from '$lib/data-freshness';
   import CountUp from '$lib/components/CountUp.svelte';
   import BeerGlass from '$lib/components/BeerGlass.svelte';
   import CoffeeGlass from '$lib/components/CoffeeGlass.svelte';
@@ -273,6 +274,10 @@
   const catLabel = $derived($t[activeCategory]);
   const catEmoji = $derived(CATEGORY_EMOJI[activeCategory]);
   const ActiveGlass = $derived(GLASS_COMPONENTS[activeCategory]);
+
+  // `null` when the build had no git history — the tag is then omitted
+  // entirely rather than rendered with a placeholder date.
+  const dataAsOf = $derived(formatDataDate(DATA_UPDATED_AT, $locale));
 
   const catCards = $derived([
     { key: 'beer', emoji: CATEGORY_EMOJI.beer, intro: $t.catIntroBeer },
@@ -965,6 +970,11 @@
             class="underline hover:text-amber-700 transition-colors">GitHub</a
           >{$t.pricesWrongSuffix}
         </div>
+        {#if dataAsOf}
+          <div class="font-mono text-[10px] text-amber-800 tracking-wide mt-2">
+            {$t.dataAsOf(dataAsOf)}
+          </div>
+        {/if}
       </div>
 
       <!-- footer -->
