@@ -1,5 +1,6 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import {
@@ -36,6 +37,7 @@
     getMilestoneBadge,
     getNextMilestone,
   } from '$lib/fun';
+  import { demoTotals } from '$lib/demo';
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();
@@ -86,13 +88,23 @@
     }
   }
 
-  let currency = $state<Currency>('EUR');
-  let portfolios: Portfolio[] = $state([]);
-  let selectedIds: Set<string> = $state(new Set());
-  let portfolioValue: number | null = $state(null);
-  let portfolioCurrency: string = $state('EUR');
-  let dividends: number = $state(0);
-  let loading = $state(true);
+  // Demo state is seeded synchronously from the server payload (not in an
+  // `$effect`, which is client-only) so `?demo=1` server-renders the real
+  // content instead of the loading spinner — the point of shareable demo links.
+  // Reading `data` once at init is deliberate here: the demo payload is a
+  // constant for the lifetime of the page, hence `untrack`.
+  const demoInitial = untrack(() => (data.demo ? data.demoData : null));
+  const demoInitialTotals = demoInitial
+    ? demoTotals(demoInitial, new Set(demoInitial.portfolios.map((p) => p.id)))
+    : null;
+
+  let currency = $state<Currency>(demoInitial?.currency ?? 'EUR');
+  let portfolios: Portfolio[] = $state(demoInitial?.portfolios ?? []);
+  let selectedIds: Set<string> = $state(new Set(demoInitial?.portfolios.map((p) => p.id) ?? []));
+  let portfolioValue: number | null = $state(demoInitialTotals?.totalValue ?? null);
+  let portfolioCurrency: string = $state(demoInitial?.currency ?? 'EUR');
+  let dividends: number = $state(demoInitialTotals?.dividends ?? 0);
+  let loading = $state(demoInitial === null);
   let loadingPerformance = $state(false);
   let error: string | null = $state(null);
   const CATEGORY_KEY = 'parqet-beer:category';
@@ -271,6 +283,10 @@
       : 0
   );
   $effect(() => {
+    // Achievement unlocks are a ratchet: the ids land in localStorage and stay
+    // there. Feeding the fixture in would hand a visitor badges they never
+    // earned and swallow the real unlock once they connect a portfolio.
+    if (isDemo) return;
     setPortfolioStats(portfolioValueEur, beverageCount);
   });
 
@@ -284,22 +300,6 @@
     { key: 'smoothie', emoji: CATEGORY_EMOJI.smoothie, intro: $t.catIntroSmoothie },
     { key: 'whisky', emoji: CATEGORY_EMOJI.whisky, intro: $t.catIntroWhisky },
   ] as const);
-
-  function loadDemo() {
-    // Demo mode: hydrate straight from the server-provided fixture, never
-    // touching /api/* (those require a real session). Read-only showcase.
-    if (!data.demo) return;
-    const d = data.demoData;
-    portfolios = d.portfolios;
-    selectedIds = new Set(d.portfolios.map((p) => p.id));
-    portfolioValue = d.totalValue;
-    dividends = d.dividends;
-    portfolioCurrency = d.currency;
-    if (d.currency === 'EUR' || d.currency === 'CHF') {
-      currency = d.currency;
-    }
-    loading = false;
-  }
 
   async function loadPortfolios() {
     try {
@@ -335,7 +335,14 @@
   });
 
   async function loadPerformance() {
-    if (isDemo) return; // Demo values are fixed; never hit /api/performance.
+    if (data.demo) {
+      // Recompute from the fixture so the selector pills behave like the real
+      // thing. Never hits /api/performance — that needs a session.
+      const totals = demoTotals(data.demoData, selectedIds);
+      portfolioValue = totals.totalValue;
+      dividends = totals.dividends;
+      return;
+    }
     if (selectedIds.size === 0) {
       portfolioValue = 0;
       return;
@@ -377,8 +384,7 @@
   }
 
   $effect(() => {
-    if (isDemo) loadDemo();
-    else loadPortfolios();
+    if (!isDemo) loadPortfolios();
   });
 </script>
 
