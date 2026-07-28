@@ -26,6 +26,11 @@ function git(args: string[]): string {
     cwd: repoRoot,
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'ignore'],
+    // A remote needing credentials would otherwise prompt and hang the build
+    // instead of failing into the caller's catch. The timeout is the backstop
+    // for a network fetch that stalls without prompting.
+    env: { ...process.env, GIT_TERMINAL_PROMPT: '0', GIT_ASKPASS: '' },
+    timeout: 30_000,
   }).trim();
 }
 
