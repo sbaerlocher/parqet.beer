@@ -14,7 +14,7 @@ product.**
 
 - 🍺 Portfolio value converted live into beer / coffee / smoothie
 - 🔐 Parqet Connect OAuth 2.0 (PKCE, read-only)
-- 💰 EUR / CHF toggle
+- 💰 EUR / CHF / USD / GBP toggle, with daily ECB exchange rates
 - 🌙 Dark mode
 - 🇩🇪 🇬🇧 German / English
 - 📊 Fun stats, beverage of the day, milestone badges, dividends in beer

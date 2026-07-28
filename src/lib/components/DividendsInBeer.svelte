@@ -2,7 +2,8 @@
 <script lang="ts">
   import type { Beverage, BeverageCategory } from '$lib/data/beverages';
   import { CATEGORY_DIVIDEND_EMOJI } from '$lib/data/beverages';
-  import { convertValue, formatNumber } from '$lib/calculator';
+  import { formatNumber } from '$lib/calculator';
+  import { convert, FX_FALLBACK, type FxRates } from '$lib/fx';
   import { locale, t } from '$lib/stores/locale';
 
   let {
@@ -10,15 +11,17 @@
     dividendsCurrency,
     beverage,
     category,
+    rates = FX_FALLBACK,
   }: {
     dividends: number;
     dividendsCurrency: string;
     beverage: Beverage;
     category: BeverageCategory;
+    rates?: FxRates;
   } = $props();
 
   const count = $derived(
-    Math.floor(convertValue(dividends, dividendsCurrency, beverage.currency) / beverage.price)
+    Math.floor(convert(dividends, dividendsCurrency, beverage.currency, rates) / beverage.price)
   );
 </script>
 
