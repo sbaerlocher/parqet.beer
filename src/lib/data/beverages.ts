@@ -7,7 +7,11 @@ import type { Beverage } from './schema';
 export type { Beverage, LocalizedNote } from './schema';
 
 export type BeverageCategory = 'beer' | 'coffee' | 'smoothie' | 'whisky';
-export type Currency = 'EUR' | 'CHF';
+
+// Display currencies the dashboard can show a portfolio in. Deliberately wider
+// than the beverage price currencies (`beverageSchema.currency`) — see the
+// note in `schema.ts`.
+export { SUPPORTED_CURRENCIES, type Currency } from '../fx';
 
 export const BEER_PRICES = beerData as Beverage[];
 export const COFFEE_PRICES = coffeeData as Beverage[];

@@ -9,6 +9,13 @@ import { z } from 'zod';
 // For beer/coffee/smoothie these usually coincide (origin = retail market).
 // For whisky they diverge because Scotch/Irish/Japanese bottles are imported
 // but priced from Whisky.de etc. — see whisky.json.
+//
+// `currency` stays narrower than the display currencies in `src/lib/fx.ts`
+// (which include USD and GBP): it describes the retail market a price was
+// actually researched in, and there is no US/UK reference data in these files
+// yet. Widening the enum before that data exists would only permit prices
+// nobody has sourced. Portfolio values in USD/GBP still convert into these
+// beverage currencies for the count — see `calculateEquivalents`.
 
 const localizedNote = z.object({
   de: z.string().trim().min(1),
