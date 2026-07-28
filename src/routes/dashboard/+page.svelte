@@ -635,7 +635,11 @@
             class="mt-3 pt-3 flex justify-between items-center"
             style="border-top: 1px dashed var(--border)"
           >
-            <span class="font-mono text-[10px] tracking-wide" style="color: var(--muted)">
+            <span
+              data-testid="demo-total"
+              class="font-mono text-[10px] tracking-wide"
+              style="color: var(--muted)"
+            >
               {showValue
                 ? `${formatNumber(Math.round(displayValue), $locale)} ${currency}`
                 : '•••••'}

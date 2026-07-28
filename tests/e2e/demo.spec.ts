@@ -28,7 +28,12 @@ test.describe('demo mode', () => {
     // `hidden sm:inline-flex`.
     const worldPill = page.getByRole('button', { name: /Demo · World ETF/ });
     await expect(worldPill).toContainText('●');
-    await expect(page.getByText(/42[.,]000/).first()).toBeVisible();
+
+    // The value also renders in the header chip, but that one is
+    // `hidden sm:inline-flex` and invisible on the mobile project. The ticket
+    // footer carries it on every viewport, so scope the assertions there.
+    const total = page.getByTestId('demo-total');
+    await expect(total).toContainText(/42[.,]000/);
 
     await worldPill.click();
     await expect(worldPill).toContainText('○');
@@ -37,7 +42,7 @@ test.describe('demo mode', () => {
     // leaves demo-dividend's 10,500 EUR. The pill marker and the selection
     // label both flip on `selectedIds` alone, so neither would catch a
     // regression that skips the recompute.
-    await expect(page.getByText(/10[.,]500/).first()).toBeVisible();
+    await expect(total).toContainText(/10[.,]500/);
   });
 
   test('demo mode never calls the authenticated API', async ({ page }) => {
