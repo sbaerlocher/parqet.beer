@@ -28,15 +28,16 @@ test.describe('demo mode', () => {
     // `hidden sm:inline-flex`.
     const worldPill = page.getByRole('button', { name: /Demo · World ETF/ });
     await expect(worldPill).toContainText('●');
-    const before = await page.locator('main').innerText();
+    await expect(page.getByText(/42[.,]000/).first()).toBeVisible();
 
     await worldPill.click();
     await expect(worldPill).toContainText('○');
 
-    // The pill flipping is not enough — the fixture subtotal has to actually
-    // recompute. Inert pills would read as a broken product to exactly the
-    // first-time visitor the demo is meant to impress.
-    await expect.poll(async () => await page.locator('main').innerText()).not.toBe(before);
+    // Assert on a number only `demoTotals` can produce: dropping demo-world
+    // leaves demo-dividend's 10,500 EUR. The pill marker and the selection
+    // label both flip on `selectedIds` alone, so neither would catch a
+    // regression that skips the recompute.
+    await expect(page.getByText(/10[.,]500/).first()).toBeVisible();
   });
 
   test('demo mode never calls the authenticated API', async ({ page }) => {
