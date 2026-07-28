@@ -2,13 +2,16 @@
 /**
  * "Stand vom" / "As of" tag for the beverage price data.
  *
- * The date is the last commit touching `src/lib/data/*.json`, injected at
- * build time by `vite.config.ts` as `__DATA_UPDATED_AT__`. Build-time
- * injection keeps it automatic — no `meta.lastUpdated` field to maintain by
- * hand, so it can never drift from the data it describes.
+ * The date is the last commit touching the four price files in
+ * `src/lib/data/`, injected at build time by `vite.config.ts` as
+ * `__DATA_UPDATED_AT__`. Build-time injection keeps it automatic — no
+ * `meta.lastUpdated` field to maintain by hand, so it cannot drift from the
+ * data it describes.
  *
- * Contributors changing prices go through PRs (see CONTRIBUTING.md), so the
- * commit date is exactly the date the data last changed.
+ * Accurate to about a day, not to the minute: `%cs` is the *committer* date,
+ * so a squash-merge or rebase stamps the merge date rather than the date the
+ * contributor observed the price, and it renders in the committer's local
+ * timezone. Fine for a freshness hint, which is all this is.
  */
 import type { Locale } from './i18n';
 
@@ -42,8 +45,10 @@ export function formatDataDate(iso: string | null, locale: Locale = 'de'): strin
 
   const [, year, month, day] = match;
 
-  // Reject calendar-invalid dates (2026-02-31, 2026-13-01) that match the
-  // shape but aren't real days.
+  // Reject calendar-invalid dates that match the shape but aren't real days.
+  // Both checks are load-bearing: an out-of-range month (2026-13-01) yields
+  // Invalid Date, while an out-of-range day (2026-02-31) does *not* — V8
+  // rolls it over to 2026-03-03, so only the round-trip comparison catches it.
   const parsed = new Date(`${iso}T00:00:00Z`);
   if (Number.isNaN(parsed.getTime()) || parsed.getUTCDate() !== Number(day)) return null;
 

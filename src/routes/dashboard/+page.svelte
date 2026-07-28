@@ -949,6 +949,14 @@
             {/each}
           </div>
         </div>
+        {#if dataAsOf}
+          <!-- Freshness of the price data above. `datetime` carries the raw
+               ISO value for screen readers and crawlers. -->
+          <div class="mt-2.5 text-xs" style="color: var(--muted)">
+            {$t.dataAsOf}
+            <time datetime={DATA_UPDATED_AT} class="font-mono tabular-nums">{dataAsOf}</time>
+          </div>
+        {/if}
       </div>
 
       <!-- legal bar -->
@@ -970,11 +978,6 @@
             class="underline hover:text-amber-700 transition-colors">GitHub</a
           >{$t.pricesWrongSuffix}
         </div>
-        {#if dataAsOf}
-          <div class="font-mono text-[10px] text-amber-800 tracking-wide mt-2">
-            {$t.dataAsOf(dataAsOf)}
-          </div>
-        {/if}
       </div>
 
       <!-- footer -->
