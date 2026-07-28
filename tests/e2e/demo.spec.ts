@@ -23,17 +23,20 @@ test.describe('demo mode', () => {
     await page.goto('/dashboard?demo=1');
     await page.locator('html[data-hydrated]').waitFor();
 
-    // Both portfolios selected: the label reads "Your Portfolio" / "Dein
-    // Portfolio". Matching the count text instead of either translation keeps
-    // this independent of the locale cookie.
-    const selectionLabel = page.getByText(/\b1\b.*\b2\b/);
-    await expect(selectionLabel).toHaveCount(0);
+    // The pill's own ●/○ marker tracks `selectedIds`, so it is both precise and
+    // locale- and viewport-independent — unlike the header value chip, which is
+    // `hidden sm:inline-flex`.
+    const worldPill = page.getByRole('button', { name: /Demo · World ETF/ });
+    await expect(worldPill).toContainText('●');
+    const before = await page.locator('main').innerText();
 
-    await page.getByRole('button', { name: /Demo · World ETF/ }).click();
+    await worldPill.click();
+    await expect(worldPill).toContainText('○');
 
-    // Deselecting one of the two has to actually move the numbers; inert pills
-    // would read as a broken product to a first-time visitor.
-    await expect(selectionLabel.first()).toBeVisible();
+    // The pill flipping is not enough — the fixture subtotal has to actually
+    // recompute. Inert pills would read as a broken product to exactly the
+    // first-time visitor the demo is meant to impress.
+    await expect.poll(async () => await page.locator('main').innerText()).not.toBe(before);
   });
 
   test('demo mode never calls the authenticated API', async ({ page }) => {
