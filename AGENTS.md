@@ -52,11 +52,17 @@ Cloudflare KV
 - **Beverage reference data**: `src/lib/data/{beer,coffee,smoothie}.json` —
   schema: `{name, size, price, currency, country}` (price in local currency,
   conversion via FX rate in `src/lib/fx.ts`)
-- **Commits**: Conventional Commits with Claude Code signature
+- **Commits**: Conventional Commits, signed and DCO-signed off
+  (`git commit -S --signoff`) — see `CONTRIBUTING.md`. No AI attribution
+  trailers.
 
 ## Development
 
-### With DDE (recommended)
+This project has a `.dde/config.yml`. **All project-dependent commands run in
+the container, never directly on the host.** AI assistants: use the DDE
+commands below, without exception.
+
+### With DDE
 
 ```bash
 dde project:up                    # Start container (runs pnpm install via adapter)
@@ -74,6 +80,9 @@ dde exec pnpm generate:assets     # OG image / favicons from scripts/generate-as
 ```
 
 ### Without DDE
+
+Not an agent path. Only for human contributors who have no DDE installed —
+AI assistants must use the DDE commands above.
 
 ```bash
 pnpm install
