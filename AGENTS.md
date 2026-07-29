@@ -52,9 +52,8 @@ Cloudflare KV
 - **Beverage reference data**: `src/lib/data/{beer,coffee,smoothie}.json` —
   schema: `{name, size, price, currency, country}` (price in local currency,
   conversion via FX rate in `src/lib/fx.ts`)
-- **Commits**: Conventional Commits, signed and DCO-signed off
-  (`git commit -S --signoff`) — see `CONTRIBUTING.md`. No AI attribution
-  trailers.
+- **Commits**: Conventional Commits, DCO-signed off (`git commit -s`) — see
+  `CONTRIBUTING.md`
 
 ## Development
 
@@ -81,23 +80,7 @@ dde exec pnpm generate:assets     # OG image / favicons from scripts/generate-as
 
 ### Without DDE
 
-Not an agent path. Only for human contributors who have no DDE installed —
-AI assistants must use the DDE commands above.
-
-```bash
-pnpm install
-pnpm dev              # Dev server on localhost:5173
-pnpm build            # Build for CF Pages
-pnpm preview          # Wrangler against .svelte-kit/cloudflare — requires `pnpm build` first
-pnpm check            # TypeScript + Svelte check
-pnpm check:watch      # svelte-check in watch mode
-pnpm test             # Vitest
-pnpm test:watch       # Vitest watch
-pnpm test:e2e         # Playwright
-pnpm lint             # Prettier --check (CI enforced)
-pnpm format           # Prettier
-pnpm generate:assets  # OG image / favicons from scripts/generate-assets.mjs
-```
+Not an agent path — see `CONTRIBUTING.md` § Setup.
 
 ## Gotchas
 
