@@ -1,7 +1,34 @@
 // SPDX-License-Identifier: MIT
 import * as jose from 'jose';
 import { z } from 'zod';
+import { error } from '@sveltejs/kit';
 import type { Cookies } from '@sveltejs/kit';
+
+/**
+ * Resolve `platform.env` for the OAuth routes, failing with a defined 503
+ * instead of crashing when the Cloudflare bindings are missing. Under
+ * `vite dev` without bindings `platform.env` is an empty object, so reading a
+ * binding off it yields `undefined` and the route breaks further downstream
+ * with no useful signal.
+ *
+ * Only the keys the calling route actually consumes are checked — the missing
+ * ones are logged so a misconfigured deploy leaves its own trace in the Workers
+ * logs rather than hiding behind the HTTP status alone.
+ */
+export function requireAuthEnv(
+  platform: App.Platform | undefined,
+  keys: (keyof App.Platform['env'])[]
+): App.Platform['env'] {
+  const env = platform?.env;
+  const missing = env ? keys.filter((key) => !env[key]) : keys;
+
+  if (!env || missing.length > 0) {
+    console.error(`[auth] missing bindings: ${missing.join(', ')}`);
+    error(503, 'Auth not configured');
+  }
+
+  return env;
+}
 
 /** Resolve the public-facing origin. Behind a TLS-terminating reverse proxy
  *  (e.g. Traefik) the internal connection is plain HTTP, but the client-facing

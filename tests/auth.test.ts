@@ -7,6 +7,7 @@ import {
   clearUserKv,
   storeTokens,
   getTokens,
+  requireAuthEnv,
 } from '../src/lib/server/auth';
 
 const SECRET = 'test-secret-at-least-32-characters-long!';
@@ -206,5 +207,60 @@ describe('clearUserKv', () => {
 
     // Promise.allSettled swallows individual failures.
     await expect(clearUserKv(kv, 'u3')).resolves.toBeUndefined();
+  });
+});
+
+describe('requireAuthEnv', () => {
+  const fullEnv = {
+    PARQET_CLIENT_ID: 'client-1',
+    PARQET_AUTHORIZE_URL: 'https://auth.example.com/authorize',
+  } as unknown as App.Platform['env'];
+
+  function expectStatus(fn: () => unknown, status: number): void {
+    try {
+      fn();
+    } catch (e) {
+      // SvelteKit's `error()` throws an HttpError-shaped object.
+      if (typeof e === 'object' && e !== null && 'status' in e) {
+        expect((e as { status: number }).status).toBe(status);
+        return;
+      }
+      throw e;
+    }
+    throw new Error(`expected a ${status} to be thrown`);
+  }
+
+  it('returns the env when all requested keys are present', () => {
+    const platform = { env: fullEnv } as App.Platform;
+    expect(requireAuthEnv(platform, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL'])).toBe(fullEnv);
+  });
+
+  it('throws 503 when platform is undefined', () => {
+    expectStatus(() => requireAuthEnv(undefined, ['PARQET_CLIENT_ID']), 503);
+  });
+
+  it('throws 503 when env is an empty object', () => {
+    const platform = { env: {} } as unknown as App.Platform;
+    expectStatus(() => requireAuthEnv(platform, ['PARQET_CLIENT_ID']), 503);
+  });
+
+  it('throws 503 when only a subset of the requested keys is present', () => {
+    const platform = { env: { PARQET_CLIENT_ID: 'client-1' } } as unknown as App.Platform;
+    expectStatus(() => requireAuthEnv(platform, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL']), 503);
+  });
+
+  it('logs exactly the missing keys', () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const platform = { env: { PARQET_CLIENT_ID: 'client-1' } } as unknown as App.Platform;
+    expectStatus(() => requireAuthEnv(platform, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL']), 503);
+    const logged = spy.mock.calls[0]?.join(' ') ?? '';
+    expect(logged).toContain('PARQET_AUTHORIZE_URL');
+    expect(logged).not.toContain('PARQET_CLIENT_ID');
+    spy.mockRestore();
+  });
+
+  it('ignores keys that were not requested', () => {
+    const platform = { env: { PARQET_CLIENT_ID: 'client-1' } } as unknown as App.Platform;
+    expect(requireAuthEnv(platform, ['PARQET_CLIENT_ID'])).toBe(platform.env);
   });
 });
