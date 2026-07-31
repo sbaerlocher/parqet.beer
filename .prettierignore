@@ -3,6 +3,7 @@
 # (node_modules/ is skipped unconditionally, ignore files aside.)
 node_modules/
 .svelte-kit/
+.wrangler/
 build/
 dist/
 coverage/
