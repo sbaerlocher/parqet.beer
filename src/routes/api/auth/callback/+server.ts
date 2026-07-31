@@ -5,6 +5,7 @@ import { exchangeCodeForTokens, getUserInfo } from '$lib/server/parqet-client';
 import {
   setSessionCookie,
   storeTokens,
+  requireAuthEnv,
   resolveSessionSecret,
   resolveOrigin,
   OAUTH_STATE_COOKIE,
@@ -12,7 +13,12 @@ import {
 } from '$lib/server/auth';
 
 export const GET: RequestHandler = async ({ url, cookies, platform, request }) => {
-  const env = platform!.env;
+  const env = requireAuthEnv(platform, [
+    'PARQET_TOKEN_URL',
+    'PARQET_API_URL',
+    'PARQET_KV',
+    'SESSION_SECRET',
+  ]);
 
   const code = url.searchParams.get('code');
   const state = url.searchParams.get('state');

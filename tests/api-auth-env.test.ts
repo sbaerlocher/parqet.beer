@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { GET as login } from '../src/routes/api/auth/login/+server';
+import { GET as callback } from '../src/routes/api/auth/callback/+server';
 
 /**
  * Both SvelteKit's `error()` and `redirect()` throw, so the status always
@@ -68,5 +69,34 @@ describe('GET /api/auth/login without bindings', () => {
 
     expect(thrown.location).toContain('https://auth.example.com/authorize?');
     expect(thrown.location).toContain('client_id=client-1');
+  });
+});
+
+function buildCallbackEvent(opts: LoginEventOpts = {}) {
+  const url = new URL('https://app.example.com/api/auth/callback?code=c&state=s');
+  const request = new Request(url);
+  return {
+    request,
+    url,
+    locals: { session: null },
+    platform: opts.env === undefined ? undefined : { env: opts.env },
+    cookies: { set: () => {}, get: () => undefined, delete: () => {} },
+    fetch: globalThis.fetch,
+    getClientAddress: () => '127.0.0.1',
+    params: {},
+    route: { id: '/api/auth/callback' },
+    setHeaders: () => {},
+    isDataRequest: false,
+    isSubRequest: false,
+  } as unknown as Parameters<typeof callback>[0];
+}
+
+describe('GET /api/auth/callback without bindings', () => {
+  it('responds 503 when platform.env is empty', async () => {
+    await expectStatus(callback(buildCallbackEvent({ env: {} })) as Promise<Response>, 503);
+  });
+
+  it('responds 503 when platform is missing entirely', async () => {
+    await expectStatus(callback(buildCallbackEvent()) as Promise<Response>, 503);
   });
 });
