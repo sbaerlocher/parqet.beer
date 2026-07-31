@@ -2,9 +2,10 @@
 import { error, json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
+import { SUPPORTED_CURRENCIES } from '$lib/fx';
 
 const PreferencesSchema = z.object({
-  currency: z.enum(['EUR', 'CHF']),
+  currency: z.enum(SUPPORTED_CURRENCIES),
   category: z.enum(['beer', 'coffee', 'smoothie', 'whisky']),
 });
 

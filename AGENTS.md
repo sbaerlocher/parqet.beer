@@ -39,7 +39,8 @@ Cloudflare KV
   ├── user:{userId}        → User info (TTL 1h)
   ├── portfolios:{userId}  → Portfolio list (TTL 1h)
   ├── performance:{userId} → Total value (TTL 15min)
-  └── preferences:{userId} → Preferences
+  ├── preferences:{userId} → Preferences
+  └── fx:rates             → ECB rates (no TTL — stale entry is the outage fallback)
 ```
 
 ## Conventions
@@ -51,7 +52,12 @@ Cloudflare KV
 - **Components**: `src/lib/components/`
 - **Beverage reference data**: `src/lib/data/{beer,coffee,smoothie}.json` —
   schema: `{name, size, price, currency, country}` (price in local currency,
-  conversion via FX rate in `src/lib/fx.ts`)
+  conversion via `convert()` in `src/lib/fx.ts`)
+- **FX**: `src/lib/fx.ts` holds the client-safe half (EUR-based `FxRates`,
+  `FX_FALLBACK`, `convert()` — EUR is the pivot, so any pair works).
+  `src/lib/server/fx-service.ts` fetches daily ECB rates from Frankfurter and
+  caches them in KV under `fx:rates`. Display currencies (EUR/CHF/USD/GBP) are
+  deliberately wider than the beverage price currencies (EUR/CHF).
 - **Commits**: Conventional Commits with Claude Code signature
 
 ## Development

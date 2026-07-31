@@ -114,8 +114,8 @@ describe('PUT /api/preferences', () => {
     await expectStatus(PUT(buildPutEvent({ bodyText: '{not json' })), 400);
   });
 
-  it('rejects an unknown currency with 400', async () => {
-    await expectStatus(PUT(buildPutEvent({ body: { currency: 'USD', category: 'beer' } })), 400);
+  it('rejects an unsupported currency with 400', async () => {
+    await expectStatus(PUT(buildPutEvent({ body: { currency: 'JPY', category: 'beer' } })), 400);
   });
 
   it('rejects an unknown category with 400', async () => {
@@ -134,6 +134,13 @@ describe('PUT /api/preferences', () => {
     expect(fake.store.get('preferences:user-1')).toBe(
       JSON.stringify({ currency: 'CHF', category: 'coffee' })
     );
+  });
+
+  it.each(['USD', 'GBP'])('accepts %s as a display currency', async (currency) => {
+    const fake = createFakeKv();
+    const res = await PUT(buildPutEvent({ kv: fake.kv, body: { currency, category: 'beer' } }));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ currency, category: 'beer' });
   });
 });
 

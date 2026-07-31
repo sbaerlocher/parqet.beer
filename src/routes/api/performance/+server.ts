@@ -4,7 +4,9 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { getPerformance, getPortfolios, ParqetAuthError } from '$lib/server/parqet-client';
 import { getCached } from '$lib/server/kv-cache';
+import { getRates } from '$lib/server/fx-service';
 import { clearSessionCookie, clearUserKv } from '$lib/server/auth';
+import { FX_FALLBACK } from '$lib/fx';
 
 // Parqet portfolio IDs are short opaque strings; cap to avoid abuse.
 const PortfolioIdSchema = z
@@ -28,14 +30,18 @@ export const GET: RequestHandler = async ({ locals, platform, url, cookies }) =>
   const portfolioIds = parsedIds.data;
 
   if (portfolioIds.length === 0) {
-    return json({ totalValue: 0, dividends: 0, currency: 'EUR' });
+    return json({ totalValue: 0, dividends: 0, currency: 'EUR', rates: FX_FALLBACK });
   }
 
   try {
-    // Get portfolios to determine currency
-    const allPortfolios = await getCached(env.PARQET_KV, `portfolios:${userId}`, 3600, () =>
-      getPortfolios(env.PARQET_API_URL, accessToken)
-    );
+    // Get portfolios to determine currency. FX rates are independent of the
+    // Parqet call, so fetch both at once rather than serialising them.
+    const [allPortfolios, rates] = await Promise.all([
+      getCached(env.PARQET_KV, `portfolios:${userId}`, 3600, () =>
+        getPortfolios(env.PARQET_API_URL, accessToken)
+      ),
+      getRates(env),
+    ]);
 
     const selectedPortfolios = (allPortfolios ?? []).filter((p) => portfolioIds.includes(p.id));
 
@@ -52,13 +58,17 @@ export const GET: RequestHandler = async ({ locals, platform, url, cookies }) =>
       env.PARQET_KV,
       cacheKey,
       900, // 15min
-      () => getPerformance(env.PARQET_API_URL, accessToken, portfolioIds, currency)
+      () => getPerformance(env.PARQET_API_URL, accessToken, portfolioIds, currency, rates)
     );
 
+    // Rates travel with the payload so the client can switch display currency
+    // without a round-trip — and so client display and server valuation are
+    // demonstrably computed from the same numbers.
     return json({
       totalValue: performance?.totalValue ?? 0,
       dividends: performance?.dividends ?? 0,
       currency,
+      rates,
     });
   } catch (e) {
     if (e instanceof ParqetAuthError) {

@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   refreshAccessToken,
   exchangeCodeForTokens,
-  getEurToChfRate,
   holdingValueInCurrency,
   computeValuation,
   getUserInfo,
@@ -11,7 +10,7 @@ import {
   ParqetAuthError,
   type Holding,
 } from '../src/lib/server/parqet-client';
-import { EUR_TO_CHF_RATE } from '../src/lib/fx';
+import { FX_FALLBACK, type FxRates } from '../src/lib/fx';
 
 const env = {
   PARQET_CLIENT_ID: 'test-client',
@@ -160,125 +159,107 @@ describe('exchangeCodeForTokens', () => {
 const eurSecurity = (value: number): Holding => ({
   position: { currentValue: value },
 });
-const chfSecurity = (eurValue: number, rate: number): Holding => ({
-  position: { currentValue: eurValue },
-  quote: { fx: { originalCurrency: 'CHF', rate } },
-});
 const customAsset = (value: number): Holding => ({
   position: { currentValue: value },
   asset: { type: 'custom' },
 });
 
-describe('getEurToChfRate', () => {
-  it('returns the rate from the first CHF-quoted holding', () => {
-    const holdings = [eurSecurity(100), chfSecurity(50, 0.92), chfSecurity(200, 0.88)];
-    expect(getEurToChfRate(holdings)).toBe(0.92);
-  });
-
-  it('falls back to the shared constant when no CHF holding is present', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    expect(getEurToChfRate([eurSecurity(100)])).toBe(EUR_TO_CHF_RATE);
-    expect(warnSpy).toHaveBeenCalledOnce();
-    warnSpy.mockRestore();
-  });
-
-  it('skips CHF holdings with invalid rates', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const holdings: Holding[] = [
-      { quote: { fx: { originalCurrency: 'CHF', rate: 0 } } },
-      { quote: { fx: { originalCurrency: 'CHF' } } },
-    ];
-    expect(getEurToChfRate(holdings)).toBe(EUR_TO_CHF_RATE);
-    warnSpy.mockRestore();
-  });
-});
+// Keep rates explicit so valuation tests don't depend on the fallback values.
+const rates: FxRates = { EUR: 1, CHF: 0.95, USD: 1.25, GBP: 0.8 };
 
 describe('holdingValueInCurrency', () => {
-  // Keep rate explicit so tests don't depend on the fallback constant.
-  const rate = 0.95;
-
   describe('target EUR', () => {
     it('returns the stored EUR value for a plain security', () => {
-      expect(holdingValueInCurrency(eurSecurity(100), rate, 'EUR', 'EUR')).toBe(100);
-    });
-
-    it('returns the stored EUR value for an FX-quoted security', () => {
-      expect(holdingValueInCurrency(chfSecurity(100, rate), rate, 'EUR', 'EUR')).toBe(100);
+      expect(holdingValueInCurrency(eurSecurity(100), rates, 'EUR', 'EUR')).toBe(100);
     });
 
     it('keeps custom assets in portfolio currency when portfolio is EUR', () => {
-      expect(holdingValueInCurrency(customAsset(100), rate, 'EUR', 'EUR')).toBe(100);
+      expect(holdingValueInCurrency(customAsset(100), rates, 'EUR', 'EUR')).toBe(100);
     });
 
     it('converts custom CHF assets back to EUR for an EUR target', () => {
-      expect(holdingValueInCurrency(customAsset(100), rate, 'EUR', 'CHF')).toBeCloseTo(
-        100 / rate,
+      expect(holdingValueInCurrency(customAsset(100), rates, 'EUR', 'CHF')).toBeCloseTo(
+        100 / rates.CHF,
         5
       );
     });
   });
 
   describe('target CHF', () => {
-    it('multiplies FX-quoted EUR values by the rate', () => {
-      expect(holdingValueInCurrency(chfSecurity(100, rate), rate, 'CHF', 'CHF')).toBeCloseTo(95, 5);
-    });
-
     it('multiplies plain EUR securities by the rate', () => {
-      expect(holdingValueInCurrency(eurSecurity(100), rate, 'CHF', 'CHF')).toBeCloseTo(95, 5);
+      expect(holdingValueInCurrency(eurSecurity(100), rates, 'CHF', 'CHF')).toBeCloseTo(95, 5);
     });
 
     it('keeps custom assets in portfolio currency when portfolio is CHF', () => {
-      expect(holdingValueInCurrency(customAsset(100), rate, 'CHF', 'CHF')).toBe(100);
+      expect(holdingValueInCurrency(customAsset(100), rates, 'CHF', 'CHF')).toBe(100);
     });
 
     it('converts custom EUR assets to CHF when portfolio is EUR', () => {
-      expect(holdingValueInCurrency(customAsset(100), rate, 'CHF', 'EUR')).toBeCloseTo(95, 5);
+      expect(holdingValueInCurrency(customAsset(100), rates, 'CHF', 'EUR')).toBeCloseTo(95, 5);
+    });
+  });
+
+  describe('target USD and GBP', () => {
+    it('converts EUR securities into USD', () => {
+      expect(holdingValueInCurrency(eurSecurity(100), rates, 'USD', 'EUR')).toBeCloseTo(125, 5);
+    });
+
+    it('converts EUR securities into GBP', () => {
+      expect(holdingValueInCurrency(eurSecurity(100), rates, 'GBP', 'EUR')).toBeCloseTo(80, 5);
+    });
+
+    it('converts custom assets between two non-EUR currencies via the EUR pivot', () => {
+      // 125 USD → 100 EUR → 80 GBP
+      expect(holdingValueInCurrency(customAsset(125), rates, 'GBP', 'USD')).toBeCloseTo(80, 5);
     });
   });
 
   it('treats missing currentValue as zero', () => {
-    expect(holdingValueInCurrency({}, rate, 'EUR', 'EUR')).toBe(0);
+    expect(holdingValueInCurrency({}, rates, 'EUR', 'EUR')).toBe(0);
   });
 });
 
 describe('computeValuation', () => {
   it('sums plain EUR holdings into an EUR total', () => {
     const holdings = [eurSecurity(100), eurSecurity(250.5), eurSecurity(49.5)];
-    expect(computeValuation(holdings, 0.95, 'EUR', 'EUR')).toBe(400);
+    expect(computeValuation(holdings, rates, 'EUR', 'EUR')).toBe(400);
   });
 
   it('rounds totals to two decimals to avoid floating-point noise', () => {
     const holdings = [eurSecurity(0.1), eurSecurity(0.2)];
-    expect(computeValuation(holdings, 0.95, 'EUR', 'EUR')).toBe(0.3);
+    expect(computeValuation(holdings, rates, 'EUR', 'EUR')).toBe(0.3);
   });
 
-  it('converts an all-EUR portfolio to CHF using the shared rate', () => {
+  it('converts an all-EUR portfolio to CHF using the supplied rates', () => {
     const holdings = [eurSecurity(1000)];
-    // Consistency check with the FX module — if EUR_TO_CHF_RATE changes, the
-    // client display (calculator.ts) and this value stay aligned.
-    expect(computeValuation(holdings, EUR_TO_CHF_RATE, 'CHF', 'CHF')).toBeCloseTo(
-      1000 * EUR_TO_CHF_RATE,
+    expect(computeValuation(holdings, rates, 'CHF', 'CHF')).toBeCloseTo(1000 * rates.CHF, 2);
+  });
+
+  it('stays aligned with the client-side fallback rates', () => {
+    // Consistency check with the FX module — server valuation and client
+    // display (calculator.ts) share the same rate source.
+    expect(computeValuation([eurSecurity(1000)], FX_FALLBACK, 'CHF', 'CHF')).toBeCloseTo(
+      1000 * FX_FALLBACK.CHF,
       2
     );
   });
 
-  it('handles a mixed portfolio with custom assets and FX holdings', () => {
-    const rate = 0.9;
+  it('handles a mixed portfolio of securities and custom assets', () => {
     const holdings = [
       eurSecurity(1000), // 1000 EUR
-      chfSecurity(500, rate), // currentValue 500 EUR, CHF-original
+      eurSecurity(500), // 500 EUR
       customAsset(200), // 200 in portfolio currency (CHF here)
     ];
     // Portfolio is CHF, target CHF:
-    //   1000 EUR * 0.9 = 900 CHF
-    //   500 EUR  * 0.9 = 450 CHF
-    //   200 CHF  kept  = 200 CHF
-    //   total           = 1550 CHF
-    expect(computeValuation(holdings, rate, 'CHF', 'CHF')).toBeCloseTo(1550, 2);
+    //   1000 EUR * 0.95 = 950 CHF
+    //   500 EUR  * 0.95 = 475 CHF
+    //   200 CHF  kept   = 200 CHF
+    //   total            = 1625 CHF
+    expect(computeValuation(holdings, rates, 'CHF', 'CHF')).toBeCloseTo(1625, 2);
   });
 
   it('returns 0 for an empty holdings list', () => {
-    expect(computeValuation([], 0.95, 'EUR', 'EUR')).toBe(0);
+    expect(computeValuation([], rates, 'EUR', 'EUR')).toBe(0);
   });
 });
 
@@ -386,7 +367,7 @@ describe('getPerformance 401 handling', () => {
       Promise.resolve(new Response('unauthorized', { status: 401 }))
     );
     await expect(
-      getPerformance('https://api.example.com', 'dead-token', ['p1'], 'EUR')
+      getPerformance('https://api.example.com', 'dead-token', ['p1'], 'EUR', rates)
     ).rejects.toBeInstanceOf(ParqetAuthError);
   });
 
@@ -400,7 +381,7 @@ describe('getPerformance 401 handling', () => {
       .mockResolvedValueOnce(new Response('unauthorized', { status: 401 }));
 
     await expect(
-      getPerformance('https://api.example.com', 'dead-token', ['p1'], 'EUR')
+      getPerformance('https://api.example.com', 'dead-token', ['p1'], 'EUR', rates)
     ).rejects.toBeInstanceOf(ParqetAuthError);
   });
 
@@ -408,13 +389,25 @@ describe('getPerformance 401 handling', () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
       new Response('server error', { status: 503 })
     );
-    const result = await getPerformance('https://api.example.com', 'any-token', ['p1'], 'EUR');
+    const result = await getPerformance(
+      'https://api.example.com',
+      'any-token',
+      ['p1'],
+      'EUR',
+      rates
+    );
     expect(result).toBeNull();
   });
 
   it('returns null when fetch throws', async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('network down'));
-    const result = await getPerformance('https://api.example.com', 'any-token', ['p1'], 'EUR');
+    const result = await getPerformance(
+      'https://api.example.com',
+      'any-token',
+      ['p1'],
+      'EUR',
+      rates
+    );
     expect(result).toBeNull();
   });
 });

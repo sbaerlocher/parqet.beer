@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 import { z } from 'zod';
-import { EUR_TO_CHF_RATE } from '../fx';
+import { convert, type FxRates } from '../fx';
 
 /**
  * Thrown when Parqet rejects a request with HTTP 401 — the stored access
@@ -167,7 +167,6 @@ export async function getPortfolios(
 
 export interface Holding {
   position?: { currentValue?: number };
-  quote?: { fx?: { rate?: number; originalCurrency?: string } };
   asset?: { type?: string };
 }
 
@@ -179,62 +178,35 @@ interface PerformanceResponse {
   holdings?: Holding[];
 }
 
-export function getEurToChfRate(holdings: Holding[]): number {
-  for (const h of holdings) {
-    const fx = h.quote?.fx;
-    if (fx?.originalCurrency === 'CHF' && fx.rate && fx.rate > 0) {
-      return fx.rate;
-    }
-  }
-  // No CHF-quoted holding → can't derive a live rate. Warn so mismatches
-  // between displayed beer counts and reality are attributable.
-  console.warn(
-    '[parqet-client] FX derivation failed: no CHF-quoted holding found, ' +
-      `falling back to ${EUR_TO_CHF_RATE.toFixed(4)}`
-  );
-  return EUR_TO_CHF_RATE;
+/**
+ * Currency a holding's `currentValue` is denominated in. Parqet reports
+ * securities in EUR regardless of the quote's original currency (the `fx`
+ * block describes the quote, not the stored value). Custom assets are the
+ * exception: those are stored in the portfolio's own currency.
+ */
+function holdingSourceCurrency(h: Holding, portfolioCurrency: string): string {
+  return h.asset?.type === 'custom' ? portfolioCurrency : 'EUR';
 }
 
 export function holdingValueInCurrency(
   h: Holding,
-  eurToChf: number,
+  rates: FxRates,
   targetCurrency: string,
   portfolioCurrency: string
 ): number {
   const value = h.position?.currentValue ?? 0;
-  const fx = h.quote?.fx;
-
-  if (targetCurrency === 'CHF') {
-    // Convert to CHF
-    if (fx) {
-      // Holdings with FX: currentValue is in EUR
-      return value * eurToChf;
-    }
-    if (h.asset?.type === 'custom') {
-      // Custom assets without FX: value is in portfolio currency
-      return portfolioCurrency === 'CHF' ? value : value * eurToChf;
-    }
-    // Securities without FX: value is in EUR
-    return value * eurToChf;
-  } else {
-    // Target is EUR — currentValue is already EUR for most holdings
-    if (fx) return value;
-    if (h.asset?.type === 'custom') {
-      return portfolioCurrency === 'EUR' ? value : value / eurToChf;
-    }
-    return value;
-  }
+  return convert(value, holdingSourceCurrency(h, portfolioCurrency), targetCurrency, rates);
 }
 
 export function computeValuation(
   holdings: Holding[],
-  eurToChf: number,
+  rates: FxRates,
   targetCurrency: string,
   portfolioCurrency: string
 ): number {
   let total = 0;
   for (const h of holdings) {
-    total += holdingValueInCurrency(h, eurToChf, targetCurrency, portfolioCurrency);
+    total += holdingValueInCurrency(h, rates, targetCurrency, portfolioCurrency);
   }
   return Math.round(total * 100) / 100;
 }
@@ -243,7 +215,8 @@ export async function getPerformance(
   apiUrl: string,
   accessToken: string,
   portfolioIds: string[],
-  portfolioCurrency: string
+  portfolioCurrency: string,
+  rates: FxRates
 ): Promise<{ totalValue: number; dividends: number } | null> {
   try {
     // Two parallel calls: max interval for total value, 1y for annual dividends
@@ -288,17 +261,16 @@ export async function getPerformance(
 
     const maxData = (await maxRes.json()) as PerformanceResponse;
     const holdings = maxData.holdings ?? [];
-    const eurToChf = getEurToChfRate(holdings);
 
     // Total value from max interval
-    const totalValue = computeValuation(holdings, eurToChf, portfolioCurrency, portfolioCurrency);
+    const totalValue = computeValuation(holdings, rates, portfolioCurrency, portfolioCurrency);
 
-    // Dividends from 1y interval
+    // Dividends from 1y interval. Parqet reports them in EUR.
     let dividends = 0;
     if (yearRes.ok) {
       const yearData = (await yearRes.json()) as PerformanceResponse;
       const dividendsEur = yearData.performance?.dividends?.inInterval?.gainGross ?? 0;
-      dividends = portfolioCurrency === 'CHF' ? dividendsEur * eurToChf : dividendsEur;
+      dividends = convert(dividendsEur, 'EUR', portfolioCurrency, rates);
     }
 
     return { totalValue, dividends: Math.round(dividends * 100) / 100 };
