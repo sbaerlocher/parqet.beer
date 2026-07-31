@@ -31,7 +31,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "5.20260728.1",
     "@eslint/js": "10.0.1",
-    "@playwright/test": "1.61.1",
+    "@playwright/test": "1.62.0",
     "@resvg/resvg-js": "2.6.2",
     "@sveltejs/adapter-cloudflare": "7.2.9",
     "@sveltejs/kit": "2.70.1",
@@ -42,7 +42,7 @@
     "eslint": "10.8.0",
     "eslint-plugin-security": "4.0.1",
     "eslint-plugin-svelte": "3.22.0",
-    "globals": "17.7.0",
+    "globals": "17.8.0",
     "lefthook": "2.1.10",
     "prettier": "3.9.6",
     "prettier-plugin-svelte": "4.1.1",
