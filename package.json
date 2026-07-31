@@ -16,7 +16,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:data": "vitest run tests/data-validation.test.ts",
-    "test:e2e": "playwright test",
+    "test:e2e": "svelte-kit sync && playwright test",
     "lint": "prettier --check . && eslint .",
     "lint:fix": "prettier --write . && eslint . --fix",
     "format": "prettier --write .",
