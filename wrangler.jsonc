@@ -60,6 +60,40 @@
   },
 
   "env": {
+    // ---------- E2E (Playwright, local + CI) ----------
+    // Never deployed. `pnpm test:e2e` boots
+    // `wrangler dev --local-protocol https --env e2e`, which is the only way
+    // the OAuth success path is testable at all: `hooks.server.ts` needs both
+    // `PARQET_KV` and `SESSION_SECRET` present before it runs any auth logic,
+    // and the `__Host-` cookie prefix forces `Secure`, which browsers refuse
+    // to store over plain HTTP.
+    //
+    // The OAuth URLs point back at this same worker (`src/routes/__e2e__/`),
+    // so there is no second mock server to keep alive and no extra TLS cert.
+    // Those routes 404 unless `ENVIRONMENT === "e2e"`, which only ever holds
+    // here — `preview` and `production` below set their own value.
+    "e2e": {
+      "kv_namespaces": [
+        {
+          "binding": "PARQET_KV",
+          // Placeholder — `wrangler dev` runs KV in-memory via Miniflare.
+          "id": "e2e-local-placeholder",
+        },
+      ],
+      "vars": {
+        "ENVIRONMENT": "e2e",
+        // Plain var, not a Secrets Store binding: `resolveSessionSecret`
+        // takes the string branch. Deliberately committed — it only ever
+        // encrypts throwaway sessions on localhost. Must stay >= 32 bytes,
+        // else `deriveKey` throws (auth.ts).
+        "SESSION_SECRET": "e2e-only-session-secret-not-a-real-credential",
+        "PARQET_AUTHORIZE_URL": "https://localhost:4173/__e2e__/authorize",
+        "PARQET_TOKEN_URL": "https://localhost:4173/__e2e__/token",
+        "PARQET_API_URL": "https://localhost:4173/__e2e__",
+        "PARQET_CLIENT_ID": "e2e-client-id",
+      },
+    },
+
     // ---------- PREVIEW (PR deployments) ----------
     // No custom domain — Cloudflare assigns a workers.dev URL per deploy.
     // Uses its own KV namespace so preview writes never touch prod data.

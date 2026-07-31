@@ -87,6 +87,23 @@ Not an agent path — see `CONTRIBUTING.md` § Setup.
 - **Svelte 5 Runes**: `$state`, `$derived`, `$effect`, `$props` — not Svelte 4 syntax (`export let`, reactive `$:`)
 - **Tailwind v4**: No `tailwind.config.js` — config via CSS (`@import "tailwindcss"` in `src/app.css`)
 - **`pnpm preview`** requires `pnpm build` first (Wrangler reads `.svelte-kit/cloudflare`)
+- **E2E runs against the built worker over HTTPS**, not `vite dev`:
+  `pnpm test:e2e` boots `pnpm build && wrangler dev --env e2e --local-protocol
+https` on port 4173. Both parts are load-bearing — `hooks.server.ts` only
+  runs auth logic when `PARQET_KV` _and_ `SESSION_SECRET` are bound, and the
+  `__Host-` cookie prefix implies `Secure`, which browsers drop over plain
+  HTTP. Consequence: each e2e run pays for a build first.
+- **The OAuth mocks live in the app**, under `src/routes/__e2e__/` (authorize,
+  token, user, portfolios, performance). `env.e2e` in `wrangler.jsonc` points
+  `PARQET_*_URL` back at them, so there is no second server and no extra TLS
+  cert. Every one of those routes calls `assertE2e()` first and 404s unless
+  `ENVIRONMENT === "e2e"` — a value only `env.e2e` ever sets. When adding a
+  route there, the guard call comes before any other statement.
+- **Mock endpoints that accept form bodies must parse the raw text**
+  (`new URLSearchParams(await request.text())`), not `request.formData()`:
+  SvelteKit's CSRF protection rejects urlencoded POSTs without a matching
+  `Origin`, and the worker's own server-side `fetch` to the token endpoint
+  sends none.
 - **Node version** is pinned in `.nvmrc`
 
 ## Environment Variables

@@ -52,6 +52,10 @@ jobs:
               - 'src/**'
               - 'tests/e2e/**'
               - 'playwright.config.ts'
+              # The suite runs against `wrangler dev --env e2e`, so the
+              # bindings and mock URLs in `env.e2e` are part of its contract.
+              - 'wrangler.jsonc'
+              - 'svelte.config.js'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - '.github/workflows/pull-request.yml'

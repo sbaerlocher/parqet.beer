@@ -88,6 +88,13 @@ pnpm preview      # Wrangler preview against .svelte-kit/cloudflare
 `pnpm preview` requires `pnpm build` to have been run first, because Wrangler
 reads from `.svelte-kit/cloudflare`.
 
+`pnpm test:e2e` builds the app and serves it via
+`wrangler dev --env e2e --local-protocol https`, so the suite exercises real
+Cloudflare bindings over HTTPS — both are required for the OAuth flow to work
+at all. Expect the build to run on every invocation, and note that the browser
+will warn about the self-signed certificate if you open
+`https://localhost:4173` by hand.
+
 ## Branch Naming
 
 Use a short, descriptive slug under one of the following prefixes:

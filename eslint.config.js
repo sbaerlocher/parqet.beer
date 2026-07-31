@@ -39,6 +39,9 @@ export default ts.config(
     },
   },
   {
+    // `.wrangler/` holds bundles Wrangler writes while `wrangler dev` runs —
+    // which `pnpm test:e2e` now does on every invocation. It is gitignored
+    // generated output, so linting it only produces noise.
     ignores: [
       '.svelte-kit/',
       '.wrangler/',
