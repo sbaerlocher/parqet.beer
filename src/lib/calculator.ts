@@ -1,13 +1,24 @@
 // SPDX-License-Identifier: MIT
 import type { Beverage, LocalizedNote } from './data/beverages';
 import type { Locale } from './i18n';
-import { EUR_TO_CHF_RATE } from './fx';
+import { FX_RATES } from './fx';
 
-export function convertValue(value: number, fromCurrency: string, toCurrency: string): number {
+// Convert via EUR as the pivot currency. `rates[c]` is "<c> per EUR", so
+// EUR amount = value / fromRate, then target amount = eur * toRate. Unknown
+// currencies fall back to the original value (count stays best-effort rather
+// than rendering NaN). `rates` defaults to the static fallback table; the
+// dashboard passes the live ECB rates fetched server-side instead.
+export function convertValue(
+  value: number,
+  fromCurrency: string,
+  toCurrency: string,
+  rates: Record<string, number> = FX_RATES
+): number {
   if (fromCurrency === toCurrency) return value;
-  if (fromCurrency === 'EUR' && toCurrency === 'CHF') return value * EUR_TO_CHF_RATE;
-  if (fromCurrency === 'CHF' && toCurrency === 'EUR') return value / EUR_TO_CHF_RATE;
-  return value; // Fallback for other currencies
+  const fromRate = rates[fromCurrency];
+  const toRate = rates[toCurrency];
+  if (fromRate === undefined || toRate === undefined) return value;
+  return (value / fromRate) * toRate;
 }
 
 export interface BeverageEquivalent {

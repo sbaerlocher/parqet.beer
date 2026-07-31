@@ -120,7 +120,11 @@
         <section class="mb-8">
           <h2 class="font-display font-bold text-xl text-amber-950 mb-3">5. Was wir NICHT tun</h2>
           <ul class="list-disc list-outside ml-5 space-y-2" style="color: var(--ink-soft)">
-            <li>Kein Tracking, keine Analytics, keine Cookies von Dritten</li>
+            <li>
+              Kein personenbezogenes Tracking, keine Werbe-Cookies, keine Cookies von Dritten. Zur
+              Reichweitenmessung nutzen wir ausschliesslich Cloudflare Web Analytics — cookielos,
+              ohne Geräte-Fingerprinting, es werden nur aggregierte Seitenaufrufe gezählt.
+            </li>
             <li>Keine Weitergabe deiner Daten an Dritte</li>
             <li>Kein Schreibzugriff auf dein Parqet-Konto (Read-only)</li>
             <li>Keine Speicherung einzelner Positionen oder Transaktionen</li>
@@ -233,7 +237,11 @@
         <section class="mb-8">
           <h2 class="font-display font-bold text-xl text-amber-950 mb-3">5. What we do NOT do</h2>
           <ul class="list-disc list-outside ml-5 space-y-2" style="color: var(--ink-soft)">
-            <li>No tracking, no analytics, no third-party cookies</li>
+            <li>
+              No personal tracking, no advertising cookies, no third-party cookies. For traffic
+              measurement we use Cloudflare Web Analytics only — cookieless, no device
+              fingerprinting, aggregated page views only.
+            </li>
             <li>No sharing of your data with third parties</li>
             <li>No write access to your Parqet account (read-only)</li>
             <li>No storage of individual positions or transactions</li>

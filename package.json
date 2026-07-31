@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:data": "vitest run tests/data-validation.test.ts",
+    "validate:data": "node scripts/validate-beverages.mjs",
     "test:e2e": "playwright test",
     "lint": "prettier --check . && eslint .",
     "lint:fix": "prettier --write . && eslint . --fix",

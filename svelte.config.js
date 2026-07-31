@@ -20,12 +20,17 @@ const config = {
     csp: {
       mode: 'hash',
       directives: {
+        // Cloudflare Web Analytics is enabled on the CF dashboard and the
+        // beacon is auto-injected by Cloudflare on the served response (no
+        // app-side script). `static.cloudflareinsights.com` serves that
+        // beacon and `cloudflareinsights.com` is where it POSTs pageviews,
+        // so both must be allowed or CSP would block CF's own injection.
         'default-src': ['self'],
-        'script-src': ['self'],
+        'script-src': ['self', 'https://static.cloudflareinsights.com'],
         'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
         'img-src': ['self', 'data:', 'https:'],
         'font-src': ['self', 'data:', 'https://fonts.gstatic.com'],
-        'connect-src': ['self', 'https://connect.parqet.com'],
+        'connect-src': ['self', 'https://connect.parqet.com', 'https://cloudflareinsights.com'],
         'base-uri': ['self'],
         'form-action': ['self', 'https://connect.parqet.com'],
         'upgrade-insecure-requests': true,

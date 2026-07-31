@@ -4,6 +4,7 @@ import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { getPerformance, getPortfolios, ParqetAuthError } from '$lib/server/parqet-client';
 import { getCached } from '$lib/server/kv-cache';
+import { getLiveFxRates } from '$lib/server/fx-live';
 import { clearSessionCookie, clearUserKv } from '$lib/server/auth';
 
 // Parqet portfolio IDs are short opaque strings; cap to avoid abuse.
@@ -48,17 +49,21 @@ export const GET: RequestHandler = async ({ locals, platform, url, cookies }) =>
     // Cache key includes selected portfolio IDs
     const cacheKey = `performance:${userId}:${portfolioIds.sort().join(',')}`;
 
-    const performance = await getCached(
-      env.PARQET_KV,
-      cacheKey,
-      900, // 15min
-      () => getPerformance(env.PARQET_API_URL, accessToken, portfolioIds, currency)
-    );
+    const [performance, fxRates] = await Promise.all([
+      getCached(
+        env.PARQET_KV,
+        cacheKey,
+        900, // 15min
+        () => getPerformance(env.PARQET_API_URL, accessToken, portfolioIds, currency)
+      ),
+      getLiveFxRates(env.PARQET_KV),
+    ]);
 
     return json({
       totalValue: performance?.totalValue ?? 0,
       dividends: performance?.dividends ?? 0,
       currency,
+      fxRates,
     });
   } catch (e) {
     if (e instanceof ParqetAuthError) {
