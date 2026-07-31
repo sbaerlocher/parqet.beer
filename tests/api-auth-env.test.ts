@@ -20,14 +20,14 @@ async function expectStatus(promise: Promise<Response>, status: number): Promise
   throw new Error(`expected a ${status} to be thrown`);
 }
 
-interface LoginEventOpts {
+interface AuthEventOpts {
   env?: Record<string, unknown> | undefined;
 }
 
-function buildLoginEvent(opts: LoginEventOpts = {}) {
-  const url = new URL('https://app.example.com/api/auth/login');
+function buildAuthEvent(routeId: string, path: string, opts: AuthEventOpts = {}) {
+  const url = new URL(`https://app.example.com${path}`);
   const request = new Request(url);
-  // The handler only touches a small subset of RequestEvent — cast loosely so
+  // The handlers only touch a small subset of RequestEvent — cast loosely so
   // we don't have to fabricate the full surface.
   return {
     request,
@@ -38,11 +38,17 @@ function buildLoginEvent(opts: LoginEventOpts = {}) {
     fetch: globalThis.fetch,
     getClientAddress: () => '127.0.0.1',
     params: {},
-    route: { id: '/api/auth/login' },
+    route: { id: routeId },
     setHeaders: () => {},
     isDataRequest: false,
     isSubRequest: false,
-  } as unknown as Parameters<typeof login>[0];
+  };
+}
+
+function buildLoginEvent(opts: AuthEventOpts = {}) {
+  return buildAuthEvent('/api/auth/login', '/api/auth/login', opts) as unknown as Parameters<
+    typeof login
+  >[0];
 }
 
 describe('GET /api/auth/login without bindings', () => {
@@ -72,23 +78,12 @@ describe('GET /api/auth/login without bindings', () => {
   });
 });
 
-function buildCallbackEvent(opts: LoginEventOpts = {}) {
-  const url = new URL('https://app.example.com/api/auth/callback?code=c&state=s');
-  const request = new Request(url);
-  return {
-    request,
-    url,
-    locals: { session: null },
-    platform: opts.env === undefined ? undefined : { env: opts.env },
-    cookies: { set: () => {}, get: () => undefined, delete: () => {} },
-    fetch: globalThis.fetch,
-    getClientAddress: () => '127.0.0.1',
-    params: {},
-    route: { id: '/api/auth/callback' },
-    setHeaders: () => {},
-    isDataRequest: false,
-    isSubRequest: false,
-  } as unknown as Parameters<typeof callback>[0];
+function buildCallbackEvent(opts: AuthEventOpts = {}) {
+  return buildAuthEvent(
+    '/api/auth/callback',
+    '/api/auth/callback?code=c&state=s',
+    opts
+  ) as unknown as Parameters<typeof callback>[0];
 }
 
 describe('GET /api/auth/callback without bindings', () => {
@@ -98,5 +93,24 @@ describe('GET /api/auth/callback without bindings', () => {
 
   it('responds 503 when platform is missing entirely', async () => {
     await expectStatus(callback(buildCallbackEvent()) as Promise<Response>, 503);
+  });
+
+  // The token exchange reads PARQET_CLIENT_ID indirectly, so a partial env is
+  // the case that actually exercises the key list — a fully empty env would
+  // pass even with the key missing from it.
+  it('responds 503 when only PARQET_CLIENT_ID is absent', async () => {
+    await expectStatus(
+      callback(
+        buildCallbackEvent({
+          env: {
+            PARQET_TOKEN_URL: 'https://auth.example.com/token',
+            PARQET_API_URL: 'https://api.example.com',
+            PARQET_KV: {} as KVNamespace,
+            SESSION_SECRET: 'secret',
+          },
+        })
+      ) as Promise<Response>,
+      503
+    );
   });
 });

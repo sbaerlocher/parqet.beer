@@ -20,9 +20,17 @@ export function requireAuthEnv(
   keys: (keyof App.Platform['env'])[]
 ): App.Platform['env'] {
   const env = platform?.env;
-  const missing = env ? keys.filter((key) => !env[key]) : keys;
 
-  if (!env || missing.length > 0) {
+  // A missing platform object and an empty one are different operational
+  // faults — no Workers runtime at all vs. a deploy without bindings — so log
+  // them apart instead of collapsing both into a missing-keys list.
+  if (!env) {
+    console.error('[auth] no platform.env — not running on the Workers runtime');
+    error(503, 'Auth not configured');
+  }
+
+  const missing = keys.filter((key) => !env[key]);
+  if (missing.length > 0) {
     console.error(`[auth] missing bindings: ${missing.join(', ')}`);
     error(503, 'Auth not configured');
   }

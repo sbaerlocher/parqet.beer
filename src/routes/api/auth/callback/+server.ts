@@ -14,6 +14,8 @@ import {
 
 export const GET: RequestHandler = async ({ url, cookies, platform, request }) => {
   const env = requireAuthEnv(platform, [
+    // Consumed indirectly via `exchangeCodeForTokens` below.
+    'PARQET_CLIENT_ID',
     'PARQET_TOKEN_URL',
     'PARQET_API_URL',
     'PARQET_KV',
