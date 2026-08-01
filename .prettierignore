@@ -3,6 +3,8 @@ node_modules/
 build/
 dist/
 coverage/
+playwright-report/
+test-results/
 pnpm-lock.yaml
 *.min.js
 *.min.css
