@@ -53,13 +53,6 @@ export const GET: RequestHandler = async ({ url, cookies, platform, request }) =
     error(500, 'Failed to fetch user info');
   }
 
-  console.log('[auth:callback] Token response:', {
-    hasRefreshToken: !!tokens.refresh_token,
-    expiresIn: tokens.expires_in,
-    expiresInHours: Math.round(tokens.expires_in / 3600),
-    tokenType: tokens.token_type,
-  });
-
   // Store user info in KV (1h TTL).
   await env.PARQET_KV.put(`user:${userInfo.userId}`, JSON.stringify(userInfo), {
     expirationTtl: 3600,
