@@ -11,3 +11,4 @@ coverage
 *.log
 playwright-report
 test-results
+.certs

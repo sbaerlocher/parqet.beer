@@ -17,11 +17,13 @@ import { assertE2e } from '../guard';
  * access token rather than held in server state that would leak between
  * parallel tests.
  *
- * The body is parsed by hand rather than via `request.formData()`: SvelteKit's
- * CSRF protection rejects `application/x-www-form-urlencoded` POSTs that carry
- * no matching `Origin` header, and `exchangeCodeForTokens` — a server-side
- * `fetch` inside the worker — sends none. Reading the raw text sidesteps that
- * check, and the guard above is what actually keeps this endpoint closed.
+ * SvelteKit's CSRF guard rejects urlencoded POSTs whose `Origin` does not match
+ * the request origin, and it runs in `respond.js` *before* this handler — so how
+ * the body is read here cannot influence it. `exchangeCodeForTokens` therefore
+ * sets `Origin` from the redirect URI, which for e2e is this same origin. The
+ * guard above is what keeps the endpoint closed; the check is only satisfied,
+ * never bypassed. (The guard also sits behind `!__SVELTEKIT_DEV__`, which is why
+ * it only appeared once the suite moved off `vite dev` onto the built worker.)
  */
 export const POST: RequestHandler = async ({ platform, request }) => {
   assertE2e(platform);

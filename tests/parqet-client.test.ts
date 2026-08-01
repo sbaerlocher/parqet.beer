@@ -135,6 +135,58 @@ describe('exchangeCodeForTokens', () => {
     expect(body.get('code_verifier')).toBe('pkce-verifier');
   });
 
+  it('sends an Origin header so urlencoded POSTs survive CSRF checks', async () => {
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          access_token: 'a',
+          refresh_token: 'r',
+          expires_in: 3600,
+          token_type: 'Bearer',
+        }),
+        { status: 200 }
+      )
+    );
+
+    await exchangeCodeForTokens(
+      'auth-code',
+      'https://app.example.com/api/auth/callback',
+      env,
+      'pkce-verifier'
+    );
+
+    // An urlencoded POST without `Origin` is what SvelteKit's CSRF guard
+    // rejects outright (`respond.js`: no origin → forbidden), which is how the
+    // e2e token mock came to 403 on a request the worker itself sent.
+    const call = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    expect(call[1].headers['Origin']).toBe('https://app.example.com');
+  });
+
+  it('derives Origin from the redirect URI, not from the token URL', async () => {
+    (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          access_token: 'a',
+          refresh_token: 'r',
+          expires_in: 3600,
+          token_type: 'Bearer',
+        }),
+        { status: 200 }
+      )
+    );
+
+    // `Origin` names the sender, not the target. The redirect URI is this app's
+    // own callback, so its origin is the app's; the token URL belongs to the
+    // authorization server and would be the wrong answer — and against a real
+    // provider on a different host it would also be a false claim.
+    await exchangeCodeForTokens('auth-code', 'https://app.example.com/api/auth/callback', env, 'v');
+
+    const call = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
+    expect(call[0]).toBe('https://oauth.example.com/token');
+    expect(call[1].headers['Origin']).toBe('https://app.example.com');
+    expect(call[1].headers['Origin']).not.toBe('https://oauth.example.com');
+  });
+
   it('returns null on a non-ok HTTP response', async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
       new Response('invalid_grant', { status: 400 })

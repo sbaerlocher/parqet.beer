@@ -99,11 +99,24 @@ https` on port 4173. Both parts are load-bearing — `hooks.server.ts` only
   cert. Every one of those routes calls `assertE2e()` first and 404s unless
   `ENVIRONMENT === "e2e"` — a value only `env.e2e` ever sets. When adding a
   route there, the guard call comes before any other statement.
-- **Mock endpoints that accept form bodies must parse the raw text**
-  (`new URLSearchParams(await request.text())`), not `request.formData()`:
-  SvelteKit's CSRF protection rejects urlencoded POSTs without a matching
-  `Origin`, and the worker's own server-side `fetch` to the token endpoint
-  sends none.
+- **`mkcert` is required for `pnpm test:e2e`.** `pretest:e2e` generates a
+  certificate into `.certs/` (gitignored) via `scripts/e2e-certs.sh`. A
+  self-signed certificate does not work: the worker calls its own token
+  endpoint over that listener, and workerd rejects a certificate outside its
+  trust store with no per-request opt-out — `ignoreHTTPSErrors` only ever
+  covers the browser. Install with `brew install mkcert nss` /
+  `apt install mkcert libnss3-tools`, then `mkcert -install` once.
+- **The token exchange sends an explicit `Origin` header**
+  (`parqet-client.ts`, derived from the redirect URI). SvelteKit's CSRF guard
+  rejects urlencoded POSTs whose origin does not match, and a server-side
+  `fetch` sends none by default. Two consequences worth knowing before
+  "fixing" it: reading the body with `request.text()` instead of
+  `request.formData()` does **not** help, because the guard runs in
+  `respond.js` before the handler and looks only at method, content type, and
+  origin; and the guard sits behind `!__SVELTEKIT_DEV__`, so it is invisible
+  under `vite dev` and only appears once you run the built worker. Sending the
+  real sender origin satisfies the check without weakening it — a genuinely
+  cross-site POST still carries a foreign origin and is still refused.
 - **Node version** is pinned in `.nvmrc`
 
 ## Environment Variables
