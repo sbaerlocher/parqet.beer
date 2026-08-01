@@ -7,23 +7,34 @@ const E2E_USER_ID = 'e2e-user-1';
  * Drive the full OAuth flow: landing → `/api/auth/login` → mock consent →
  * `/api/auth/callback` → `/dashboard`.
  *
- * `e2eCode` selects the downstream failure the mocks should inject; it is
- * threaded through the authorize redirect as `e2e_code`. Since `/api/auth/login`
- * builds that redirect from `PARQET_AUTHORIZE_URL`, the parameter is appended
- * here by rewriting the authorize request on the way out.
+ * `e2eCode` selects the downstream failure the mocks should inject
+ * (`fail-token` → 500 from the token endpoint, `fail-user` → 500 from
+ * userinfo). It reaches the authorize mock as an `e2e_code` query parameter.
+ *
+ * Getting it there needs care. `/api/auth/login` answers with a 302 to
+ * `PARQET_AUTHORIZE_URL`, and rewriting that hop with `page.route()` is
+ * unreliable: a redirect the server issues is not consistently surfaced as an
+ * interceptable request, so the parameter silently goes missing and the mock
+ * falls back to the success code — the flow then logs in and the failure-path
+ * assertions fail against a working `/dashboard`.
+ *
+ * So the redirect is followed manually instead: click through to the authorize
+ * page, then re-navigate to the same URL with `e2e_code` appended. Both hops
+ * are real navigations from the browser, which is what the `__Host-` state and
+ * verifier cookies need in order to ride along.
  */
 async function login(page: Page, e2eCode?: string): Promise<void> {
-  if (e2eCode) {
-    await page.route('**/__e2e__/authorize*', async (route) => {
-      const url = new URL(route.request().url());
-      url.searchParams.set('e2e_code', e2eCode);
-      await route.continue({ url: url.toString() });
-    });
-  }
-
   await page.goto('/');
   await page.locator('html[data-hydrated]').waitFor();
   await page.getByTestId('hero-cta').click();
+  await page.getByTestId('mock-consent-approve').waitFor();
+
+  if (e2eCode) {
+    const authorizeUrl = new URL(page.url());
+    authorizeUrl.searchParams.set('e2e_code', e2eCode);
+    await page.goto(authorizeUrl.toString());
+  }
+
   await page.getByTestId('mock-consent-approve').click();
 }
 
@@ -104,7 +115,11 @@ test.describe('OAuth failure paths', () => {
     await page.goto('/');
     await page.locator('html[data-hydrated]').waitFor();
     await page.getByTestId('hero-cta').click();
-    await expect(page.getByTestId('mock-consent-approve')).toBeVisible();
+    // The CTA goes through `/api/auth/login`'s 302 to the authorize mock, so
+    // this waits on a full redirect chain. `waitFor` uses the suite's action
+    // timeout rather than the 5s `toBeVisible` default, which a cold worker
+    // under CI load can exceed — the assertion below is what actually matters.
+    await page.getByTestId('mock-consent-approve').waitFor();
 
     // Same browser, valid verifier cookie, wrong state → CSRF guard must fire.
     const response = await page.goto('/api/auth/callback?code=e2e-auth-code&state=tampered');

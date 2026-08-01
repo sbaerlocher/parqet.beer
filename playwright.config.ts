@@ -5,7 +5,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  reporter: process.env.CI ? 'github' : 'list',
+  // In CI, `github` alone writes annotations but no report directory, so the
+  // `playwright-report/` upload on failure finds nothing and every red run has
+  // to be diagnosed from annotations only. Pair it with the HTML reporter.
+  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'https://localhost:4173',
     // The certificate comes from mkcert, so a machine that ran `mkcert -install`
