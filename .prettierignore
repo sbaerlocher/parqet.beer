@@ -1,10 +1,15 @@
+# Prettier 3 reads .gitignore by default, so the entries below are
+# redundant. Kept so coverage survives a .gitignore change.
+# (node_modules/ is skipped unconditionally, ignore files aside.)
 node_modules/
 .svelte-kit/
-build/
 dist/
 coverage/
 playwright-report/
 test-results/
+
+# Not covered by .gitignore — only these entries carry weight:
+build/
 pnpm-lock.yaml
 *.min.js
 *.min.css
