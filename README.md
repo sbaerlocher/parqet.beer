@@ -87,7 +87,8 @@ In production, secrets are set via the Cloudflare dashboard, not through
 
 ## Scripts
 
-With DDE, use the `just` recipes — each one runs inside the container:
+With DDE, use the `just` recipes — `dev` manages the containers, the rest run
+inside them:
 
 ```bash
 just                  # List all recipes
@@ -96,7 +97,7 @@ just build            # Build for Cloudflare Pages
 just check            # TypeScript + Svelte check
 just test             # Vitest (unit tests)
 just e2e              # Playwright (E2E tests)
-just lint             # Prettier check
+just lint             # Prettier check + ESLint
 just fmt              # Prettier write
 ```
 

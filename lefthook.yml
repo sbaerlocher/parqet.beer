@@ -8,6 +8,10 @@ pre-commit:
       glob: '*.{js,ts,svelte}'
       run: pnpm eslint {staged_files}
 
+# Hooks call pnpm directly, not the just recipes: lefthook is installed for
+# every contributor via the `prepare` script, including the documented
+# non-DDE path (Node + pnpm only), where `just` is absent and its recipes
+# would delegate into a container that does not exist.
 pre-push:
   commands:
     typecheck:

@@ -26,7 +26,7 @@ By participating in this project you agree to abide by our
 You will need:
 
 - **[DDE](https://dde.sh)** — Docker-based development environment
-- **[just](https://just.systems)** — task runner (the pre-push hook calls it)
+- **[just](https://just.systems)** — task runner for the commands below
 
 Then:
 
@@ -41,16 +41,17 @@ Other useful commands:
 just check        # TypeScript + svelte-check
 just test         # Vitest
 just e2e          # Playwright
-just lint         # Prettier --check (CI enforced)
+just lint         # Prettier --check + ESLint (CI enforced)
 just fmt          # Prettier write
 just build        # Build for Cloudflare Pages
 ```
 
-`just --list` shows every recipe. Each one runs inside the container via
-`dde project:exec`. Toolchain-only scripts that have no recipe (`check:watch`,
-`test:watch`, `test:coverage`, `test:data`, `preview`, `generate:assets`,
-`lint:fix`, `format:check`, `typecheck`) stay in `package.json` and are called
-as `dde project:exec pnpm <script>`.
+`just --list` shows every recipe. Apart from `just dev`, which manages the
+containers, they run inside them via `dde project:exec`. Toolchain-only
+scripts that have no recipe (`check:watch`, `test:watch`, `test:coverage`,
+`test:data`, `preview`, `generate:assets`, `lint:fix`, `format:check`,
+`typecheck`) stay in `package.json` and are called as
+`dde project:exec pnpm <script>`.
 
 ### Without DDE
 
