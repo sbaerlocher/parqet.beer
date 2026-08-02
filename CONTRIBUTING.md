@@ -26,24 +26,31 @@ By participating in this project you agree to abide by our
 You will need:
 
 - **[DDE](https://dde.sh)** — Docker-based development environment
+- **[just](https://just.systems)** — task runner (the pre-push hook calls it)
 
 Then:
 
 ```bash
 cp .dev.vars.example .dev.vars   # fill in PARQET_CLIENT_ID and SESSION_SECRET
-dde project:up                   # https://parqet-beer.test
+just dev                         # https://parqet-beer.test
 ```
 
 Other useful commands:
 
 ```bash
-dde exec pnpm check        # TypeScript + svelte-check
-dde exec pnpm test         # Vitest
-dde exec pnpm test:e2e     # Playwright
-dde exec pnpm lint         # Prettier --check (CI enforced)
-dde exec pnpm format       # Prettier write
-dde exec pnpm build        # Build for Cloudflare Pages
+just check        # TypeScript + svelte-check
+just test         # Vitest
+just e2e          # Playwright
+just lint         # Prettier --check (CI enforced)
+just fmt          # Prettier write
+just build        # Build for Cloudflare Pages
 ```
+
+`just --list` shows every recipe. Each one runs inside the container via
+`dde project:exec`. Toolchain-only scripts that have no recipe (`check:watch`,
+`test:watch`, `test:coverage`, `test:data`, `preview`, `generate:assets`,
+`lint:fix`, `format:check`, `typecheck`) stay in `package.json` and are called
+as `dde project:exec pnpm <script>`.
 
 ### Without DDE
 
@@ -61,6 +68,9 @@ pnpm install
 cp .dev.vars.example .dev.vars   # fill in PARQET_CLIENT_ID and SESSION_SECRET
 pnpm dev                         # http://localhost:5173
 ```
+
+The `just` recipes do not apply here — they delegate to the container, so
+without DDE you call pnpm directly.
 
 Other useful commands:
 
@@ -191,9 +201,9 @@ to submit it under the project's MIT license.
 
 Before opening a PR, please confirm:
 
-- [ ] `pnpm lint` passes
-- [ ] `pnpm check` passes (TypeScript + svelte-check are green)
-- [ ] `pnpm test` passes, and new code has tests
+- [ ] `just lint` passes
+- [ ] `just check` passes (TypeScript + svelte-check are green)
+- [ ] `just test` passes, and new code has tests
 - [ ] No secrets, tokens, or `.dev.vars` content committed
 - [ ] Documentation updated if behavior or config changed
 - [ ] Beverage data changes include source URL, date, and curation
