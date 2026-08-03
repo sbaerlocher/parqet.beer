@@ -12,9 +12,10 @@ All notable changes documented here. Format: [Keep a Changelog](https://keepacha
   gallery. Client-only, persisted in localStorage — no server state.
 
 - `justfile` with the org-wide task verbs (`dev`, `build`, `test`, `lint`,
-  `fmt`) plus `check` and `e2e`, delegating to `dde project:exec`. `just` is
-  the local task entrypoint; CI keeps calling pnpm through the reusable
-  workflow.
+  `fmt`) plus `check` and `e2e`. `dev` starts the containers via
+  `dde project:up`, the remaining recipes run inside them via
+  `dde project:exec`. `just` is the local task entrypoint; CI keeps calling
+  pnpm through the reusable workflow.
 
 ### Changed
 
