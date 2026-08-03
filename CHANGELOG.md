@@ -11,6 +11,17 @@ All notable changes documented here. Format: [Keep a Changelog](https://keepacha
   unlock toast, a streak badge in the dashboard header, and an `/achievements`
   gallery. Client-only, persisted in localStorage — no server state.
 
+- `justfile` with the org-wide task verbs (`dev`, `build`, `test`, `lint`,
+  `fmt`) plus `check` and `e2e`. `dev` starts the containers via
+  `dde project:up`, the remaining recipes run inside them via
+  `dde project:exec`. `just` is the local task entrypoint; CI keeps calling
+  pnpm through the reusable workflow.
+
+### Changed
+
+- README and CONTRIBUTING document the `just` recipes for the DDE path and no
+  longer use `dde exec`, which is not a dde subcommand (`dde project:exec` is).
+
 ## [0.3.0] - 2026-04-22
 
 ### Added

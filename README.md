@@ -34,7 +34,7 @@ product.**
 
 ### With DDE (recommended)
 
-Prerequisites: [DDE](https://dde.sh).
+Prerequisites: [DDE](https://dde.sh), [just](https://just.systems).
 
 ```bash
 # 1. Clone the repository
@@ -46,7 +46,7 @@ cp .dev.vars.example .dev.vars
 # Set PARQET_CLIENT_ID and SESSION_SECRET
 
 # 3. Start the project (installs dependencies automatically)
-dde project:up
+just dev
 ```
 
 Then open `https://parqet-beer.test` in your browser.
@@ -87,17 +87,22 @@ In production, secrets are set via the Cloudflare dashboard, not through
 
 ## Scripts
 
-With DDE, prefix commands with `dde exec`:
+With DDE, use the `just` recipes — `dev` manages the containers, the rest run
+inside them:
 
 ```bash
-dde exec pnpm build            # Build for Cloudflare Pages
-dde exec pnpm check            # TypeScript + Svelte check
-dde exec pnpm test             # Vitest (unit tests)
-dde exec pnpm lint             # Prettier check
-dde exec pnpm format           # Prettier write
+just                  # List all recipes
+just dev              # Start the containers (https://parqet-beer.test)
+just build            # Build for Cloudflare Pages
+just check            # TypeScript + Svelte check
+just test             # Vitest (unit tests)
+just e2e              # Playwright (E2E tests)
+just lint             # Prettier check + ESLint
+just fmt              # Prettier write
 ```
 
-Without DDE:
+Without DDE, call the pnpm scripts directly — the recipes above delegate to
+the container and do not apply:
 
 ```bash
 pnpm dev              # Vite dev server (localhost:5173)
