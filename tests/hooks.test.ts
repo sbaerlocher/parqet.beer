@@ -268,8 +268,9 @@ describe('hooks.server handle()', () => {
         accessToken: 'access-new',
       });
 
-      // Refresh lock was acquired.
-      expect(ctx.kv.store.has('refresh_lock:user-2')).toBe(true);
+      // Refresh lock was released after the refresh completed (a stale lock
+      // would pin later requests to the expiring session — the self-DoS bug).
+      expect(ctx.kv.store.has('refresh_lock:user-2')).toBe(false);
 
       // Tokens were written to KV.
       const storedRaw = ctx.kv.store.get('token:user-2');
@@ -279,11 +280,36 @@ describe('hooks.server handle()', () => {
       expect(stored.refreshToken).toBe('refresh-new');
     });
 
-    it('falls back to the existing session when the refresh request fails', async () => {
+    it('falls back to the existing session and releases the lock on a transient 5xx', async () => {
       const cookies = createFakeCookies();
       const kv = createFakeKv();
       await seedSession(cookies, kv, {
         userId: 'user-3',
+        accessToken: 'access-stale',
+        refreshToken: 'refresh-stale',
+        expiresAt: Date.now() + 60 * 1000,
+      });
+
+      globalThis.fetch = vi.fn().mockResolvedValue(new Response('boom', { status: 503 }));
+
+      const ctx = buildEvent({ pathname: '/', cookies, kv });
+      await runHandle(ctx.event);
+
+      // Transient outage: keep the still-valid session so the user isn't
+      // logged out over a Parqet blip.
+      expect(ctx.event.locals.session).toEqual({
+        userId: 'user-3',
+        accessToken: 'access-stale',
+      });
+      // Lock released so the next request retries immediately (no self-DoS).
+      expect(ctx.kv.store.has('refresh_lock:user-3')).toBe(false);
+    });
+
+    it('clears the session on a permanent 4xx (dead grant)', async () => {
+      const cookies = createFakeCookies();
+      const kv = createFakeKv();
+      await seedSession(cookies, kv, {
+        userId: 'user-3b',
         accessToken: 'access-stale',
         refreshToken: 'refresh-stale',
         expiresAt: Date.now() + 60 * 1000,
@@ -294,10 +320,9 @@ describe('hooks.server handle()', () => {
       const ctx = buildEvent({ pathname: '/', cookies, kv });
       await runHandle(ctx.event);
 
-      expect(ctx.event.locals.session).toEqual({
-        userId: 'user-3',
-        accessToken: 'access-stale',
-      });
+      // Dead grant: log the user out rather than serving a doomed token.
+      expect(ctx.event.locals.session).toBeNull();
+      expect(ctx.kv.store.has('refresh_lock:user-3b')).toBe(false);
     });
 
     it('skips the refresh entirely when another request holds the lock', async () => {

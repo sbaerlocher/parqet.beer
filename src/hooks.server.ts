@@ -48,10 +48,24 @@ const API_RATE_WINDOW_SECONDS = 60;
 const LOGIN_RATE_LIMIT = 10;
 const LOGIN_RATE_WINDOW_SECONDS = 60;
 
+// How long to wait for a peer's in-flight refresh before giving up and
+// serving the current (still-valid-for-a-bit) session. Kept well under a
+// request budget; the token isn't dead yet, so a miss here is harmless.
+const LOCK_WAIT_MS = 400;
+const LOCK_POLL_MS = 50;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/**
+ * Refresh a near-expiry session. Returns the refreshed session, the original
+ * (still-valid) session when a refresh is unnecessary or a peer is handling
+ * it, or `null` when the grant is permanently dead and the caller should tear
+ * the session down.
+ */
 async function maybeRefreshSession(
   session: FullSession,
   env: App.Platform['env']
-): Promise<FullSession> {
+): Promise<FullSession | null> {
   if (!session.refreshToken) {
     console.warn('[auth:refresh] No refresh token in session, cannot refresh');
     return session;
@@ -64,41 +78,68 @@ async function maybeRefreshSession(
 
   // Best-effort lock to prevent parallel requests from double-spending the
   // same refresh token. KV is eventually consistent, so this is not a hard
-  // mutex — but it drastically shrinks the race window in practice. If the
-  // lock is present, fall through with the (still-valid-for-a-bit) current
-  // session and let the next request pick up the refreshed one.
+  // mutex — but it drastically shrinks the race window in practice.
   // 60s is the minimum expirationTtl KV accepts.
   const lockKey = `refresh_lock:${session.userId}`;
-  const existing = await env.PARQET_KV.get(lockKey);
-  if (existing) return session;
-  await env.PARQET_KV.put(lockKey, '1', { expirationTtl: 60 });
 
-  const tokens = await refreshAccessToken(session.refreshToken, env);
-  if (!tokens) {
-    console.error('[auth:refresh] Refresh failed — token may be expired or revoked');
+  // If a peer holds the lock, briefly poll for the refreshed tokens instead of
+  // immediately returning the expiring session. Without this, a burst of
+  // requests all serve the soon-dead token and cascade into 401s. If the wait
+  // elapses, fall through to the current session (still valid for a moment).
+  if (await env.PARQET_KV.get(lockKey)) {
+    for (let waited = 0; waited < LOCK_WAIT_MS; waited += LOCK_POLL_MS) {
+      await sleep(LOCK_POLL_MS);
+      if (!(await env.PARQET_KV.get(lockKey))) {
+        const fresh = await getTokens(env.PARQET_KV, session.userId);
+        if (fresh && fresh.expiresAt - Date.now() > REFRESH_SKEW_MS) {
+          return { userId: session.userId, ...fresh };
+        }
+        break;
+      }
+    }
     return session;
   }
 
-  console.log('[auth:refresh] Refresh successful', {
-    hasNewRefreshToken: !!tokens.refresh_token,
-    newExpiresIn: tokens.expires_in,
-  });
+  await env.PARQET_KV.put(lockKey, '1', { expirationTtl: 60 });
+  try {
+    const result = await refreshAccessToken(session.refreshToken, env);
+    if (!result.ok) {
+      if (result.permanent) {
+        console.error('[auth:refresh] Refresh rejected — grant is dead, clearing session');
+        return null;
+      }
+      // Transient Parqet outage: keep the current session (still briefly
+      // valid) and let the next request retry — the lock is released below.
+      console.warn('[auth:refresh] Refresh failed transiently, will retry next request');
+      return session;
+    }
 
-  const refreshed: FullSession = {
-    userId: session.userId,
-    accessToken: tokens.access_token,
-    refreshToken: tokens.refresh_token ?? session.refreshToken,
-    expiresAt: Date.now() + tokens.expires_in * 1000,
-  };
+    const { tokens } = result;
+    console.log('[auth:refresh] Refresh successful', {
+      hasNewRefreshToken: !!tokens.refresh_token,
+      newExpiresIn: tokens.expires_in,
+    });
 
-  // Persist refreshed tokens to KV (30-day TTL resets on each refresh).
-  await storeTokens(env.PARQET_KV, session.userId, {
-    accessToken: refreshed.accessToken,
-    refreshToken: refreshed.refreshToken,
-    expiresAt: refreshed.expiresAt,
-  });
+    const refreshed: FullSession = {
+      userId: session.userId,
+      accessToken: tokens.access_token,
+      refreshToken: tokens.refresh_token ?? session.refreshToken,
+      expiresAt: Date.now() + tokens.expires_in * 1000,
+    };
 
-  return refreshed;
+    // Persist refreshed tokens to KV (30-day TTL resets on each refresh).
+    await storeTokens(env.PARQET_KV, session.userId, {
+      accessToken: refreshed.accessToken,
+      refreshToken: refreshed.refreshToken,
+      expiresAt: refreshed.expiresAt,
+    });
+
+    return refreshed;
+  } finally {
+    // Always release the lock — a stale lock after a failed refresh pins every
+    // subsequent request to the expiring session (the self-DoS this fixes).
+    await env.PARQET_KV.delete(lockKey);
+  }
 }
 
 function rateLimitResponse(result: { resetAt: number }, limit: number): Response {
@@ -155,7 +196,13 @@ export const handle: Handle = async ({ event, resolve }) => {
           expiresAt: tokenData.expiresAt,
         };
         const session = await maybeRefreshSession(full, env);
-        event.locals.session = { userId: session.userId, accessToken: session.accessToken };
+        if (session) {
+          event.locals.session = { userId: session.userId, accessToken: session.accessToken };
+        } else {
+          // Grant is permanently dead — drop the session so the UI logs out.
+          event.locals.session = null;
+          clearSessionCookie(event.cookies);
+        }
       } else {
         event.locals.session = null;
         clearSessionCookie(event.cookies);
