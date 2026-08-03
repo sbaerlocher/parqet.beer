@@ -277,6 +277,10 @@ describe('hooks.server handle()', () => {
       const stored = JSON.parse(storedRaw!);
       expect(stored.accessToken).toBe('access-new');
       expect(stored.refreshToken).toBe('refresh-new');
+
+      // The Origin header comes from the request, not a hardcoded literal.
+      const call = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
+      expect(call[1].headers.Origin).toBe('https://app.example.com');
     });
 
     it('falls back to the existing session when the refresh request fails', async () => {
