@@ -61,7 +61,13 @@ export async function exchangeCodeForTokens(
   try {
     const response = await fetch(env.PARQET_TOKEN_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        // Same CSRF-guard reasoning as the refresh grant. The redirect URI is
+        // already built from the runtime origin, so derive it rather than
+        // threading the same value through a second parameter.
+        Origin: new URL(redirectUri).origin,
+      },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,

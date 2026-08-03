@@ -126,6 +126,7 @@ describe('exchangeCodeForTokens', () => {
     expect(call[0]).toBe('https://oauth.example.com/token');
     expect(call[1].method).toBe('POST');
     expect(call[1].headers['Content-Type']).toBe('application/x-www-form-urlencoded');
+    expect(call[1].headers.Origin).toBe('https://app.example.com');
     const body = new URLSearchParams(call[1].body as string);
     expect(body.get('grant_type')).toBe('authorization_code');
     expect(body.get('code')).toBe('auth-code');
