@@ -60,10 +60,6 @@ async function maybeRefreshSession(
   }
   if (session.expiresAt - Date.now() > REFRESH_SKEW_MS) return session;
 
-  console.log('[auth:refresh] Token expiring soon, attempting refresh', {
-    expiresIn: Math.round((session.expiresAt - Date.now()) / 1000),
-  });
-
   // Best-effort lock to prevent parallel requests from double-spending the
   // same refresh token. KV is eventually consistent, so this is not a hard
   // mutex — but it drastically shrinks the race window in practice. If the
@@ -80,11 +76,6 @@ async function maybeRefreshSession(
     console.error('[auth:refresh] Refresh failed — token may be expired or revoked');
     return session;
   }
-
-  console.log('[auth:refresh] Refresh successful', {
-    hasNewRefreshToken: !!tokens.refresh_token,
-    newExpiresIn: tokens.expires_in,
-  });
 
   const refreshed: FullSession = {
     userId: session.userId,
