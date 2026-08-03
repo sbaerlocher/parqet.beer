@@ -61,7 +61,13 @@ export async function exchangeCodeForTokens(
   try {
     const response = await fetch(env.PARQET_TOKEN_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        // Same CSRF-guard reasoning as the refresh grant. The redirect URI is
+        // already built from the runtime origin, so derive it rather than
+        // threading the same value through a second parameter.
+        Origin: new URL(redirectUri).origin,
+      },
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code,
@@ -83,15 +89,22 @@ export async function exchangeCodeForTokens(
 /**
  * Exchange a refresh token for a fresh access token. Returns null on any
  * failure so the caller can fall back to re-auth.
+ *
+ * `origin` is sent as the `Origin` header: a token endpoint that applies a
+ * CSRF guard (method + content-type + origin, as SvelteKit's own does) rejects
+ * an origin-less form POST with 403, which would turn a silent refresh into a
+ * forced re-auth. The caller passes the runtime origin so this stays correct
+ * behind a TLS-terminating proxy.
  */
 export async function refreshAccessToken(
   refreshToken: string,
+  origin: string,
   env: App.Platform['env']
 ): Promise<TokenResponse | null> {
   try {
     const response = await fetch(env.PARQET_TOKEN_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Origin: origin },
       body: new URLSearchParams({
         grant_type: 'refresh_token',
         refresh_token: refreshToken,

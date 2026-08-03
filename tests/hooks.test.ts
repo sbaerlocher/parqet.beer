@@ -45,10 +45,14 @@ interface BuildEventOpts {
   cookies?: ReturnType<typeof createFakeCookies>;
   kv?: ReturnType<typeof createFakeKv>;
   clientIp?: string;
+  /** Origin of the incoming request. Defaults to the https app origin. */
+  requestOrigin?: string;
+  /** Sets `x-forwarded-proto`, as a TLS-terminating proxy would. */
+  forwardedProto?: string;
 }
 
 function buildEvent(opts: BuildEventOpts = {}) {
-  const url = new URL(`https://app.example.com${opts.pathname ?? '/'}`);
+  const url = new URL(`${opts.requestOrigin ?? 'https://app.example.com'}${opts.pathname ?? '/'}`);
   const cookies = opts.cookies ?? createFakeCookies();
   const kv = opts.kv ?? createFakeKv();
   const env = {
@@ -63,7 +67,10 @@ function buildEvent(opts: BuildEventOpts = {}) {
 
   const event = {
     url,
-    request: new Request(url),
+    request: new Request(
+      url,
+      opts.forwardedProto ? { headers: { 'x-forwarded-proto': opts.forwardedProto } } : undefined
+    ),
     cookies: cookies.cookies,
     locals: {
       session: null as null | { userId: string; accessToken: string },
@@ -259,7 +266,16 @@ describe('hooks.server handle()', () => {
         )
       );
 
-      const ctx = buildEvent({ pathname: '/', cookies, kv });
+      // Plain http behind a TLS-terminating proxy, on a host that differs from
+      // every other origin in this suite: a hardcoded literal or a naive
+      // `url.origin` both produce something other than the expected value.
+      const ctx = buildEvent({
+        pathname: '/',
+        cookies,
+        kv,
+        requestOrigin: 'http://beer.example.org',
+        forwardedProto: 'https',
+      });
       await runHandle(ctx.event);
 
       // locals reflect the refreshed access token.
@@ -277,6 +293,11 @@ describe('hooks.server handle()', () => {
       const stored = JSON.parse(storedRaw!);
       expect(stored.accessToken).toBe('access-new');
       expect(stored.refreshToken).toBe('refresh-new');
+
+      // The Origin header comes from the request — host from the URL, scheme
+      // from x-forwarded-proto — not from a literal or the raw url.origin.
+      const call = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
+      expect(call[1].headers.Origin).toBe('https://beer.example.org');
     });
 
     it('falls back to the existing session when the refresh request fails', async () => {
