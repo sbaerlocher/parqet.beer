@@ -4,6 +4,7 @@ node_modules
 .wrangler
 .dev.vars
 .env
+build
 dist
 coverage
 .DS_Store
