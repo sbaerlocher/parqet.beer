@@ -4,6 +4,7 @@ import {
   getUserId,
   getTokens,
   storeTokens,
+  resolveOrigin,
   resolveSessionSecret,
   clearSessionCookie,
   SESSION_COOKIE,
@@ -50,6 +51,7 @@ const LOGIN_RATE_WINDOW_SECONDS = 60;
 
 async function maybeRefreshSession(
   session: FullSession,
+  origin: string,
   env: App.Platform['env']
 ): Promise<FullSession> {
   if (!session.refreshToken) {
@@ -73,7 +75,7 @@ async function maybeRefreshSession(
   if (existing) return session;
   await env.PARQET_KV.put(lockKey, '1', { expirationTtl: 60 });
 
-  const tokens = await refreshAccessToken(session.refreshToken, env);
+  const tokens = await refreshAccessToken(session.refreshToken, origin, env);
   if (!tokens) {
     console.error('[auth:refresh] Refresh failed — token may be expired or revoked');
     return session;
@@ -154,7 +156,11 @@ export const handle: Handle = async ({ event, resolve }) => {
           refreshToken: tokenData.refreshToken,
           expiresAt: tokenData.expiresAt,
         };
-        const session = await maybeRefreshSession(full, env);
+        const session = await maybeRefreshSession(
+          full,
+          resolveOrigin(event.url, event.request),
+          env
+        );
         event.locals.session = { userId: session.userId, accessToken: session.accessToken };
       } else {
         event.locals.session = null;

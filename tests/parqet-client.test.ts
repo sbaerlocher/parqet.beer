@@ -42,7 +42,7 @@ describe('refreshAccessToken', () => {
       )
     );
 
-    const result = await refreshAccessToken('old-refresh', env);
+    const result = await refreshAccessToken('old-refresh', 'https://app.example.com', env);
 
     expect(result).toEqual({
       access_token: 'new-access',
@@ -54,6 +54,7 @@ describe('refreshAccessToken', () => {
     const call = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0]!;
     expect(call[0]).toBe('https://oauth.example.com/token');
     expect(call[1].method).toBe('POST');
+    expect(call[1].headers.Origin).toBe('https://app.example.com');
     const body = new URLSearchParams(call[1].body as string);
     expect(body.get('grant_type')).toBe('refresh_token');
     expect(body.get('refresh_token')).toBe('old-refresh');
@@ -64,13 +65,13 @@ describe('refreshAccessToken', () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
       new Response('nope', { status: 401 })
     );
-    const result = await refreshAccessToken('bad-refresh', env);
+    const result = await refreshAccessToken('bad-refresh', 'https://app.example.com', env);
     expect(result).toBeNull();
   });
 
   it('returns null when fetch throws', async () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new Error('network down'));
-    const result = await refreshAccessToken('any', env);
+    const result = await refreshAccessToken('any', 'https://app.example.com', env);
     expect(result).toBeNull();
   });
 
@@ -78,7 +79,7 @@ describe('refreshAccessToken', () => {
     (globalThis.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
       new Response(JSON.stringify({ wrong: 'shape' }), { status: 200 })
     );
-    const result = await refreshAccessToken('any', env);
+    const result = await refreshAccessToken('any', 'https://app.example.com', env);
     expect(result).toBeNull();
   });
 });
