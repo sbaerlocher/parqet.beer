@@ -87,6 +87,36 @@ Not an agent path — see `CONTRIBUTING.md` § Setup.
 - **Svelte 5 Runes**: `$state`, `$derived`, `$effect`, `$props` — not Svelte 4 syntax (`export let`, reactive `$:`)
 - **Tailwind v4**: No `tailwind.config.js` — config via CSS (`@import "tailwindcss"` in `src/app.css`)
 - **`pnpm preview`** requires `pnpm build` first (Wrangler reads `.svelte-kit/cloudflare`)
+- **E2E runs against the built worker over HTTPS**, not `vite dev`:
+  `pnpm test:e2e` boots `pnpm build && wrangler dev --env e2e --local-protocol
+https` on port 4173. Both parts are load-bearing — `hooks.server.ts` only
+  runs auth logic when `PARQET_KV` _and_ `SESSION_SECRET` are bound, and the
+  `__Host-` cookie prefix implies `Secure`, which browsers drop over plain
+  HTTP. Consequence: each e2e run pays for a build first.
+- **The OAuth mocks live in the app**, under `src/routes/__e2e__/` (authorize,
+  token, user, portfolios, performance). `env.e2e` in `wrangler.jsonc` points
+  `PARQET_*_URL` back at them, so there is no second server and no extra TLS
+  cert. Every one of those routes calls `assertE2e()` first and 404s unless
+  `ENVIRONMENT === "e2e"` — a value only `env.e2e` ever sets. When adding a
+  route there, the guard call comes before any other statement.
+- **`mkcert` is required for `pnpm test:e2e`.** `pretest:e2e` generates a
+  certificate into `.certs/` (gitignored) via `scripts/e2e-certs.sh`. A
+  self-signed certificate does not work: the worker calls its own token
+  endpoint over that listener, and workerd rejects a certificate outside its
+  trust store with no per-request opt-out — `ignoreHTTPSErrors` only ever
+  covers the browser. Install with `brew install mkcert nss` /
+  `apt install mkcert libnss3-tools`, then `mkcert -install` once.
+- **The token exchange sends an explicit `Origin` header**
+  (`parqet-client.ts`, derived from the redirect URI). SvelteKit's CSRF guard
+  rejects urlencoded POSTs whose origin does not match, and a server-side
+  `fetch` sends none by default. Two consequences worth knowing before
+  "fixing" it: reading the body with `request.text()` instead of
+  `request.formData()` does **not** help, because the guard runs in
+  `respond.js` before the handler and looks only at method, content type, and
+  origin; and the guard sits behind `!__SVELTEKIT_DEV__`, so it is invisible
+  under `vite dev` and only appears once you run the built worker. Sending the
+  real sender origin satisfies the check without weakening it — a genuinely
+  cross-site POST still carries a foreign origin and is still refused.
 - **Node version** is pinned in `.nvmrc`
 
 ## Environment Variables

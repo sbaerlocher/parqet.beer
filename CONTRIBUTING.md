@@ -88,6 +88,25 @@ pnpm preview      # Wrangler preview against .svelte-kit/cloudflare
 `pnpm preview` requires `pnpm build` to have been run first, because Wrangler
 reads from `.svelte-kit/cloudflare`.
 
+`pnpm test:e2e` builds the app and serves it via
+`wrangler dev --env e2e --local-protocol https`, so the suite exercises real
+Cloudflare bindings over HTTPS — both are required for the OAuth flow to work
+at all. Expect the build to run on every invocation.
+
+The suite additionally needs [mkcert](https://github.com/FiloSottile/mkcert):
+
+```bash
+brew install mkcert nss           # macOS
+sudo apt install mkcert libnss3-tools  # Debian/Ubuntu
+mkcert -install                   # once, adds the local CA to your trust store
+```
+
+`pretest:e2e` then generates `.certs/localhost.pem` automatically (gitignored,
+never committed). A trusted certificate rather than a self-signed one is
+load-bearing: during the token exchange the worker calls its own endpoint over
+this listener, and workerd refuses certificates outside its trust store —
+unlike the browser, it has no `ignoreHTTPSErrors` equivalent.
+
 ## Branch Naming
 
 Use a short, descriptive slug under one of the following prefixes:

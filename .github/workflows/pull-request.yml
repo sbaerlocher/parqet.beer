@@ -52,6 +52,13 @@ jobs:
               - 'src/**'
               - 'tests/e2e/**'
               - 'playwright.config.ts'
+              # The suite runs against `wrangler dev --env e2e`, so the
+              # bindings and mock URLs in `env.e2e` are part of its contract.
+              - 'wrangler.jsonc'
+              # `pretest:e2e` runs this to mint the TLS certificate the suite
+              # serves over; if it breaks, the suite cannot start at all.
+              - 'scripts/e2e-certs.sh'
+              - 'svelte.config.js'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - '.github/workflows/pull-request.yml'
@@ -104,6 +111,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-
       - run: pnpm exec playwright install --with-deps chromium
+      # The suite serves HTTPS so `__Host-` cookies survive, and the worker
+      # calls its own token endpoint over that listener — workerd rejects a
+      # certificate it does not trust, so the CA has to be a real one.
+      # `libnss3-tools` is what lets mkcert reach Chromium's own NSS store,
+      # which is separate from the system trust store.
+      - name: Install mkcert and trust its CA
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mkcert libnss3-tools
+          mkcert -install
       - run: pnpm test:e2e
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: failure()

@@ -115,8 +115,12 @@ export const handle: Handle = async ({ event, resolve }) => {
   // empty object (not undefined), so guarding on `env` alone lets the session
   // path through with no bindings. Require the two bindings we actually need —
   // KV for rate-limiting/refresh-lock and the SESSION_SECRET for JWE — before
-  // running any auth logic. Without them we treat the request as anonymous,
-  // which is what the e2e smoke suite depends on for public routes.
+  // running any auth logic. Without them we treat the request as anonymous, so
+  // `pnpm dev` boots against a fresh clone with no Cloudflare account.
+  //
+  // The e2e suite deliberately runs on the other side of this branch: it boots
+  // `wrangler dev --env e2e`, which binds both, because the OAuth success path
+  // is unreachable without them.
   const env =
     platformEnv && platformEnv.PARQET_KV && platformEnv.SESSION_SECRET ? platformEnv : undefined;
 
