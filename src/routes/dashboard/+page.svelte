@@ -17,6 +17,7 @@
     formatNumber,
   } from '$lib/calculator';
   import { countryFlag } from '$lib/fx';
+  import { DATA_UPDATED_AT, formatDataDate } from '$lib/data-freshness';
   import CountUp from '$lib/components/CountUp.svelte';
   import BeerGlass from '$lib/components/BeerGlass.svelte';
   import CoffeeGlass from '$lib/components/CoffeeGlass.svelte';
@@ -293,6 +294,10 @@
   const catLabel = $derived($t[activeCategory]);
   const catEmoji = $derived(CATEGORY_EMOJI[activeCategory]);
   const ActiveGlass = $derived(GLASS_COMPONENTS[activeCategory]);
+
+  // `null` when the build had no git history — the tag is then omitted
+  // entirely rather than rendered with a placeholder date.
+  const dataAsOf = $derived(formatDataDate(DATA_UPDATED_AT, $locale));
 
   const catCards = $derived([
     { key: 'beer', emoji: CATEGORY_EMOJI.beer, intro: $t.catIntroBeer },
@@ -1010,6 +1015,14 @@
             {/each}
           </div>
         </div>
+        {#if dataAsOf}
+          <!-- Freshness of the price data above. `datetime` carries the raw
+               ISO value for screen readers and crawlers. -->
+          <div class="mt-2.5 text-xs" style="color: var(--muted)">
+            {$t.dataAsOf}
+            <time datetime={DATA_UPDATED_AT} class="font-mono tabular-nums">{dataAsOf}</time>
+          </div>
+        {/if}
       </div>
 
       <!-- legal bar -->

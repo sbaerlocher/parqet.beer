@@ -88,6 +88,7 @@ export const translations = {
     noFreeBeerHint: 'Sobald Dividenden eintrudeln, gibt\u2019s hier die Rechnung.',
     pricesWrong: 'Preise stimmen nicht? Jeder kann sie auf ',
     pricesWrongSuffix: ' anpassen!',
+    dataAsOf: 'Preisdaten Stand vom',
     shareLabel: 'TEILEN',
 
     // Components
@@ -215,6 +216,7 @@ export const translations = {
     noFreeBeerHint: 'Once dividends arrive, we\u2019ll post the tab here.',
     pricesWrong: 'Prices wrong? Anyone can update them on ',
     pricesWrongSuffix: '!',
+    dataAsOf: 'Price data as of',
     shareLabel: 'SHARE',
 
     // Components
