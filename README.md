@@ -14,6 +14,7 @@ product.**
 
 - 🍺 Portfolio value converted live into beer / coffee / smoothie
 - 🔐 Parqet Connect OAuth 2.0 (PKCE, read-only)
+- 🧪 Demo mode without login: [parqet.beer/dashboard?demo=1](https://parqet.beer/dashboard?demo=1)
 - 💰 EUR / CHF toggle
 - 🌙 Dark mode
 - 🇩🇪 🇬🇧 German / English
@@ -159,6 +160,7 @@ src/
 │   ├── calculator.ts         # Portfolio → beverage logic
 │   ├── components/           # Svelte components
 │   ├── data/                 # Beverages & badges (JSON)
+│   ├── demo.ts               # Demo-mode sample portfolio
 │   ├── fun.ts                # Fun stats, beverage of the day
 │   ├── i18n.ts               # DE/EN translations
 │   ├── server/               # Server-only: auth, parqet-client, kv-cache
@@ -168,7 +170,7 @@ src/
     ├── +page.svelte          # Landing
     ├── +error.svelte         # 404/500
     ├── api/                  # OAuth, portfolios, performance, preferences
-    ├── dashboard/            # Auth-protected
+    ├── dashboard/            # Auth-protected (`?demo=1` renders a public demo)
     └── privacy/
 tests/                        # Vitest unit & integration tests
 static/                       # Favicon, OG image, etc.

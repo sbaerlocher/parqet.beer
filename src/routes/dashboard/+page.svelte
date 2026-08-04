@@ -1,5 +1,6 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import {
@@ -36,6 +37,11 @@
     getMilestoneBadge,
     getNextMilestone,
   } from '$lib/fun';
+  import { demoTotals } from '$lib/demo';
+  import type { PageData } from './$types';
+
+  let { data }: { data: PageData } = $props();
+  const isDemo = $derived(data.demo === true);
 
   const GLASS_COMPONENTS = {
     beer: BeerGlass,
@@ -82,13 +88,23 @@
     }
   }
 
-  let currency = $state<Currency>('EUR');
-  let portfolios: Portfolio[] = $state([]);
-  let selectedIds: Set<string> = $state(new Set());
-  let portfolioValue: number | null = $state(null);
-  let portfolioCurrency: string = $state('EUR');
-  let dividends: number = $state(0);
-  let loading = $state(true);
+  // Demo state is seeded synchronously from the server payload (not in an
+  // `$effect`, which is client-only) so `?demo=1` server-renders the real
+  // content instead of the loading spinner — the point of shareable demo links.
+  // Reading `data` once at init is deliberate here: the demo payload is a
+  // constant for the lifetime of the page, hence `untrack`.
+  const demoInitial = untrack(() => (data.demo ? data.demoData : null));
+  const demoInitialTotals = demoInitial
+    ? demoTotals(demoInitial, new Set(demoInitial.portfolios.map((p) => p.id)))
+    : null;
+
+  let currency = $state<Currency>(demoInitial?.currency ?? 'EUR');
+  let portfolios: Portfolio[] = $state(demoInitial?.portfolios ?? []);
+  let selectedIds: Set<string> = $state(new Set(demoInitial?.portfolios.map((p) => p.id) ?? []));
+  let portfolioValue: number | null = $state(demoInitialTotals?.totalValue ?? null);
+  let portfolioCurrency: string = $state(demoInitial?.currency ?? 'EUR');
+  let dividends: number = $state(demoInitialTotals?.dividends ?? 0);
+  let loading = $state(demoInitial === null);
   let loadingPerformance = $state(false);
   let error: string | null = $state(null);
   const CATEGORY_KEY = 'parqet-beer:category';
@@ -267,6 +283,10 @@
       : 0
   );
   $effect(() => {
+    // Achievement unlocks are a ratchet: the ids land in localStorage and stay
+    // there. Feeding the fixture in would hand a visitor badges they never
+    // earned and swallow the real unlock once they connect a portfolio.
+    if (isDemo) return;
     setPortfolioStats(portfolioValueEur, beverageCount);
   });
 
@@ -307,10 +327,22 @@
 
   $effect(() => {
     if (loading) return;
+    // Demo selection uses synthetic IDs (demo-world, …); persisting them would
+    // clobber the real user's saved portfolio subset under the shared key and
+    // wipe it on their next visit. Demo mode must never write this key.
+    if (isDemo) return;
     persistSelection(selectedIds);
   });
 
   async function loadPerformance() {
+    if (data.demo) {
+      // Recompute from the fixture so the selector pills behave like the real
+      // thing. Never hits /api/performance — that needs a session.
+      const totals = demoTotals(data.demoData, selectedIds);
+      portfolioValue = totals.totalValue;
+      dividends = totals.dividends;
+      return;
+    }
     if (selectedIds.size === 0) {
       portfolioValue = 0;
       return;
@@ -352,9 +384,18 @@
   }
 
   $effect(() => {
-    loadPortfolios();
+    if (!isDemo) loadPortfolios();
   });
 </script>
+
+<svelte:head>
+  <!-- The demo renders fixture data under the same path as the real dashboard.
+       Keep it out of the index so search results never point at the sample
+       portfolio instead of the landing page. -->
+  {#if isDemo}
+    <meta name="robots" content="noindex" />
+  {/if}
+</svelte:head>
 
 <div class="min-h-screen" style="background: var(--paper); color: var(--ink)">
   <!-- header -->
@@ -370,9 +411,9 @@
         >
           🍺
         </span>
-        <span class="font-display font-bold text-base shrink-0"
-          >parqet<span class="text-amber-600">.beer</span></span
-        >
+        <h1 class="font-display font-bold text-base shrink-0">
+          parqet<span class="text-amber-600">.beer</span>
+        </h1>
         {#if displayValue !== null}
           <!-- equation chip (R12) -->
           <div
@@ -430,17 +471,24 @@
         >
           {showValue ? '👁' : '👁‍🗨'}
         </button>
-        <form method="POST" action="/api/auth/logout">
-          <button
-            type="submit"
-            class="btn btn-ghost text-[13px]"
-            style="padding: 6px 8px"
-            title={$t.logout}
-          >
-            <span class="hidden sm:inline">{$t.logout}</span>
-            <span class="sm:hidden text-base">⏻</span>
-          </button>
-        </form>
+        {#if isDemo}
+          <a href="/api/auth/login" class="btn btn-ghost text-[13px]" style="padding: 6px 8px">
+            <span class="hidden sm:inline">{$t.demoConnect}</span>
+            <span class="sm:hidden text-base">🔗</span>
+          </a>
+        {:else}
+          <form method="POST" action="/api/auth/logout">
+            <button
+              type="submit"
+              class="btn btn-ghost text-[13px]"
+              style="padding: 6px 8px"
+              title={$t.logout}
+            >
+              <span class="hidden sm:inline">{$t.logout}</span>
+              <span class="sm:hidden text-base">⏻</span>
+            </button>
+          </form>
+        {/if}
       </div>
     </div>
   </header>
@@ -448,6 +496,20 @@
   <AchievementToast />
 
   <main class="max-w-[1200px] mx-auto px-4 sm:px-7 py-5 sm:py-7 pb-20">
+    {#if isDemo}
+      <div
+        class="mb-5 flex items-center justify-between gap-3 flex-wrap rounded-[10px] px-4 py-2.5"
+        style="background: var(--accent); border: 1px dashed var(--accent-hover)"
+      >
+        <span class="font-mono text-[11px] sm:text-xs text-amber-800">🧪 {$t.demoBanner}</span>
+        <a
+          href="/api/auth/login"
+          class="font-mono text-[11px] sm:text-xs font-bold text-amber-700 hover:text-amber-900 underline shrink-0"
+        >
+          {$t.demoConnect} →
+        </a>
+      </div>
+    {/if}
     {#if loading}
       <div class="text-center py-20">
         <p class="text-5xl mb-4 animate-pulse">🍺</p>
@@ -573,7 +635,11 @@
             class="mt-3 pt-3 flex justify-between items-center"
             style="border-top: 1px dashed var(--border)"
           >
-            <span class="font-mono text-[10px] tracking-wide" style="color: var(--muted)">
+            <span
+              data-testid="hero-formula"
+              class="font-mono text-[10px] tracking-wide"
+              style="color: var(--muted)"
+            >
               {showValue
                 ? `${formatNumber(Math.round(displayValue), $locale)} ${currency}`
                 : '•••••'}
