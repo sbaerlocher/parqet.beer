@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       jose:
-        specifier: ^6.2.8
+        specifier: ^6.2.9
         version: 6.2.9
       zod:
         specifier: ^4.4.3
