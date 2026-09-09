@@ -26,7 +26,7 @@
     "prepare": "node scripts/install-hooks.mjs"
   },
   "dependencies": {
-    "jose": "^6.2.10",
+    "jose": "^6.2.11",
     "zod": "^4.5.4"
   },
   "devDependencies": {
