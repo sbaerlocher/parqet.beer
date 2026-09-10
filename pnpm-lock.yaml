@@ -110,7 +110,7 @@ importers:
   .:
     dependencies:
       jose:
-        specifier: ^6.2.10
+        specifier: ^6.2.11
         version: 6.2.11
       zod:
         specifier: ^4.5.4
