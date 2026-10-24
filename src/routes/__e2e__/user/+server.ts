@@ -3,6 +3,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { assertE2e } from '../guard';
 import { E2E_USER_ID } from '../fixtures';
+import { getPlatform } from '#lib/server/platform';
 
 /**
  * Stand-in for Parqet's `/user`.
@@ -12,8 +13,8 @@ import { E2E_USER_ID } from '../fixtures';
  * inside `getUserInfo`, which returns null and turns into a confusing
  * "Failed to fetch user info" 500 with no hint that the mock was at fault.
  */
-export const GET: RequestHandler = async ({ platform, request }) => {
-  assertE2e(platform);
+export const GET: RequestHandler = async ({ request }) => {
+  assertE2e(getPlatform());
 
   // The failure marker rides in the token minted by `../token`.
   if (request.headers.get('Authorization')?.includes('fail-user')) {

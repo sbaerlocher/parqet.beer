@@ -2,6 +2,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { assertE2e } from '../guard';
+import { getPlatform } from '#lib/server/platform';
 
 /**
  * Stand-in for Parqet's `/performance`. POST, and `getPerformance` fires two
@@ -12,8 +13,8 @@ import { assertE2e } from '../guard';
  * the payload instead of falling back to the hardcoded constant and logging a
  * warning on every dashboard load.
  */
-export const POST: RequestHandler = async ({ platform }) => {
-  assertE2e(platform);
+export const POST: RequestHandler = async () => {
+  assertE2e(getPlatform());
 
   return json({
     performance: {

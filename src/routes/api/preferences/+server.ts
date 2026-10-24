@@ -2,6 +2,7 @@
 import { error, json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
+import { getPlatform } from '#lib/server/platform';
 
 const PreferencesSchema = z.object({
   currency: z.enum(['EUR', 'CHF']),
@@ -15,10 +16,10 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   category: 'beer',
 };
 
-export const GET: RequestHandler = async ({ locals, platform }) => {
+export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.session) error(401, 'Unauthorized');
 
-  const env = platform!.env;
+  const env = getPlatform().env;
   const stored = await env.PARQET_KV.get<UserPreferences>(
     `preferences:${locals.session.userId}`,
     'json'
@@ -27,7 +28,7 @@ export const GET: RequestHandler = async ({ locals, platform }) => {
   return json(stored ?? DEFAULT_PREFERENCES);
 };
 
-export const PUT: RequestHandler = async ({ locals, platform, request, url }) => {
+export const PUT: RequestHandler = async ({ locals, request, url }) => {
   if (!locals.session) error(401, 'Unauthorized');
 
   // SvelteKit's built-in CSRF protection only covers form-encoded POSTs.
@@ -38,7 +39,7 @@ export const PUT: RequestHandler = async ({ locals, platform, request, url }) =>
     error(403, 'Forbidden');
   }
 
-  const env = platform!.env;
+  const env = getPlatform().env;
 
   let raw: unknown;
   try {

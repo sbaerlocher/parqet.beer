@@ -14,6 +14,7 @@ import {
 import { refreshAccessToken } from '#lib/server/parqet-client';
 import { rateLimit } from '#lib/server/rate-limit';
 import { applySecurityHeaders } from '#lib/server/security-headers';
+import { getPlatform } from '#lib/server/platform';
 
 // Locale-Handoff-Contract:
 //   - `event.locals.locale` is populated on every request from the `locale`
@@ -153,8 +154,8 @@ function rateLimitResponse(result: { resetAt: number }, limit: number): Response
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const platformEnv = event.platform?.env;
-  // `adapter-cloudflare` under `vite dev` populates `event.platform.env` as an
+  const platformEnv = getPlatform().env;
+  // `adapter-cloudflare` under `vite dev` proxies the bindings as an
   // empty object (not undefined), so guarding on `env` alone lets the session
   // path through with no bindings. Require the two bindings we actually need —
   // KV for rate-limiting/refresh-lock and the SESSION_SECRET for JWE — before
@@ -168,7 +169,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     platformEnv && platformEnv.PARQET_KV && platformEnv.SESSION_SECRET ? platformEnv : undefined;
 
   // Locale resolution runs unconditionally so SSR always has a valid lang
-  // attribute, even in the (test) codepath where `event.platform` is absent.
+  // attribute, even in the codepath without bindings.
   event.locals.locale = resolveLocale(event.cookies.get('locale'));
 
   if (env) {

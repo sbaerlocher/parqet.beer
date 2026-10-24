@@ -11,9 +11,10 @@ import {
   OAUTH_STATE_COOKIE,
   OAUTH_VERIFIER_COOKIE,
 } from '#lib/server/auth';
+import { getPlatform } from '#lib/server/platform';
 
-export const GET: RequestHandler = async ({ url, cookies, platform, request }) => {
-  const env = requireAuthEnv(platform, [
+export const GET: RequestHandler = async ({ url, cookies, request }) => {
+  const env = requireAuthEnv(getPlatform(), [
     // Consumed indirectly via `exchangeCodeForTokens` below.
     'PARQET_CLIENT_ID',
     'PARQET_TOKEN_URL',

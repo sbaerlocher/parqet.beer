@@ -4,11 +4,12 @@ import type { RequestHandler } from './$types';
 import { getPortfolios, ParqetAuthError } from '#lib/server/parqet-client';
 import { getCached } from '#lib/server/kv-cache';
 import { clearSessionCookie, clearUserKv } from '#lib/server/auth';
+import { getPlatform } from '#lib/server/platform';
 
-export const GET: RequestHandler = async ({ locals, platform, cookies, url }) => {
+export const GET: RequestHandler = async ({ locals, cookies, url }) => {
   if (!locals.session) error(401, 'Unauthorized');
 
-  const env = platform!.env;
+  const env = getPlatform().env;
   const { userId, accessToken } = locals.session;
 
   // `?fresh=1` bypasses the KV cache so the dashboard can perform a

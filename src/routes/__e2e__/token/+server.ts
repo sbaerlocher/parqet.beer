@@ -2,6 +2,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { assertE2e } from '../guard';
+import { getPlatform } from '#lib/server/platform';
 
 /**
  * Stand-in for Parqet's `/oauth2/token`, for both `authorization_code` and
@@ -25,8 +26,8 @@ import { assertE2e } from '../guard';
  * never bypassed. (The guard also sits behind `!__SVELTEKIT_DEV__`, which is why
  * it only appeared once the suite moved off `vite dev` onto the built worker.)
  */
-export const POST: RequestHandler = async ({ platform, request }) => {
-  assertE2e(platform);
+export const POST: RequestHandler = async ({ request }) => {
+  assertE2e(getPlatform());
 
   const form = new URLSearchParams(await request.text());
   const grantType = form.get('grant_type');

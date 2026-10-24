@@ -8,8 +8,9 @@ import {
   requireAuthEnv,
   resolveOrigin,
 } from '#lib/server/auth';
+import { getPlatform } from '#lib/server/platform';
 
-export const GET: RequestHandler = async ({ platform, cookies, url, request, locals }) => {
+export const GET: RequestHandler = async ({ cookies, url, request, locals }) => {
   // Already authenticated — skip the Parqet round-trip. Avoids burning a PKCE
   // verifier, a rate-limit slot, and an authorize request just to land back
   // where the user clicked from.
@@ -17,7 +18,7 @@ export const GET: RequestHandler = async ({ platform, cookies, url, request, loc
     redirect(302, '/dashboard');
   }
 
-  const env = requireAuthEnv(platform, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL']);
+  const env = requireAuthEnv(getPlatform(), ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL']);
 
   const codeVerifier = generateCodeVerifier();
   const codeChallenge = await generateCodeChallenge(codeVerifier);

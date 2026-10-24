@@ -1,6 +1,15 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      // Only exists inside workerd; see the stub for how tests set bindings.
+      'cloudflare:workers': fileURLToPath(
+        new URL('./tests/cloudflare-workers.stub.ts', import.meta.url)
+      ),
+    },
+  },
   test: {
     globals: true,
     environment: 'node',

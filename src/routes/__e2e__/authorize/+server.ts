@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 import type { RequestHandler } from './$types';
 import { assertE2e } from '../guard';
+import { getPlatform } from '#lib/server/platform';
 
 /**
  * Stand-in for Parqet's `/oauth2/authorize`.
@@ -14,8 +15,8 @@ import { assertE2e } from '../guard';
  * see `../token/+server.ts`. Nothing is stored server-side, so tests stay
  * independent of each other and of execution order.
  */
-export const GET: RequestHandler = async ({ platform, url }) => {
-  assertE2e(platform);
+export const GET: RequestHandler = async ({ url }) => {
+  assertE2e(getPlatform());
 
   const redirectUri = url.searchParams.get('redirect_uri') ?? '';
   const state = url.searchParams.get('state') ?? '';

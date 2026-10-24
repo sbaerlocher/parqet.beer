@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { handle } from '../src/hooks.server';
 import { createSessionCookie, SESSION_COOKIE } from '../src/lib/server/auth';
+import { setEnv } from './cloudflare-workers.stub';
 
 const SESSION_SECRET = 'test-secret-at-least-32-characters-long!';
 
@@ -64,6 +65,7 @@ function buildEvent(opts: BuildEventOpts = {}) {
     PARQET_API_URL: 'https://api.example.com',
     ENVIRONMENT: 'test',
   };
+  setEnv(env);
 
   const event = {
     url,
@@ -76,7 +78,6 @@ function buildEvent(opts: BuildEventOpts = {}) {
       session: null as null | { userId: string; accessToken: string },
       locale: 'de' as 'de' | 'en',
     },
-    platform: { env },
     getClientAddress: () => opts.clientIp ?? '203.0.113.7',
     fetch: globalThis.fetch,
     params: {},

@@ -2,6 +2,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { assertE2e } from '../guard';
+import { getPlatform } from '#lib/server/platform';
 
 /**
  * Stand-in for Parqet's `/portfolios`. Not part of the OAuth flow, but the
@@ -11,8 +12,8 @@ import { assertE2e } from '../guard';
  *
  * Shape must satisfy `PortfolioListSchema` in `#lib/server/parqet-client`.
  */
-export const GET: RequestHandler = async ({ platform }) => {
-  assertE2e(platform);
+export const GET: RequestHandler = async () => {
+  assertE2e(getPlatform());
 
   return json({
     items: [
