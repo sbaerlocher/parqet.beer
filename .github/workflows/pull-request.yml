@@ -58,7 +58,7 @@ jobs:
               # `pretest:e2e` runs this to mint the TLS certificate the suite
               # serves over; if it breaks, the suite cannot start at all.
               - 'scripts/e2e-certs.sh'
-              - 'svelte.config.js'
+              - 'vite.config.ts'
               - 'package.json'
               - 'pnpm-lock.yaml'
               - '.github/workflows/pull-request.yml'

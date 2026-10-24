@@ -3,7 +3,7 @@
  * Security headers applied to every response by `hooks.server.ts`.
  *
  * **CSP split:** the full `default-src`/`script-src`/`style-src` policy lives
- * in `svelte.config.js` under `kit.csp` so SvelteKit can inject per-build
+ * in `vite.config.ts` under the `sveltekit({ csp })` option so SvelteKit can inject per-build
  * SHA-256 hashes for its own hydration bootstrap script (whose content
  * embeds build-hashed asset URLs and therefore changes every deploy) as well
  * as the inline theme-detection script in `src/app.html`. SvelteKit emits

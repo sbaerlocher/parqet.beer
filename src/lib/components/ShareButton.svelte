@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { formatNumber } from '$lib/calculator';
-  import { t, locale } from '$lib/stores/locale';
+  import { formatNumber } from '#lib/calculator';
+  import { t, locale } from '#lib/stores/locale';
 
   let {
     emoji,

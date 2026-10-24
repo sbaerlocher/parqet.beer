@@ -9,36 +9,36 @@
     CATEGORY_EMOJI,
     type BeverageCategory,
     type Currency,
-  } from '$lib/data/beverages';
+  } from '#lib/data/beverages';
   import {
     calculateEquivalents,
     calculateFunStats,
     convertValue,
     formatNumber,
-  } from '$lib/calculator';
-  import { countryFlag } from '$lib/fx';
-  import { DATA_UPDATED_AT, formatDataDate } from '$lib/data-freshness';
-  import CountUp from '$lib/components/CountUp.svelte';
-  import BeerGlass from '$lib/components/BeerGlass.svelte';
-  import CoffeeGlass from '$lib/components/CoffeeGlass.svelte';
-  import SmoothieGlass from '$lib/components/SmoothieGlass.svelte';
-  import WhiskyGlass from '$lib/components/WhiskyGlass.svelte';
-  import LocaleToggle from '$lib/components/LocaleToggle.svelte';
-  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-  import ShareButton from '$lib/components/ShareButton.svelte';
-  import NoteBadge from '$lib/components/NoteBadge.svelte';
-  import StreakBadge from '$lib/components/StreakBadge.svelte';
-  import AchievementToast from '$lib/components/AchievementToast.svelte';
-  import { setPortfolioStats } from '$lib/stores/achievements';
-  import { t, locale } from '$lib/stores/locale';
+  } from '#lib/calculator';
+  import { countryFlag } from '#lib/fx';
+  import { DATA_UPDATED_AT, formatDataDate } from '#lib/data-freshness';
+  import CountUp from '#lib/components/CountUp.svelte';
+  import BeerGlass from '#lib/components/BeerGlass.svelte';
+  import CoffeeGlass from '#lib/components/CoffeeGlass.svelte';
+  import SmoothieGlass from '#lib/components/SmoothieGlass.svelte';
+  import WhiskyGlass from '#lib/components/WhiskyGlass.svelte';
+  import LocaleToggle from '#lib/components/LocaleToggle.svelte';
+  import ThemeToggle from '#lib/components/ThemeToggle.svelte';
+  import ShareButton from '#lib/components/ShareButton.svelte';
+  import NoteBadge from '#lib/components/NoteBadge.svelte';
+  import StreakBadge from '#lib/components/StreakBadge.svelte';
+  import AchievementToast from '#lib/components/AchievementToast.svelte';
+  import { setPortfolioStats } from '#lib/stores/achievements';
+  import { t, locale } from '#lib/stores/locale';
   import {
     getBeverageOfTheDay,
     getAllBadges,
     getFunComparisons,
     getMilestoneBadge,
     getNextMilestone,
-  } from '$lib/fun';
-  import { demoTotals } from '$lib/demo';
+  } from '#lib/fun';
+  import { demoTotals } from '#lib/demo';
   import type { PageData } from './$types';
 
   let { data }: { data: PageData } = $props();

@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { theme } from '$lib/stores/theme';
+  import { theme } from '#lib/stores/theme';
 </script>
 
 <button

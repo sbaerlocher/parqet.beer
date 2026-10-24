@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import type { LocalizedNote } from '$lib/data/beverages';
-  import { locale } from '$lib/stores/locale';
+  import type { LocalizedNote } from '#lib/data/beverages';
+  import { locale } from '#lib/stores/locale';
 
   type Variant = 'prominent' | 'full' | 'icon';
 

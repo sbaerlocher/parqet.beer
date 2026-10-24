@@ -14,8 +14,8 @@ import { assertE2e } from '../guard';
  * see `../token/+server.ts`. Nothing is stored server-side, so tests stay
  * independent of each other and of execution order.
  */
-export const GET: RequestHandler = async ({ platform, url }) => {
-  assertE2e(platform);
+export const GET: RequestHandler = async ({ url }) => {
+  assertE2e();
 
   const redirectUri = url.searchParams.get('redirect_uri') ?? '';
   const state = url.searchParams.get('state') ?? '';

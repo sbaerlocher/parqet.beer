@@ -23,10 +23,10 @@ function fakeLocalStorage() {
 }
 
 async function loadStore(streakDays = 0) {
-  vi.doMock('$app/environment', () => ({ browser: true }));
+  vi.doMock('$app/env', () => ({ browser: true }));
   // A deterministic streak store instead of the localStorage-backed one, so
   // the combining logic is tested in isolation from the streak persistence.
-  vi.doMock('$lib/stores/streak', () => ({
+  vi.doMock('#lib/stores/streak', () => ({
     streak: { subscribe: (run: (v: number) => void) => (run(streakDays), () => {}) },
   }));
   return await import('../src/lib/stores/achievements');
@@ -43,8 +43,8 @@ describe('achievements store', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
-    vi.doUnmock('$app/environment');
-    vi.doUnmock('$lib/stores/streak');
+    vi.doUnmock('$app/env');
+    vi.doUnmock('#lib/stores/streak');
   });
 
   it('combines portfolio stats and streak into unlocked achievements', async () => {
@@ -94,9 +94,9 @@ describe('achievements store', () => {
   });
 
   it('is a no-op on the server (browser false): no throw, nothing unlocked', async () => {
-    vi.doUnmock('$app/environment');
-    vi.doMock('$app/environment', () => ({ browser: false }));
-    vi.doMock('$lib/stores/streak', () => ({
+    vi.doUnmock('$app/env');
+    vi.doMock('$app/env', () => ({ browser: false }));
+    vi.doMock('#lib/stores/streak', () => ({
       streak: { subscribe: (run: (v: number) => void) => (run(0), () => {}) },
     }));
     vi.unstubAllGlobals(); // no localStorage on the server

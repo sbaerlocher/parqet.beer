@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { handle } from '../src/hooks.server';
+import { setEnv } from './stubs/cloudflare-workers';
 import { createSessionCookie, SESSION_COOKIE } from '../src/lib/server/auth';
 
 const SESSION_SECRET = 'test-secret-at-least-32-characters-long!';
@@ -65,6 +66,8 @@ function buildEvent(opts: BuildEventOpts = {}) {
     ENVIRONMENT: 'test',
   };
 
+  setEnv(env);
+
   const event = {
     url,
     request: new Request(
@@ -76,7 +79,6 @@ function buildEvent(opts: BuildEventOpts = {}) {
       session: null as null | { userId: string; accessToken: string },
       locale: 'de' as 'de' | 'en',
     },
-    platform: { env },
     getClientAddress: () => opts.clientIp ?? '203.0.113.7',
     fetch: globalThis.fetch,
     params: {},

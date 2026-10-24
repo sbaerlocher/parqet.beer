@@ -2,7 +2,7 @@ import { test, expect, type APIResponse } from '@playwright/test';
 
 // Mirrors `OAUTH_STATE_COOKIE` / `OAUTH_VERIFIER_COOKIE` in
 // `src/lib/server/auth.ts`. Duplicated as literals on purpose: importing from
-// `$lib/server/*` into an e2e spec would pull server-only code into the test
+// `#lib/server/*` into an e2e spec would pull server-only code into the test
 // runner, and a drift in the cookie names should fail this suite loudly.
 const STATE_COOKIE = '__Host-oauth_state';
 const VERIFIER_COOKIE = '__Host-oauth_code_verifier';

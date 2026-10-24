@@ -5,30 +5,19 @@ import { error } from '@sveltejs/kit';
 import type { Cookies } from '@sveltejs/kit';
 
 /**
- * Resolve `platform.env` for the OAuth routes, failing with a defined 503
- * instead of crashing when the Cloudflare bindings are missing. Under
- * `vite dev` without bindings `platform.env` is an empty object, so reading a
- * binding off it yields `undefined` and the route breaks further downstream
- * with no useful signal.
+ * Check the Cloudflare bindings for the OAuth routes, failing with a defined
+ * 503 instead of crashing when they are missing. Without bindings `env` is an
+ * empty object, so reading a binding off it yields `undefined` and the route
+ * breaks further downstream with no useful signal.
  *
  * Only the keys the calling route actually consumes are checked — the missing
  * ones are logged so a misconfigured deploy leaves its own trace in the Workers
  * logs rather than hiding behind the HTTP status alone.
  */
 export function requireAuthEnv(
-  platform: App.Platform | undefined,
-  keys: (keyof App.Platform['env'])[]
-): App.Platform['env'] {
-  const env = platform?.env;
-
-  // A missing platform object and an empty one are different operational
-  // faults — no Workers runtime at all vs. a deploy without bindings — so log
-  // them apart instead of collapsing both into a missing-keys list.
-  if (!env) {
-    console.error('[auth] no platform.env — not running on the Workers runtime');
-    error(503, 'Auth not configured');
-  }
-
+  env: Cloudflare.Env,
+  keys: (keyof Cloudflare.Env)[]
+): Cloudflare.Env {
   const missing = keys.filter((key) => !env[key]);
   if (missing.length > 0) {
     console.error(`[auth] missing bindings: ${missing.join(', ')}`);
@@ -105,7 +94,7 @@ const MIN_SESSION_SECRET_BYTES = 32;
  * throws. As a fallback we read `env.SESSION_SECRET_DEV` from `.dev.vars`,
  * which only exists locally.
  */
-export async function resolveSessionSecret(env: App.Platform['env']): Promise<string> {
+export async function resolveSessionSecret(env: Cloudflare.Env): Promise<string> {
   const secret = env.SESSION_SECRET;
   if (typeof secret === 'string') return secret;
 

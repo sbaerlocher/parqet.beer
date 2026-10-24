@@ -1,8 +1,8 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { locale, t } from '$lib/stores/locale';
-  import LocaleToggle from '$lib/components/LocaleToggle.svelte';
-  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+  import { locale, t } from '#lib/stores/locale';
+  import LocaleToggle from '#lib/components/LocaleToggle.svelte';
+  import ThemeToggle from '#lib/components/ThemeToggle.svelte';
 </script>
 
 <div class="min-h-screen" style="background: var(--paper); color: var(--ink)">

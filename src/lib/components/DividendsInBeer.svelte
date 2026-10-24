@@ -1,9 +1,9 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import type { Beverage, BeverageCategory } from '$lib/data/beverages';
-  import { CATEGORY_DIVIDEND_EMOJI } from '$lib/data/beverages';
-  import { convertValue, formatNumber } from '$lib/calculator';
-  import { locale, t } from '$lib/stores/locale';
+  import type { Beverage, BeverageCategory } from '#lib/data/beverages';
+  import { CATEGORY_DIVIDEND_EMOJI } from '#lib/data/beverages';
+  import { convertValue, formatNumber } from '#lib/calculator';
+  import { locale, t } from '#lib/stores/locale';
 
   let {
     dividends,

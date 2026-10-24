@@ -1,14 +1,14 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { page } from '$app/stores';
-  import { t } from '$lib/stores/locale';
-  import LocaleToggle from '$lib/components/LocaleToggle.svelte';
-  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+  import { page } from '$app/state';
+  import { t } from '#lib/stores/locale';
+  import LocaleToggle from '#lib/components/LocaleToggle.svelte';
+  import ThemeToggle from '#lib/components/ThemeToggle.svelte';
 
   // Treat anything that isn't 404 as a server-side failure. Route-level
   // errors (400/401/...) are rare in this app — showing the 5xx variant is
   // friendlier than exposing raw messages.
-  const is404 = $derived($page.status === 404);
+  const is404 = $derived(page.status === 404);
   const emoji = $derived(is404 ? '🕳️' : '💥');
   const errorTitle = $derived(is404 ? $t.error404Title : $t.error500Title);
   const errorMessage = $derived(is404 ? $t.error404Message : $t.error500Message);
@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-  <title>{$page.status} · parqet.beer</title>
+  <title>{page.status} · parqet.beer</title>
 </svelte:head>
 
 <div
@@ -33,9 +33,9 @@
 
     <p
       class="text-sm font-semibold tracking-widest uppercase text-amber-600 mb-3"
-      aria-label="{$t.errorStatusLabel} {$page.status}"
+      aria-label="{$t.errorStatusLabel} {page.status}"
     >
-      {$t.errorStatusLabel} · {$page.status}
+      {$t.errorStatusLabel} · {page.status}
     </p>
 
     <h1 class="text-4xl sm:text-5xl font-bold text-amber-900 mb-4">{errorTitle}</h1>

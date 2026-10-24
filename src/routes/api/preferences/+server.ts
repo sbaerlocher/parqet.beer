@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 import { error, json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { env } from 'cloudflare:workers';
 import type { RequestHandler } from './$types';
 
 const PreferencesSchema = z.object({
@@ -15,10 +16,9 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   category: 'beer',
 };
 
-export const GET: RequestHandler = async ({ locals, platform }) => {
+export const GET: RequestHandler = async ({ locals }) => {
   if (!locals.session) error(401, 'Unauthorized');
 
-  const env = platform!.env;
   const stored = await env.PARQET_KV.get<UserPreferences>(
     `preferences:${locals.session.userId}`,
     'json'
@@ -27,7 +27,7 @@ export const GET: RequestHandler = async ({ locals, platform }) => {
   return json(stored ?? DEFAULT_PREFERENCES);
 };
 
-export const PUT: RequestHandler = async ({ locals, platform, request, url }) => {
+export const PUT: RequestHandler = async ({ locals, request, url }) => {
   if (!locals.session) error(401, 'Unauthorized');
 
   // SvelteKit's built-in CSRF protection only covers form-encoded POSTs.
@@ -37,8 +37,6 @@ export const PUT: RequestHandler = async ({ locals, platform, request, url }) =>
   if (!origin || origin !== url.origin) {
     error(403, 'Forbidden');
   }
-
-  const env = platform!.env;
 
   let raw: unknown;
   try {

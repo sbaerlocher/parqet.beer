@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { PUT, GET } from '../src/routes/api/preferences/+server';
+import { setEnv } from './stubs/cloudflare-workers';
 
 /**
  * In-memory KV fake matching the subset of KVNamespace these handlers use.
@@ -45,14 +46,13 @@ function buildPutEvent(opts: BuildEventOpts = {}) {
   const request = new Request(url, { method: 'PUT', headers, body: bodyText });
   const session =
     opts.session === undefined ? { userId: 'user-1', accessToken: 'tok' } : opts.session;
-  const platform = { env: { PARQET_KV: opts.kv ?? createFakeKv().kv } };
+  setEnv({ PARQET_KV: opts.kv ?? createFakeKv().kv });
   // The handler only touches a small subset of RequestEvent — cast loosely so
   // we don't have to fabricate the full surface.
   return {
     request,
     url,
     locals: { session },
-    platform,
     cookies: {} as never,
     fetch: globalThis.fetch,
     getClientAddress: () => '127.0.0.1',
@@ -142,11 +142,11 @@ describe('GET /api/preferences', () => {
     const url = new URL('https://app.example.com/api/preferences');
     const session =
       opts.session === undefined ? { userId: 'user-1', accessToken: 'tok' } : opts.session;
+    setEnv({ PARQET_KV: opts.kv ?? createFakeKv().kv });
     return {
       request: new Request(url),
       url,
       locals: { session },
-      platform: { env: { PARQET_KV: opts.kv ?? createFakeKv().kv } },
       cookies: {} as never,
       fetch: globalThis.fetch,
       getClientAddress: () => '127.0.0.1',

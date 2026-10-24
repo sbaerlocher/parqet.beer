@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 import { error, json } from '@sveltejs/kit';
 import { z } from 'zod';
+import { env } from 'cloudflare:workers';
 import type { RequestHandler } from './$types';
-import { getPerformance, getPortfolios, ParqetAuthError } from '$lib/server/parqet-client';
-import { getCached } from '$lib/server/kv-cache';
-import { clearSessionCookie, clearUserKv } from '$lib/server/auth';
+import { getPerformance, getPortfolios, ParqetAuthError } from '#lib/server/parqet-client';
+import { getCached } from '#lib/server/kv-cache';
+import { clearSessionCookie, clearUserKv } from '#lib/server/auth';
 
 // Parqet portfolio IDs are short opaque strings; cap to avoid abuse.
 const PortfolioIdSchema = z
@@ -14,10 +15,9 @@ const PortfolioIdSchema = z
   .regex(/^[A-Za-z0-9_-]+$/);
 const PortfolioIdListSchema = z.array(PortfolioIdSchema).max(50);
 
-export const GET: RequestHandler = async ({ locals, platform, url, cookies }) => {
+export const GET: RequestHandler = async ({ locals, url, cookies }) => {
   if (!locals.session) error(401, 'Unauthorized');
 
-  const env = platform!.env;
   const { userId, accessToken } = locals.session;
 
   const rawIds = url.searchParams.getAll('portfolioId');

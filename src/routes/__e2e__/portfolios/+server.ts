@@ -9,10 +9,10 @@ import { assertE2e } from '../guard';
  * (`dashboard/+page.svelte`), so without it the post-login page sits in a
  * permanent loading state and drags every assertion out to its timeout.
  *
- * Shape must satisfy `PortfolioListSchema` in `$lib/server/parqet-client`.
+ * Shape must satisfy `PortfolioListSchema` in `#lib/server/parqet-client`.
  */
-export const GET: RequestHandler = async ({ platform }) => {
-  assertE2e(platform);
+export const GET: RequestHandler = async () => {
+  assertE2e();
 
   return json({
     items: [

@@ -50,7 +50,7 @@ describe('session cookie (JWE)', () => {
 
 describe('resolveSessionSecret', () => {
   it('returns a plain string secret directly', async () => {
-    const env = { SESSION_SECRET: 'my-plain-secret' } as unknown as App.Platform['env'];
+    const env = { SESSION_SECRET: 'my-plain-secret' } as unknown as Cloudflare.Env;
     const result = await resolveSessionSecret(env);
     expect(result).toBe('my-plain-secret');
   });
@@ -58,7 +58,7 @@ describe('resolveSessionSecret', () => {
   it('calls .get() on a Secrets Store binding', async () => {
     const env = {
       SESSION_SECRET: { get: vi.fn().mockResolvedValue('store-secret') },
-    } as unknown as App.Platform['env'];
+    } as unknown as Cloudflare.Env;
     const result = await resolveSessionSecret(env);
     expect(result).toBe('store-secret');
   });
@@ -67,7 +67,7 @@ describe('resolveSessionSecret', () => {
     const env = {
       SESSION_SECRET: { get: vi.fn().mockRejectedValue(new Error('empty store')) },
       SESSION_SECRET_DEV: 'dev-fallback-secret',
-    } as unknown as App.Platform['env'];
+    } as unknown as Cloudflare.Env;
     const result = await resolveSessionSecret(env);
     expect(result).toBe('dev-fallback-secret');
   });
@@ -75,7 +75,7 @@ describe('resolveSessionSecret', () => {
   it('re-throws when .get() fails and no dev override exists', async () => {
     const env = {
       SESSION_SECRET: { get: vi.fn().mockRejectedValue(new Error('no secret')) },
-    } as unknown as App.Platform['env'];
+    } as unknown as Cloudflare.Env;
     await expect(resolveSessionSecret(env)).rejects.toThrow('no secret');
   });
 
@@ -83,7 +83,7 @@ describe('resolveSessionSecret', () => {
     const env = {
       SESSION_SECRET: { get: vi.fn().mockRejectedValue(new Error('no secret')) },
       SESSION_SECRET_DEV: '',
-    } as unknown as App.Platform['env'];
+    } as unknown as Cloudflare.Env;
     await expect(resolveSessionSecret(env)).rejects.toThrow('no secret');
   });
 });
@@ -214,7 +214,7 @@ describe('requireAuthEnv', () => {
   const fullEnv = {
     PARQET_CLIENT_ID: 'client-1',
     PARQET_AUTHORIZE_URL: 'https://auth.example.com/authorize',
-  } as unknown as App.Platform['env'];
+  } as unknown as Cloudflare.Env;
 
   function expectStatus(fn: () => unknown, status: number): void {
     try {
@@ -231,28 +231,23 @@ describe('requireAuthEnv', () => {
   }
 
   it('returns the env when all requested keys are present', () => {
-    const platform = { env: fullEnv } as App.Platform;
-    expect(requireAuthEnv(platform, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL'])).toBe(fullEnv);
-  });
-
-  it('throws 503 when platform is undefined', () => {
-    expectStatus(() => requireAuthEnv(undefined, ['PARQET_CLIENT_ID']), 503);
+    expect(requireAuthEnv(fullEnv, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL'])).toBe(fullEnv);
   });
 
   it('throws 503 when env is an empty object', () => {
-    const platform = { env: {} } as unknown as App.Platform;
-    expectStatus(() => requireAuthEnv(platform, ['PARQET_CLIENT_ID']), 503);
+    const env = {} as unknown as Cloudflare.Env;
+    expectStatus(() => requireAuthEnv(env, ['PARQET_CLIENT_ID']), 503);
   });
 
   it('throws 503 when only a subset of the requested keys is present', () => {
-    const platform = { env: { PARQET_CLIENT_ID: 'client-1' } } as unknown as App.Platform;
-    expectStatus(() => requireAuthEnv(platform, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL']), 503);
+    const env = { PARQET_CLIENT_ID: 'client-1' } as unknown as Cloudflare.Env;
+    expectStatus(() => requireAuthEnv(env, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL']), 503);
   });
 
   it('logs exactly the missing keys', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const platform = { env: { PARQET_CLIENT_ID: 'client-1' } } as unknown as App.Platform;
-    expectStatus(() => requireAuthEnv(platform, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL']), 503);
+    const env = { PARQET_CLIENT_ID: 'client-1' } as unknown as Cloudflare.Env;
+    expectStatus(() => requireAuthEnv(env, ['PARQET_CLIENT_ID', 'PARQET_AUTHORIZE_URL']), 503);
     const logged = spy.mock.calls[0]?.join(' ') ?? '';
     expect(logged).toContain('PARQET_AUTHORIZE_URL');
     expect(logged).not.toContain('PARQET_CLIENT_ID');
@@ -260,7 +255,7 @@ describe('requireAuthEnv', () => {
   });
 
   it('ignores keys that were not requested', () => {
-    const platform = { env: { PARQET_CLIENT_ID: 'client-1' } } as unknown as App.Platform;
-    expect(requireAuthEnv(platform, ['PARQET_CLIENT_ID'])).toBe(platform.env);
+    const env = { PARQET_CLIENT_ID: 'client-1' } as unknown as Cloudflare.Env;
+    expect(requireAuthEnv(env, ['PARQET_CLIENT_ID'])).toBe(env);
   });
 });

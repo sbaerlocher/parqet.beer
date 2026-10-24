@@ -1,12 +1,12 @@
-import { defineConfig } from 'vitest/config';
 import { fileURLToPath } from 'node:url';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   resolve: {
     alias: {
-      // Mirror SvelteKit's `$lib` alias so server-side modules that import
-      // via `$lib/...` can be loaded directly in unit tests.
-      $lib: fileURLToPath(new URL('./src/lib', import.meta.url)),
+      'cloudflare:workers': fileURLToPath(
+        new URL('./tests/stubs/cloudflare-workers.ts', import.meta.url)
+      ),
     },
   },
   test: {

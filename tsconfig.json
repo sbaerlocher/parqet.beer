@@ -1,5 +1,7 @@
 {
-  "extends": "./.svelte-kit/tsconfig.json",
+  "extends": "$app/tsconfig",
+  "include": ["src", "tests", "*"],
+  "exclude": ["src/service-worker"],
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
@@ -14,6 +16,12 @@
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "moduleResolution": "bundler",
-    "types": ["@cloudflare/workers-types"]
+    // Mirrors the `#lib` subpath import in package.json. TypeScript does not
+    // probe extensions for `imports` targets, `paths` does.
+    "paths": {
+      "#lib": ["./src/lib"],
+      "#lib/*": ["./src/lib/*"]
+    },
+    "types": ["$app/types", "@cloudflare/workers-types"]
   }
 }

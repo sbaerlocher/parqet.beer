@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import type { Currency } from '$lib/data/beverages';
+  import type { Currency } from '#lib/data/beverages';
 
   let { currency = $bindable() }: { currency: Currency } = $props();
 </script>
