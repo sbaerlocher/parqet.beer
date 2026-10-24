@@ -1,12 +1,12 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import { page } from '$app/state';
-  import { t } from '$lib/stores/locale';
-  import { locale } from '$lib/stores/locale';
-  import LocaleToggle from '$lib/components/LocaleToggle.svelte';
-  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-  import RotatingTagline from '$lib/components/RotatingTagline.svelte';
-  import { BEVERAGES } from '$lib/data/beverages';
+  import { t } from '#lib/stores/locale';
+  import { locale } from '#lib/stores/locale';
+  import LocaleToggle from '#lib/components/LocaleToggle.svelte';
+  import ThemeToggle from '#lib/components/ThemeToggle.svelte';
+  import RotatingTagline from '#lib/components/RotatingTagline.svelte';
+  import { BEVERAGES } from '#lib/data/beverages';
 
   const authenticated = $derived(page.data.authenticated === true);
 

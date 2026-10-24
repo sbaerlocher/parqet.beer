@@ -7,7 +7,7 @@ In scope:
 - SvelteKit source changes (`src/routes/`, `src/lib/`)
 - Server-only code (`src/lib/server/`) — auth, KV access, Parqet API proxy
 - API routes (`src/routes/api/`)
-- Build and adapter configuration (`svelte.config.js`, `vite.config.ts`)
+- Build and adapter configuration (`vite.config.ts`)
 - CI/CD workflow changes
 - Renovate configuration updates
 

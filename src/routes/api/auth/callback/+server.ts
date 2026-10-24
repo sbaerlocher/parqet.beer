@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 import { redirect, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { exchangeCodeForTokens, getUserInfo } from '$lib/server/parqet-client';
+import { exchangeCodeForTokens, getUserInfo } from '#lib/server/parqet-client';
 import {
   setSessionCookie,
   storeTokens,
@@ -10,7 +10,7 @@ import {
   resolveOrigin,
   OAUTH_STATE_COOKIE,
   OAUTH_VERIFIER_COOKIE,
-} from '$lib/server/auth';
+} from '#lib/server/auth';
 
 export const GET: RequestHandler = async ({ url, cookies, platform, request }) => {
   const env = requireAuthEnv(platform, [

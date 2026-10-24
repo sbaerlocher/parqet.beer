@@ -1,9 +1,9 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import type { BeverageEquivalent } from '$lib/calculator';
-  import { formatNumber } from '$lib/calculator';
-  import type { Currency } from '$lib/data/beverages';
-  import { locale } from '$lib/stores/locale';
+  import type { BeverageEquivalent } from '#lib/calculator';
+  import { formatNumber } from '#lib/calculator';
+  import type { Currency } from '#lib/data/beverages';
+  import { locale } from '#lib/stores/locale';
 
   let {
     equiv,

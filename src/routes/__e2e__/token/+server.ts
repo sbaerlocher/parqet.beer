@@ -8,7 +8,7 @@ import { assertE2e } from '../guard';
  * `refresh_token` grants.
  *
  * The response must satisfy `TokenResponseSchema` in
- * `$lib/server/parqet-client` — a partial object makes Zod throw inside
+ * `#lib/server/parqet-client` — a partial object makes Zod throw inside
  * `exchangeCodeForTokens`, which swallows it and returns null, surfacing as a
  * generic 500 that says nothing about the actual cause.
  *

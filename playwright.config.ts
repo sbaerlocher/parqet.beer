@@ -3,12 +3,12 @@ import { defineConfig, devices } from '@playwright/test';
 export default defineConfig({
   testDir: 'tests/e2e',
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  forbidOnly: !!process.env['CI'],
+  retries: process.env['CI'] ? 2 : 0,
   // In CI, `github` alone writes annotations but no report directory, so the
   // `playwright-report/` upload on failure finds nothing and every red run has
   // to be diagnosed from annotations only. Pair it with the HTML reporter.
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
+  reporter: process.env['CI'] ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'https://localhost:4173',
     // The certificate comes from mkcert, so a machine that ran `mkcert -install`
@@ -49,7 +49,7 @@ export default defineConfig({
       'pnpm build && pnpm exec wrangler dev --env e2e --local-protocol https --https-cert-path .certs/localhost.pem --https-key-path .certs/localhost-key.pem --port 4173 --ip 127.0.0.1',
     url: 'https://localhost:4173/api/health',
     ignoreHTTPSErrors: true,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env['CI'],
     timeout: 180_000,
   },
   projects: [

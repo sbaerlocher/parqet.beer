@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getPortfolios, ParqetAuthError } from '$lib/server/parqet-client';
-import { getCached } from '$lib/server/kv-cache';
-import { clearSessionCookie, clearUserKv } from '$lib/server/auth';
+import { getPortfolios, ParqetAuthError } from '#lib/server/parqet-client';
+import { getCached } from '#lib/server/kv-cache';
+import { clearSessionCookie, clearUserKv } from '#lib/server/auth';
 
 export const GET: RequestHandler = async ({ locals, platform, cookies, url }) => {
   if (!locals.session) error(401, 'Unauthorized');

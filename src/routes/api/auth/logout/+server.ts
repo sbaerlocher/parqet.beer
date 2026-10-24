@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 import { redirect, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { clearSessionCookie, clearUserKv, resolveOrigin } from '$lib/server/auth';
+import { clearSessionCookie, clearUserKv, resolveOrigin } from '#lib/server/auth';
 
 export const POST: RequestHandler = async ({ cookies, platform, locals, request, url }) => {
   // Defence in depth on top of SvelteKit's built-in form-POST CSRF check.

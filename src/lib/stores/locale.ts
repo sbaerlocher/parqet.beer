@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 import { writable, derived, get } from 'svelte/store';
-import { browser } from '$app/environment';
-import { translations, type Locale } from '$lib/i18n';
+import { browser } from '$app/env';
+import { translations, type Locale } from '#lib/i18n';
 
 const STORAGE_KEY = 'locale';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365; // 1 year

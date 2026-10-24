@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { DEMO_DATA } from '$lib/demo';
+import { DEMO_DATA } from '#lib/demo';
 
 export const load: PageServerLoad = async ({ locals, url }) => {
   // Demo mode is a public, read-only showcase — no session required. It lets

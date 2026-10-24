@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { BEVERAGE_CATEGORIES, CATEGORY_EMOJI, type BeverageCategory } from '$lib/data/beverages';
-  import { t } from '$lib/stores/locale';
+  import { BEVERAGE_CATEGORIES, CATEGORY_EMOJI, type BeverageCategory } from '#lib/data/beverages';
+  import { t } from '#lib/stores/locale';
 
   let { selected = $bindable() }: { selected: BeverageCategory } = $props();
 </script>

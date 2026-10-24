@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
-import { json, type Handle } from '@sveltejs/kit';
+import { json } from '@sveltejs/kit';
+import type { Handle } from '@sveltejs/kit/hooks';
 import {
   getUserId,
   getTokens,
@@ -9,10 +10,10 @@ import {
   clearSessionCookie,
   SESSION_COOKIE,
   type FullSession,
-} from '$lib/server/auth';
-import { refreshAccessToken } from '$lib/server/parqet-client';
-import { rateLimit } from '$lib/server/rate-limit';
-import { applySecurityHeaders } from '$lib/server/security-headers';
+} from '#lib/server/auth';
+import { refreshAccessToken } from '#lib/server/parqet-client';
+import { rateLimit } from '#lib/server/rate-limit';
+import { applySecurityHeaders } from '#lib/server/security-headers';
 
 // Locale-Handoff-Contract:
 //   - `event.locals.locale` is populated on every request from the `locale`

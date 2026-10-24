@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 /**
  * Thin localStorage layer for the visit streak. All real logic (what a streak
- * is, when it breaks) lives in the pure, tested `$lib/achievements` module —
+ * is, when it breaks) lives in the pure, tested `#lib/achievements` module —
  * this file only persists the list of visit days and exposes the current
  * streak as a readable store.
  *
@@ -10,8 +10,8 @@
  * and are intentionally out of scope for this MVP — see achievements.ts.
  */
 import { readable } from 'svelte/store';
-import { browser } from '$app/environment';
-import { dayIndex, recordVisit, streakFromDays } from '$lib/achievements';
+import { browser } from '$app/env';
+import { dayIndex, recordVisit, streakFromDays } from '#lib/achievements';
 
 const STORAGE_KEY = 'visit-days';
 

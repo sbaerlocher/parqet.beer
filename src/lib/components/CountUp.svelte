@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { formatNumber } from '$lib/calculator';
-  import { locale } from '$lib/stores/locale';
+  import { formatNumber } from '#lib/calculator';
+  import { locale } from '#lib/stores/locale';
   import { untrack } from 'svelte';
 
   let { value, duration = 1200 }: { value: number; duration?: number } = $props();

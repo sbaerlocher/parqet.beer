@@ -5,14 +5,14 @@
  * unlocked achievements, and derives which of those are *newly* unlocked so a
  * toast fires once — not on every reload.
  *
- * All achievement/streak logic is pure and lives in `$lib/achievements`. This
+ * All achievement/streak logic is pure and lives in `#lib/achievements`. This
  * file only wires inputs together and persists the "already seen" set in
  * localStorage (client-only, best-effort — same trade-offs as the streak
  * store). No server state.
  */
 import { writable, derived, type Readable } from 'svelte/store';
-import { browser } from '$app/environment';
-import { streak } from '$lib/stores/streak';
+import { browser } from '$app/env';
+import { streak } from '#lib/stores/streak';
 import {
   allAchievements,
   unlockedAchievements,
@@ -20,7 +20,7 @@ import {
   type Achievement,
   type AchievementId,
   type AchievementInput,
-} from '$lib/achievements';
+} from '#lib/achievements';
 
 const SEEN_KEY = 'achievements-seen';
 

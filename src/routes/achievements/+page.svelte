@@ -1,9 +1,9 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { locale } from '$lib/stores/locale';
-  import { all, unlocked, seenIds } from '$lib/stores/achievements';
-  import LocaleToggle from '$lib/components/LocaleToggle.svelte';
-  import ThemeToggle from '$lib/components/ThemeToggle.svelte';
+  import { locale } from '#lib/stores/locale';
+  import { all, unlocked, seenIds } from '#lib/stores/achievements';
+  import LocaleToggle from '#lib/components/LocaleToggle.svelte';
+  import ThemeToggle from '#lib/components/ThemeToggle.svelte';
 
   // Currently-true predicates ∪ everything ever unlocked (persisted in
   // localStorage). The union means a direct load of this page — where the

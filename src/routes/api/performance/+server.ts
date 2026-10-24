@@ -2,9 +2,9 @@
 import { error, json } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
-import { getPerformance, getPortfolios, ParqetAuthError } from '$lib/server/parqet-client';
-import { getCached } from '$lib/server/kv-cache';
-import { clearSessionCookie, clearUserKv } from '$lib/server/auth';
+import { getPerformance, getPortfolios, ParqetAuthError } from '#lib/server/parqet-client';
+import { getCached } from '#lib/server/kv-cache';
+import { clearSessionCookie, clearUserKv } from '#lib/server/auth';
 
 // Parqet portfolio IDs are short opaque strings; cap to avoid abuse.
 const PortfolioIdSchema = z

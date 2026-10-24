@@ -1,6 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
@@ -75,7 +77,38 @@ function dataUpdatedAt(): string {
 }
 
 export default defineConfig({
-  plugins: [tailwindcss(), sveltekit()],
+  plugins: [
+    tailwindcss(),
+    sveltekit({
+      preprocess: vitePreprocess(),
+      adapter: adapter(),
+      files: {
+        errorTemplate: 'src/error.html',
+      },
+      // SvelteKit computes SHA-256 hashes for every inline <script>/<style> it
+      // emits (hydration bootstrap + the theme-detection script in `app.html`)
+      // and injects a `<meta http-equiv="Content-Security-Policy">` tag per
+      // rendered page. This is the only practical way to cover SvelteKit's
+      // build-hashed hydration script whose content changes every deploy.
+      //
+      // `frame-ancestors` can't live in a meta CSP (spec); it stays in the
+      // HTTP-header CSP applied by `src/lib/server/security-headers.ts`.
+      csp: {
+        mode: 'hash',
+        directives: {
+          'default-src': ['self'],
+          'script-src': ['self'],
+          'style-src': ['self', 'unsafe-inline', 'https://fonts.googleapis.com'],
+          'img-src': ['self', 'data:', 'https:'],
+          'font-src': ['self', 'data:', 'https://fonts.gstatic.com'],
+          'connect-src': ['self', 'https://connect.parqet.com'],
+          'base-uri': ['self'],
+          'form-action': ['self', 'https://connect.parqet.com'],
+          'upgrade-insecure-requests': true,
+        },
+      },
+    }),
+  ],
   define: {
     __DATA_UPDATED_AT__: JSON.stringify(dataUpdatedAt()),
   },

@@ -23,7 +23,7 @@ declare global {
         PARQET_API_URL: string;
         // Cloudflare Secrets Store binding in prod. Local dev via `.dev.vars`
         // still provides it as a plain string, so accept both and normalise
-        // through `resolveSessionSecret` in `$lib/server/auth`.
+        // through `resolveSessionSecret` in `#lib/server/auth`.
         SESSION_SECRET: string | SecretsStoreSecret;
         // Local-dev fallback sourced from `.dev.vars`. The Secrets Store
         // binding shadows any same-named `.dev.vars` entry locally, so we

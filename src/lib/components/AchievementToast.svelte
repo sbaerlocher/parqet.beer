@@ -2,9 +2,9 @@
 <script lang="ts">
   import { untrack } from 'svelte';
   import { fly } from 'svelte/transition';
-  import { newlyUnlocked, all } from '$lib/stores/achievements';
-  import { locale } from '$lib/stores/locale';
-  import type { Achievement, AchievementId } from '$lib/achievements';
+  import { newlyUnlocked, all } from '#lib/stores/achievements';
+  import { locale } from '#lib/stores/locale';
+  import type { Achievement, AchievementId } from '#lib/achievements';
 
   const DISMISS_MS = 4000;
 

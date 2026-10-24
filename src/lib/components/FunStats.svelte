@@ -1,9 +1,9 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import type { FunStats as FunStatsType } from '$lib/calculator';
-  import CountUp from '$lib/components/CountUp.svelte';
-  import { t } from '$lib/stores/locale';
-  import { locale } from '$lib/stores/locale';
+  import type { FunStats as FunStatsType } from '#lib/calculator';
+  import CountUp from '#lib/components/CountUp.svelte';
+  import { t } from '#lib/stores/locale';
+  import { locale } from '#lib/stores/locale';
 
   let { stats, beverageName }: { stats: FunStatsType; beverageName: string } = $props();
 

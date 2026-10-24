@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { generateCodeVerifier, generateCodeChallenge, generateState } from '$lib/server/pkce';
+import { generateCodeVerifier, generateCodeChallenge, generateState } from '#lib/server/pkce';
 import {
   OAUTH_STATE_COOKIE,
   OAUTH_VERIFIER_COOKIE,
   requireAuthEnv,
   resolveOrigin,
-} from '$lib/server/auth';
+} from '#lib/server/auth';
 
 export const GET: RequestHandler = async ({ platform, cookies, url, request, locals }) => {
   // Already authenticated — skip the Parqet round-trip. Avoids burning a PKCE
@@ -52,5 +52,5 @@ export const GET: RequestHandler = async ({ platform, cookies, url, request, loc
     code_challenge_method: 'S256',
   });
 
-  redirect(302, `${env.PARQET_AUTHORIZE_URL}?${params}`);
+  redirect(302, `${env.PARQET_AUTHORIZE_URL}?${params}`, { external: true });
 };

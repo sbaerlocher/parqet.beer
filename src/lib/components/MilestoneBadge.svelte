@@ -1,8 +1,8 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import type { BeverageCategory } from '$lib/data/beverages';
-  import { getMilestoneBadge } from '$lib/fun';
-  import { locale } from '$lib/stores/locale';
+  import type { BeverageCategory } from '#lib/data/beverages';
+  import { getMilestoneBadge } from '#lib/fun';
+  import { locale } from '#lib/stores/locale';
 
   let { count, category }: { count: number; category: BeverageCategory } = $props();
 

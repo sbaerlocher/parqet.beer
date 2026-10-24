@@ -1,9 +1,9 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
   import '../app.css';
-  import { browser } from '$app/environment';
+  import { browser } from '$app/env';
   import { untrack, type Snippet } from 'svelte';
-  import { locale, t } from '$lib/stores/locale';
+  import { locale, t } from '#lib/stores/locale';
   import type { LayoutData } from './$types';
 
   let { data, children }: { data: LayoutData; children: Snippet } = $props();

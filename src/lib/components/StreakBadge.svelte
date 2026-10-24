@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import { streak } from '$lib/stores/streak';
-  import { locale } from '$lib/stores/locale';
+  import { streak } from '#lib/stores/streak';
+  import { locale } from '#lib/stores/locale';
 </script>
 
 {#if $streak > 0}

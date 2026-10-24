@@ -1,8 +1,8 @@
 <!-- SPDX-License-Identifier: MIT -->
 <script lang="ts">
-  import type { Beverage } from '$lib/data/beverages';
-  import { formatNumber } from '$lib/calculator';
-  import { locale, t } from '$lib/stores/locale';
+  import type { Beverage } from '#lib/data/beverages';
+  import { formatNumber } from '#lib/calculator';
+  import { locale, t } from '#lib/stores/locale';
 
   let {
     beverage,
