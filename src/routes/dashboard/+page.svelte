@@ -7,17 +7,14 @@
     BEVERAGES,
     BEVERAGE_CATEGORIES,
     CATEGORY_EMOJI,
+    SUPPORTED_CURRENCIES,
     type BeverageCategory,
     type Currency,
   } from '#lib/data/beverages';
-  import {
-    calculateEquivalents,
-    calculateFunStats,
-    convertValue,
-    formatNumber,
-  } from '#lib/calculator';
-  import { countryFlag } from '#lib/fx';
+  import { calculateEquivalents, calculateFunStats, formatNumber } from '#lib/calculator';
+  import { countryFlag, convert, FX_FALLBACK, type FxRates } from '#lib/fx';
   import { DATA_UPDATED_AT, formatDataDate } from '#lib/data-freshness';
+  import CurrencyToggle from '#lib/components/CurrencyToggle.svelte';
   import CountUp from '#lib/components/CountUp.svelte';
   import BeerGlass from '#lib/components/BeerGlass.svelte';
   import CoffeeGlass from '#lib/components/CoffeeGlass.svelte';
@@ -104,6 +101,9 @@
   let selectedIds: Set<string> = $state(new Set(demoInitial?.portfolios.map((p) => p.id) ?? []));
   let portfolioValue: number | null = $state(demoInitialTotals?.totalValue ?? null);
   let portfolioCurrency: string = $state(demoInitial?.currency ?? 'EUR');
+  // Seeded with the fallback so the first render has usable rates; replaced by
+  // the live set that /api/performance returns alongside the value.
+  let rates: FxRates = $state(FX_FALLBACK);
   let dividends: number = $state(demoInitialTotals?.dividends ?? 0);
   let loading = $state(demoInitial === null);
   let loadingPerformance = $state(false);
@@ -190,12 +190,12 @@
   });
 
   const displayValue = $derived(
-    portfolioValue !== null ? convertValue(portfolioValue, portfolioCurrency, currency) : null
+    portfolioValue !== null ? convert(portfolioValue, portfolioCurrency, currency, rates) : null
   );
 
   const dayIndex = Math.floor(Date.now() / 86400000);
 
-  const displayDividends = $derived(convertValue(dividends, portfolioCurrency, currency));
+  const displayDividends = $derived(convert(dividends, portfolioCurrency, currency, rates));
 
   const activeList = $derived(BEVERAGES[activeCategory]);
 
@@ -204,7 +204,7 @@
   const botdCurrency = $derived(beverageOfTheDay ? beverageOfTheDay.beverage.currency : '');
   const botdCount = $derived(
     portfolioValue !== null && botdPrice > 0
-      ? Math.floor(convertValue(portfolioValue, portfolioCurrency, botdCurrency) / botdPrice)
+      ? Math.floor(convert(portfolioValue, portfolioCurrency, botdCurrency, rates) / botdPrice)
       : 0
   );
 
@@ -243,13 +243,13 @@
   });
   const dividendBeers = $derived(
     botdPrice > 0
-      ? Math.floor(convertValue(dividends, portfolioCurrency, botdCurrency) / botdPrice)
+      ? Math.floor(convert(dividends, portfolioCurrency, botdCurrency, rates) / botdPrice)
       : 0
   );
 
   const sortenEquivsRaw = $derived(
     portfolioValue !== null
-      ? calculateEquivalents(portfolioValue, portfolioCurrency, activeList)
+      ? calculateEquivalents(portfolioValue, portfolioCurrency, activeList, rates)
       : []
   );
   const activeFavs = $derived(favorites[activeCategory]);
@@ -268,7 +268,7 @@
   // and the `seen` ratchet locks in whatever tab happened to be active.
   const portfolioValueEur = $derived.by(() => {
     if (portfolioValue === null) return 0;
-    const eur = convertValue(portfolioValue, portfolioCurrency, 'EUR');
+    const eur = convert(portfolioValue, portfolioCurrency, 'EUR', rates);
     // A bad FX rate can yield NaN/Infinity; grade those as 0 rather than
     // silently unlocking (or never unlocking) the value tiers.
     return Number.isFinite(eur) ? eur : 0;
@@ -277,7 +277,7 @@
     portfolioValue !== null
       ? Math.max(
           0,
-          ...calculateEquivalents(portfolioValue, portfolioCurrency, BEVERAGES.beer)
+          ...calculateEquivalents(portfolioValue, portfolioCurrency, BEVERAGES.beer, rates)
             .map((e) => e.count)
             .filter((c) => Number.isFinite(c))
         )
@@ -318,9 +318,14 @@
       portfolios = data;
       const stored = loadStoredSelection(data);
       selectedIds = stored ?? new Set(data.map((p) => p.id));
-      if (data.length > 0) {
-        const primaryCurrency = data[0]?.currency;
-        if (primaryCurrency === 'CHF') currency = 'CHF';
+      // Start in the portfolio's own currency when we can display it, so the
+      // first render doesn't silently convert away from what Parqet shows.
+      const primaryCurrency = data[0]?.currency;
+      if (
+        primaryCurrency &&
+        (SUPPORTED_CURRENCIES as readonly string[]).includes(primaryCurrency)
+      ) {
+        currency = primaryCurrency as Currency;
       }
       await loadPerformance();
     } catch (e) {
@@ -366,10 +371,12 @@
         totalValue: number;
         dividends: number;
         currency: string;
+        rates?: FxRates;
       };
       portfolioValue = data.totalValue;
       dividends = data.dividends ?? 0;
       portfolioCurrency = data.currency;
+      if (data.rates) rates = data.rates;
     } catch (e) {
       error = e instanceof Error ? e.message : 'Unknown error';
     } finally {
@@ -444,23 +451,7 @@
         <StreakBadge />
         <ThemeToggle />
         <LocaleToggle />
-        <!-- currency toggle -->
-        <div
-          class="inline-flex p-0.5 rounded-md"
-          style="background: var(--accent); border: 1px solid var(--border)"
-        >
-          {#each ['EUR', 'CHF'] as c (c)}
-            <button
-              onclick={() => (currency = c as Currency)}
-              class="px-2 sm:px-2.5 py-1 rounded text-[11px] font-bold transition-all font-mono"
-              style={currency === c
-                ? 'background: var(--card); color: var(--highlight)'
-                : 'background: transparent; color: var(--highlight)'}
-            >
-              {c}
-            </button>
-          {/each}
-        </div>
+        <CurrencyToggle bind:currency />
         <!-- eye toggle -->
         <button
           onclick={() => (showValue = !showValue)}
