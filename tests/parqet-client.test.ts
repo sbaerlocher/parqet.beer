@@ -16,7 +16,7 @@ import { EUR_TO_CHF_RATE } from '../src/lib/fx';
 const env = {
   PARQET_CLIENT_ID: 'test-client',
   PARQET_TOKEN_URL: 'https://oauth.example.com/token',
-} as App.Platform['env'];
+} as Cloudflare.Env;
 
 describe('refreshAccessToken', () => {
   const originalFetch = globalThis.fetch;

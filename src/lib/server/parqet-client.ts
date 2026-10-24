@@ -55,7 +55,7 @@ export type Portfolio = z.infer<typeof PortfolioListSchema>['items'][number];
 export async function exchangeCodeForTokens(
   code: string,
   redirectUri: string,
-  env: App.Platform['env'],
+  env: Cloudflare.Env,
   codeVerifier: string
 ): Promise<TokenResponse | null> {
   try {
@@ -108,7 +108,7 @@ export type RefreshResult = { ok: true; tokens: TokenResponse } | { ok: false; p
 export async function refreshAccessToken(
   refreshToken: string,
   origin: string,
-  env: App.Platform['env']
+  env: Cloudflare.Env
 ): Promise<RefreshResult> {
   let response: Response;
   try {

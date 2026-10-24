@@ -11,8 +11,8 @@ import { assertE2e } from '../guard';
  *
  * Shape must satisfy `PortfolioListSchema` in `#lib/server/parqet-client`.
  */
-export const GET: RequestHandler = async ({ platform }) => {
-  assertE2e(platform);
+export const GET: RequestHandler = async () => {
+  assertE2e();
 
   return json({
     items: [

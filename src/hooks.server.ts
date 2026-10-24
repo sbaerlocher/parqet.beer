@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 import { json } from '@sveltejs/kit';
+import { env as bindings } from 'cloudflare:workers';
 import type { Handle } from '@sveltejs/kit/hooks';
 import {
   getUserId,
@@ -67,7 +68,7 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function maybeRefreshSession(
   session: FullSession,
   origin: string,
-  env: App.Platform['env']
+  env: Cloudflare.Env
 ): Promise<FullSession | null> {
   if (!session.refreshToken) {
     console.warn('[auth:refresh] No refresh token in session, cannot refresh');
@@ -153,9 +154,8 @@ function rateLimitResponse(result: { resetAt: number }, limit: number): Response
 }
 
 export const handle: Handle = async ({ event, resolve }) => {
-  const platformEnv = event.platform?.env;
-  // `adapter-cloudflare` under `vite dev` populates `event.platform.env` as an
-  // empty object (not undefined), so guarding on `env` alone lets the session
+  // `cloudflare:workers` hands out an empty `env` when no bindings are
+  // configured (not undefined), so guarding on `env` alone lets the session
   // path through with no bindings. Require the two bindings we actually need —
   // KV for rate-limiting/refresh-lock and the SESSION_SECRET for JWE — before
   // running any auth logic. Without them we treat the request as anonymous, so
@@ -164,11 +164,10 @@ export const handle: Handle = async ({ event, resolve }) => {
   // The e2e suite deliberately runs on the other side of this branch: it boots
   // `wrangler dev --env e2e`, which binds both, because the OAuth success path
   // is unreachable without them.
-  const env =
-    platformEnv && platformEnv.PARQET_KV && platformEnv.SESSION_SECRET ? platformEnv : undefined;
+  const env = bindings.PARQET_KV && bindings.SESSION_SECRET ? bindings : undefined;
 
   // Locale resolution runs unconditionally so SSR always has a valid lang
-  // attribute, even in the (test) codepath where `event.platform` is absent.
+  // attribute, even in the (test) codepath without bindings.
   event.locals.locale = resolveLocale(event.cookies.get('locale'));
 
   if (env) {

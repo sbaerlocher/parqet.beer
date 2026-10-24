@@ -25,8 +25,8 @@ import { assertE2e } from '../guard';
  * never bypassed. (The guard also sits behind `!__SVELTEKIT_DEV__`, which is why
  * it only appeared once the suite moved off `vite dev` onto the built worker.)
  */
-export const POST: RequestHandler = async ({ platform, request }) => {
-  assertE2e(platform);
+export const POST: RequestHandler = async ({ request }) => {
+  assertE2e();
 
   const form = new URLSearchParams(await request.text());
   const grantType = form.get('grant_type');

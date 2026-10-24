@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+import { env } from 'cloudflare:workers';
 import { error } from '@sveltejs/kit';
 
 /**
@@ -12,11 +13,11 @@ import { error } from '@sveltejs/kit';
  *
  * `ENVIRONMENT` is set to `"e2e"` exclusively by the `env.e2e` block in
  * `wrangler.jsonc`, which is never deployed. `development`, `preview` and
- * `production` all carry a different value, and a request with no platform
- * bindings at all (`vite dev`, unit tests) fails the check too.
+ * `production` all carry a different value, and an env without bindings
+ * (unit tests) fails the check too.
  */
-export function assertE2e(platform: App.Platform | undefined): void {
-  if (platform?.env?.ENVIRONMENT !== 'e2e') {
+export function assertE2e(): void {
+  if (env.ENVIRONMENT !== 'e2e') {
     error(404, 'Not Found');
   }
 }

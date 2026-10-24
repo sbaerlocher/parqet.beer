@@ -12,8 +12,8 @@ import { assertE2e } from '../guard';
  * the payload instead of falling back to the hardcoded constant and logging a
  * warning on every dashboard load.
  */
-export const POST: RequestHandler = async ({ platform }) => {
-  assertE2e(platform);
+export const POST: RequestHandler = async () => {
+  assertE2e();
 
   return json({
     performance: {

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { GET as login } from '../src/routes/api/auth/login/+server';
 import { GET as callback } from '../src/routes/api/auth/callback/+server';
+import { setEnv } from './stubs/cloudflare-workers';
 
 /**
  * Both SvelteKit's `error()` and `redirect()` throw, so the status always
@@ -21,19 +22,19 @@ async function expectStatus(promise: Promise<Response>, status: number): Promise
 }
 
 interface AuthEventOpts {
-  env?: Record<string, unknown> | undefined;
+  env?: Record<string, unknown>;
 }
 
 function buildAuthEvent(routeId: string, path: string, opts: AuthEventOpts = {}) {
   const url = new URL(`https://app.example.com${path}`);
   const request = new Request(url);
+  setEnv(opts.env);
   // The handlers only touch a small subset of RequestEvent — cast loosely so
   // we don't have to fabricate the full surface.
   return {
     request,
     url,
     locals: { session: null },
-    platform: opts.env === undefined ? undefined : { env: opts.env },
     cookies: { set: () => {}, get: () => undefined, delete: () => {} },
     fetch: globalThis.fetch,
     getClientAddress: () => '127.0.0.1',
@@ -52,12 +53,8 @@ function buildLoginEvent(opts: AuthEventOpts = {}) {
 }
 
 describe('GET /api/auth/login without bindings', () => {
-  it('responds 503 when platform.env is empty', async () => {
+  it('responds 503 when env is empty', async () => {
     await expectStatus(login(buildLoginEvent({ env: {} })) as Promise<Response>, 503);
-  });
-
-  it('responds 503 when platform is missing entirely', async () => {
-    await expectStatus(login(buildLoginEvent()) as Promise<Response>, 503);
   });
 
   it('still redirects to the authorize URL when bindings are present', async () => {
@@ -87,12 +84,8 @@ function buildCallbackEvent(opts: AuthEventOpts = {}) {
 }
 
 describe('GET /api/auth/callback without bindings', () => {
-  it('responds 503 when platform.env is empty', async () => {
+  it('responds 503 when env is empty', async () => {
     await expectStatus(callback(buildCallbackEvent({ env: {} })) as Promise<Response>, 503);
-  });
-
-  it('responds 503 when platform is missing entirely', async () => {
-    await expectStatus(callback(buildCallbackEvent()) as Promise<Response>, 503);
   });
 
   // The token exchange reads PARQET_CLIENT_ID indirectly, so a partial env is

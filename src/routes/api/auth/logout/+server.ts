@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 import { redirect, error } from '@sveltejs/kit';
+import { env } from 'cloudflare:workers';
 import type { RequestHandler } from './$types';
 import { clearSessionCookie, clearUserKv, resolveOrigin } from '#lib/server/auth';
 
-export const POST: RequestHandler = async ({ cookies, platform, locals, request, url }) => {
+export const POST: RequestHandler = async ({ cookies, locals, request, url }) => {
   // Defence in depth on top of SvelteKit's built-in form-POST CSRF check.
   // Browsers send `Origin` on cross-origin POSTs, so mismatches are a clear
   // signal to block. If the header is absent we fall through — modern
@@ -16,8 +17,7 @@ export const POST: RequestHandler = async ({ cookies, platform, locals, request,
     error(403, 'Forbidden');
   }
 
-  const env = platform?.env;
-  if (env && locals.session) {
+  if (env.PARQET_KV && locals.session) {
     await clearUserKv(env.PARQET_KV, locals.session.userId);
   }
 
