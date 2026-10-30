@@ -202,6 +202,7 @@ export async function getPortfolios(
 
 export interface Holding {
   position?: { currentValue?: number };
+  quote?: { fx?: unknown };
   asset?: { type?: string };
 }
 
@@ -216,10 +217,12 @@ interface PerformanceResponse {
 /**
  * Currency a holding's `currentValue` is denominated in. Parqet reports
  * securities in EUR regardless of the quote's original currency (the `fx`
- * block describes the quote, not the stored value). Custom assets are the
- * exception: those are stored in the portfolio's own currency.
+ * block describes the quote, not the stored value). Custom assets without an
+ * `fx` block are the exception: those are stored in the portfolio's own
+ * currency. An `fx` block wins over the asset type, as it always has.
  */
 function holdingSourceCurrency(h: Holding, portfolioCurrency: string): string {
+  if (h.quote?.fx) return 'EUR';
   return h.asset?.type === 'custom' ? portfolioCurrency : 'EUR';
 }
 

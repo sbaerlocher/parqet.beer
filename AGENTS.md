@@ -100,8 +100,8 @@ https` on port 4173. Both parts are load-bearing — `hooks.server.ts` only
   `__Host-` cookie prefix implies `Secure`, which browsers drop over plain
   HTTP. Consequence: each e2e run pays for a build first.
 - **The OAuth mocks live in the app**, under `src/routes/__e2e__/` (authorize,
-  token, user, portfolios, performance). `env.e2e` in `wrangler.jsonc` points
-  `PARQET_*_URL` back at them, so there is no second server and no extra TLS
+  token, user, portfolios, performance, fx). `env.e2e` in `wrangler.jsonc` points
+  `PARQET_*_URL` and `FX_API_URL` back at them, so there is no second server and no extra TLS
   cert. Every one of those routes calls `assertE2e()` first and 404s unless
   `ENVIRONMENT === "e2e"` — a value only `env.e2e` ever sets. When adding a
   route there, the guard call comes before any other statement.

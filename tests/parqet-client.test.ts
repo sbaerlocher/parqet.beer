@@ -289,6 +289,11 @@ describe('holdingValueInCurrency', () => {
     });
   });
 
+  it('treats a custom asset with an fx block as EUR, not portfolio currency', () => {
+    const holding = { ...customAsset(100), quote: { fx: { rate: 0.95, originalCurrency: 'CHF' } } };
+    expect(holdingValueInCurrency(holding, rates, 'CHF', 'CHF')).toBeCloseTo(95, 5);
+  });
+
   it('treats missing currentValue as zero', () => {
     expect(holdingValueInCurrency({}, rates, 'EUR', 'EUR')).toBe(0);
   });

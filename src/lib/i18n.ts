@@ -60,7 +60,7 @@ export const translations = {
     step03Body: '„Hopfen-Held" auf der Visitenkarte? Nur hier möglich.',
     featureLiveTitle: 'Live-Umrechnung',
     featureLiveBody: (counts: { beer: number; coffee: number; smoothie: number; whisky: number }) =>
-      `${counts.beer} Biere, ${counts.coffee} Kaffees, ${counts.smoothie} Smoothies, ${counts.whisky} Whiskys. EUR/CHF in Echtzeit.`,
+      `${counts.beer} Biere, ${counts.coffee} Kaffees, ${counts.smoothie} Smoothies, ${counts.whisky} Whiskys. EUR, CHF, USD und GBP zu tagesaktuellen EZB-Kursen.`,
     featureBadgesTitle: 'Milestone Badges',
     featureBadgesBody: 'Stammgast, Hopfen-Held, Bierkönig. Vom Feierabend zur Legende.',
     featureSecurityTitle: 'Read-only · PKCE',
@@ -188,7 +188,7 @@ export const translations = {
     step03Body: '"Hops Hero" on the business card? Only here.',
     featureLiveTitle: 'Live conversion',
     featureLiveBody: (counts: { beer: number; coffee: number; smoothie: number; whisky: number }) =>
-      `${counts.beer} beers, ${counts.coffee} coffees, ${counts.smoothie} smoothies, ${counts.whisky} whiskies. EUR/CHF in real time.`,
+      `${counts.beer} beers, ${counts.coffee} coffees, ${counts.smoothie} smoothies, ${counts.whisky} whiskies. EUR, CHF, USD and GBP at daily ECB rates.`,
     featureBadgesTitle: 'Milestone badges',
     featureBadgesBody: 'Regular, Hops Hero, Beer Royalty. From after-work to legend.',
     featureSecurityTitle: 'Read-only · PKCE',

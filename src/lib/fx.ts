@@ -52,7 +52,8 @@ export function isUsableRates(value: unknown): value is FxRates {
 
 /**
  * Convert between any two currencies via the EUR pivot. Unknown currency codes
- * pass the value through unchanged — beverage data is schema-validated, so in
+ * pass the value through unchanged — beverage data is schema-validated and
+ * `/api/performance` maps unsupported portfolio currencies to EUR, so in
  * practice only supported codes reach here.
  */
 export function convert(

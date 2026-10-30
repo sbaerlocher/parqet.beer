@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { FX_FALLBACK, isUsableRates, SUPPORTED_CURRENCIES } from '../src/lib/fx';
-import { fetchRates, getRates, FX_CACHE_KEY, FX_MAX_AGE_MS } from '../src/lib/server/fx-service';
+import {
+  fetchRates,
+  getRates,
+  FX_CACHE_KEY,
+  FX_MAX_AGE_MS,
+  FX_RETRY_MS,
+} from '../src/lib/server/fx-service';
 
 /** Minimal in-memory KV fake matching the subset of KVNamespace fx-service uses. */
 function createFakeKv() {
@@ -234,7 +240,63 @@ describe('getRates', () => {
     );
 
     await expect(getRates({ PARQET_KV: kv } as unknown as Cloudflare.Env)).resolves.toEqual(stale);
-    expect(kv.put).not.toHaveBeenCalled();
+    const written = JSON.parse(kv._store.get(FX_CACHE_KEY)!);
+    expect(written.rates).toEqual(stale);
+    expect(typeof written.failedAt).toBe('number');
+  });
+
+  it('skips upstream while a recent failure is recorded', async () => {
+    const kv = createFakeKv();
+    const stale = { EUR: 1, CHF: 0.9, USD: 1, GBP: 0.8 };
+    kv._store.set(
+      FX_CACHE_KEY,
+      JSON.stringify({
+        rates: stale,
+        fetchedAt: Date.now() - FX_MAX_AGE_MS - 1000,
+        failedAt: Date.now() - FX_RETRY_MS / 2,
+      })
+    );
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(getRates({ PARQET_KV: kv } as unknown as Cloudflare.Env)).resolves.toEqual(stale);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('retries upstream once the failure backoff has passed', async () => {
+    const kv = createFakeKv();
+    kv._store.set(
+      FX_CACHE_KEY,
+      JSON.stringify({
+        rates: { EUR: 1, CHF: 0.9, USD: 1, GBP: 0.8 },
+        fetchedAt: Date.now() - FX_MAX_AGE_MS - 1000,
+        failedAt: Date.now() - FX_RETRY_MS - 1000,
+      })
+    );
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(JSON.stringify(frankfurterBody({ CHF: 0.92, USD: 1.08, GBP: 0.85 })))
+      )
+    );
+
+    await expect(getRates({ PARQET_KV: kv } as unknown as Cloudflare.Env)).resolves.toEqual(LIVE);
+  });
+
+  it('uses FX_API_URL when set', async () => {
+    const kv = createFakeKv();
+    const fetchMock = vi.fn(
+      async (..._args: unknown[]) =>
+        new Response(JSON.stringify(frankfurterBody({ CHF: 0.92, USD: 1.08, GBP: 0.85 })))
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    await getRates({
+      PARQET_KV: kv,
+      FX_API_URL: 'https://mock.test/fx',
+    } as unknown as Cloudflare.Env);
+    expect(String(fetchMock.mock.calls[0]![0])).toMatch(/^https:\/\/mock\.test\/fx\/latest\?/);
   });
 
   it('falls back to FX_FALLBACK when there is neither cache nor upstream', async () => {

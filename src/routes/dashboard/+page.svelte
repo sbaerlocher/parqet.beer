@@ -12,7 +12,7 @@
     type Currency,
   } from '#lib/data/beverages';
   import { calculateEquivalents, calculateFunStats, formatNumber } from '#lib/calculator';
-  import { countryFlag, convert, FX_FALLBACK, type FxRates } from '#lib/fx';
+  import { countryFlag, convert, FX_FALLBACK, isUsableRates, type FxRates } from '#lib/fx';
   import { DATA_UPDATED_AT, formatDataDate } from '#lib/data-freshness';
   import CurrencyToggle from '#lib/components/CurrencyToggle.svelte';
   import CountUp from '#lib/components/CountUp.svelte';
@@ -376,7 +376,7 @@
       portfolioValue = data.totalValue;
       dividends = data.dividends ?? 0;
       portfolioCurrency = data.currency;
-      if (data.rates) rates = data.rates;
+      if (isUsableRates(data.rates)) rates = data.rates;
     } catch (e) {
       error = e instanceof Error ? e.message : 'Unknown error';
     } finally {
