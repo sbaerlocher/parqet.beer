@@ -108,7 +108,9 @@
               der offiziellen Parqet Connect API (connect.parqet.com).
             </li>
             <li>
-              Wechselkurse EUR/CHF werden aus den FX-Daten deiner Parqet-Positionen abgeleitet.
+              Wechselkurse (EUR/CHF/USD/GBP) sind die täglichen Referenzkurse der EZB, abgerufen
+              über die öffentliche Frankfurter API (api.frankfurter.dev). Der Server ruft sie ohne
+              Bezug zu deinem Konto ab — es werden keine Daten von dir übermittelt.
             </li>
             <li>
               Getränkepreise sind statisch im Code hinterlegt (öffentlich einsehbar auf GitHub) und
@@ -222,7 +224,11 @@
               Your portfolio value, dividends and portfolio list come exclusively from the official
               Parqet Connect API (connect.parqet.com).
             </li>
-            <li>EUR/CHF exchange rates are derived from the FX data of your Parqet positions.</li>
+            <li>
+              Exchange rates (EUR/CHF/USD/GBP) are the ECB's daily reference rates, fetched from the
+              public Frankfurter API (api.frankfurter.dev). The server requests them without any
+              link to your account — none of your data is sent.
+            </li>
             <li>
               Beverage prices are hardcoded in the source (publicly visible on GitHub) and are based
               on average supermarket and café prices.

@@ -91,6 +91,7 @@
         "PARQET_TOKEN_URL": "https://localhost:4173/__e2e__/token",
         "PARQET_API_URL": "https://localhost:4173/__e2e__",
         "PARQET_CLIENT_ID": "e2e-client-id",
+        "FX_API_URL": "https://localhost:4173/__e2e__/fx",
       },
     },
 

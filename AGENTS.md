@@ -39,7 +39,8 @@ Cloudflare KV
   ├── user:{userId}        → User info (TTL 1h)
   ├── portfolios:{userId}  → Portfolio list (TTL 1h)
   ├── performance:{userId} → Total value (TTL 15min)
-  └── preferences:{userId} → Preferences
+  ├── preferences:{userId} → Preferences
+  └── fx:rates             → ECB rates (no TTL — stale entry is the outage fallback)
 ```
 
 ## Conventions
@@ -51,7 +52,12 @@ Cloudflare KV
 - **Components**: `src/lib/components/`
 - **Beverage reference data**: `src/lib/data/{beer,coffee,smoothie}.json` —
   schema: `{name, size, price, currency, country}` (price in local currency,
-  conversion via FX rate in `src/lib/fx.ts`)
+  conversion via `convert()` in `src/lib/fx.ts`)
+- **FX**: `src/lib/fx.ts` holds the client-safe half (EUR-based `FxRates`,
+  `FX_FALLBACK`, `convert()` — EUR is the pivot, so any pair works).
+  `src/lib/server/fx-service.ts` fetches daily ECB rates from Frankfurter and
+  caches them in KV under `fx:rates`. Display currencies (EUR/CHF/USD/GBP) are
+  deliberately wider than the beverage price currencies (EUR/CHF).
 - **Commits**: Conventional Commits, DCO-signed off (`git commit -s`) — see
   `CONTRIBUTING.md`
 
@@ -94,8 +100,8 @@ https` on port 4173. Both parts are load-bearing — `hooks.server.ts` only
   `__Host-` cookie prefix implies `Secure`, which browsers drop over plain
   HTTP. Consequence: each e2e run pays for a build first.
 - **The OAuth mocks live in the app**, under `src/routes/__e2e__/` (authorize,
-  token, user, portfolios, performance). `env.e2e` in `wrangler.jsonc` points
-  `PARQET_*_URL` back at them, so there is no second server and no extra TLS
+  token, user, portfolios, performance, fx). `env.e2e` in `wrangler.jsonc` points
+  `PARQET_*_URL` and `FX_API_URL` back at them, so there is no second server and no extra TLS
   cert. Every one of those routes calls `assertE2e()` first and 404s unless
   `ENVIRONMENT === "e2e"` — a value only `env.e2e` ever sets. When adding a
   route there, the guard call comes before any other statement.

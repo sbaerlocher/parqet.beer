@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { DEMO_DATA, demoTotals } from '../src/lib/demo';
-import { calculateEquivalents, convertValue } from '../src/lib/calculator';
+import { calculateEquivalents } from '../src/lib/calculator';
+import { convert } from '../src/lib/fx';
 import { BEVERAGES, BEVERAGE_CATEGORIES } from '../src/lib/data/beverages';
 import type { Currency } from '../src/lib/data/beverages';
 
@@ -10,6 +11,8 @@ import type { Currency } from '../src/lib/data/beverages';
 const DISPLAY_CURRENCIES = Object.keys({
   EUR: true,
   CHF: true,
+  USD: true,
+  GBP: true,
 } satisfies Record<Currency, true>) as Currency[];
 
 const ALL_IDS = new Set(DEMO_DATA.portfolios.map((p) => p.id));
@@ -48,7 +51,7 @@ describe('demo fixtures', () => {
   it('renders sensible counts across all display currencies', () => {
     const { totalValue } = demoTotals(DEMO_DATA, ALL_IDS);
     for (const display of DISPLAY_CURRENCIES) {
-      const converted = convertValue(totalValue, DEMO_DATA.currency, display);
+      const converted = convert(totalValue, DEMO_DATA.currency, display);
       expect(Number.isFinite(converted)).toBe(true);
       expect(converted).toBeGreaterThan(0);
     }

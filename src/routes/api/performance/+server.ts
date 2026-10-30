@@ -5,7 +5,9 @@ import { env } from 'cloudflare:workers';
 import type { RequestHandler } from './$types';
 import { getPerformance, getPortfolios, ParqetAuthError } from '#lib/server/parqet-client';
 import { getCached } from '#lib/server/kv-cache';
+import { getRates } from '#lib/server/fx-service';
 import { clearSessionCookie, clearUserKv } from '#lib/server/auth';
+import { FX_FALLBACK, SUPPORTED_CURRENCIES, type Currency } from '#lib/fx';
 
 // Parqet portfolio IDs are short opaque strings; cap to avoid abuse.
 const PortfolioIdSchema = z
@@ -28,14 +30,18 @@ export const GET: RequestHandler = async ({ locals, url, cookies }) => {
   const portfolioIds = parsedIds.data;
 
   if (portfolioIds.length === 0) {
-    return json({ totalValue: 0, dividends: 0, currency: 'EUR' });
+    return json({ totalValue: 0, dividends: 0, currency: 'EUR', rates: FX_FALLBACK });
   }
 
   try {
-    // Get portfolios to determine currency
-    const allPortfolios = await getCached(env.PARQET_KV, `portfolios:${userId}`, 3600, () =>
-      getPortfolios(env.PARQET_API_URL, accessToken)
-    );
+    // Get portfolios to determine currency. FX rates are independent of the
+    // Parqet call, so fetch both at once rather than serialising them.
+    const [allPortfolios, rates] = await Promise.all([
+      getCached(env.PARQET_KV, `portfolios:${userId}`, 3600, () =>
+        getPortfolios(env.PARQET_API_URL, accessToken)
+      ),
+      getRates(env),
+    ]);
 
     const selectedPortfolios = (allPortfolios ?? []).filter((p) => portfolioIds.includes(p.id));
 
@@ -43,7 +49,16 @@ export const GET: RequestHandler = async ({ locals, url, cookies }) => {
     // The dashboard shows a banner when that happens; `getPerformance` then
     // normalises every holding into that single currency via
     // `holdingValueInCurrency`, so the total stays consistent.
-    const currency = selectedPortfolios[0]?.currency ?? 'EUR';
+    // Holdings are valued via `convert`, which only knows SUPPORTED_CURRENCIES.
+    // Any other portfolio currency falls back to EUR — the currency Parqet
+    // stores securities in — instead of mislabelling EUR numbers.
+    const rawCurrency = selectedPortfolios[0]?.currency ?? 'EUR';
+    const currency = (SUPPORTED_CURRENCIES as readonly string[]).includes(rawCurrency)
+      ? (rawCurrency as Currency)
+      : 'EUR';
+    if (currency !== rawCurrency) {
+      console.warn('[performance] Unsupported portfolio currency, valuing in EUR:', rawCurrency);
+    }
 
     // Cache key includes selected portfolio IDs
     const cacheKey = `performance:${userId}:${portfolioIds.sort().join(',')}`;
@@ -52,13 +67,28 @@ export const GET: RequestHandler = async ({ locals, url, cookies }) => {
       env.PARQET_KV,
       cacheKey,
       900, // 15min
-      () => getPerformance(env.PARQET_API_URL, accessToken, portfolioIds, currency)
+      // Rates are cached with the valuation they produced, so the client
+      // converts with the same numbers the server valued with.
+      async () => {
+        const result = await getPerformance(
+          env.PARQET_API_URL,
+          accessToken,
+          portfolioIds,
+          currency,
+          rates
+        );
+        return result && { ...result, rates };
+      }
     );
 
+    // Rates travel with the payload so the client can switch display currency
+    // without a round-trip — and so client display and server valuation are
+    // demonstrably computed from the same numbers.
     return json({
       totalValue: performance?.totalValue ?? 0,
       dividends: performance?.dividends ?? 0,
       currency,
+      rates: performance?.rates ?? rates,
     });
   } catch (e) {
     if (e instanceof ParqetAuthError) {

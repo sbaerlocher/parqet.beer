@@ -34,6 +34,8 @@ declare global {
       // `resolveSessionSecret` picks up when the emulator call fails.
       SESSION_SECRET_DEV?: string;
       ENVIRONMENT: string;
+      // Frankfurter base URL override; unset in prod, the e2e mock in e2e.
+      FX_API_URL?: string;
     }
   }
 }
