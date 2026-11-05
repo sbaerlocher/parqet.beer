@@ -95,6 +95,9 @@ new dev host needs that callback registered in the Parqet Connect client.
 lefthook hooks don't hit EACCES; `project.down.pre` hands root-owned files in
 the bind mount back to the host user. Best effort, only while the container
 runs — after a crash or `docker stop`, run `dde project:up && dde project:down`.
+Checkouts started before these hooks existed may already have root-owned
+mountpoints; fix them once with
+`docker run --rm -v "$PWD":/w alpine chown "$(id -u):$(id -g)" /w/node_modules /w/.svelte-kit /w/.pnpm-store`.
 
 ### Without DDE
 
