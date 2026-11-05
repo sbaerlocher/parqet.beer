@@ -113,6 +113,7 @@ export default defineConfig({
     __DATA_UPDATED_AT__: JSON.stringify(dataUpdatedAt()),
   },
   server: {
-    allowedHosts: ['parqet-beer.test'],
+    // Leading dot also allows dde worktree hosts (`<suffix>.parqet.beer.test`).
+    allowedHosts: ['.parqet.beer.test'],
   },
 });

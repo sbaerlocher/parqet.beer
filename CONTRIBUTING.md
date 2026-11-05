@@ -32,7 +32,7 @@ Then:
 
 ```bash
 cp .dev.vars.example .dev.vars   # fill in PARQET_CLIENT_ID and SESSION_SECRET
-just dev                         # https://parqet-beer.test
+just dev                         # https://parqet.beer.test
 ```
 
 Other useful commands:

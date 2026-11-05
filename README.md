@@ -50,7 +50,7 @@ cp .dev.vars.example .dev.vars
 just dev
 ```
 
-Then open `https://parqet-beer.test` in your browser.
+Then open `https://parqet.beer.test` in your browser.
 
 ### Without DDE
 
@@ -93,7 +93,7 @@ inside them:
 
 ```bash
 just                  # List all recipes
-just dev              # Start the containers (https://parqet-beer.test)
+just dev              # Start the containers (https://parqet.beer.test)
 just build            # Build for Cloudflare Pages
 just check            # TypeScript + Svelte check
 just test             # Vitest (unit tests)
