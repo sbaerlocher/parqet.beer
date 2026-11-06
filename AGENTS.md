@@ -84,6 +84,21 @@ dde project:exec pnpm format              # Prettier
 dde project:exec pnpm generate:assets     # OG image / favicons from scripts/generate-assets.mjs
 ```
 
+Dev URL: `https://parqet.beer.test` (Traefik + mkcert). Git worktrees run in
+parallel under `https://<suffix>.parqet.beer.test` (`dde project:describe`
+shows the URL); start them only via `dde project:up`. The OAuth redirect URI
+follows the request host (`<host>/api/auth/callback`), so OAuth login on a
+new dev host needs that callback registered in the Parqet Connect client.
+
+`.dde/hooks/`: `project.up.pre` pre-creates the anonymous-volume mountpoints
+(`node_modules`, `.svelte-kit`, `.pnpm-store`) as the host user so host-side
+lefthook hooks don't hit EACCES; `project.down.pre` hands root-owned files in
+the bind mount back to the host user. Best effort, only while the container
+runs — after a crash or `docker stop`, run `dde project:up && dde project:down`.
+Checkouts started before these hooks existed may already have root-owned
+mountpoints; fix them once with
+`docker run --rm -v "$PWD":/w alpine chown "$(id -u):$(id -g)" /w/node_modules /w/.svelte-kit /w/.pnpm-store`.
+
 ### Without DDE
 
 Not an agent path — see `CONTRIBUTING.md` § Setup.

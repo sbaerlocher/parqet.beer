@@ -9,11 +9,17 @@ services:
       - /app/.svelte-kit
       - /app/.pnpm-store
     command: ['pnpm', 'dev', '--host', '0.0.0.0']
+    # Router/service names carry the compose project name and the host is dde's
+    # canonical `<project>.test`: dde rewrites that host per git worktree
+    # (`<suffix>.parqet.beer.test`), and unique router names keep main and
+    # worktrees from colliding in Traefik (a shared name drops both routes).
+    # Start worktrees only via `dde project:up`: plain `docker compose up` skips
+    # the host rewrite, and two routers would then silently share one host.
     labels:
       - 'traefik.enable=true'
-      - 'traefik.http.routers.parqet-beer-worker.rule=Host(`parqet-beer.test`)'
-      - 'traefik.http.routers.parqet-beer-worker.tls=true'
-      - 'traefik.http.services.parqet-beer-worker.loadbalancer.server.port=5173'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-parqet-beer}.rule=Host(`parqet.beer.test`)'
+      - 'traefik.http.routers.${COMPOSE_PROJECT_NAME:-parqet-beer}.tls=true'
+      - 'traefik.http.services.${COMPOSE_PROJECT_NAME:-parqet-beer}.loadbalancer.server.port=5173'
     env_file:
       - .dev.vars
 

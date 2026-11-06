@@ -19,6 +19,11 @@ All notable changes documented here. Format: [Keep a Changelog](https://keepacha
 
 ### Changed
 
+- Local dev URL moved from `parqet-beer.test` to dde's canonical
+  `parqet.beer.test`, so dde git worktrees run in parallel under
+  `<suffix>.parqet.beer.test` with their own Traefik router. dde hooks keep
+  host-side git hooks working by pre-creating the volume mountpoints and
+  handing root-owned files back on `project:down`.
 - README and CONTRIBUTING document the `just` recipes for the DDE path and no
   longer use `dde exec`, which is not a dde subcommand (`dde project:exec` is).
 
