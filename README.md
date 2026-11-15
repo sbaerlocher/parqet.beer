@@ -23,7 +23,7 @@ product.**
 
 ## Tech Stack
 
-- **Framework**: [SvelteKit](https://kit.svelte.dev) (Svelte 5, SSR on Cloudflare Pages)
+- **Framework**: [SvelteKit](https://kit.svelte.dev) (Svelte 5, SSR on Cloudflare Workers)
 - **Adapter**: `@sveltejs/adapter-cloudflare`
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com)
 - **Auth**: Parqet Connect OAuth 2.0 + PKCE, sessions via [jose](https://github.com/panva/jose) JWE (httpOnly cookie)
@@ -94,7 +94,7 @@ inside them:
 ```bash
 just                  # List all recipes
 just dev              # Start the containers (https://parqet.beer.test)
-just build            # Build for Cloudflare Pages
+just build            # Build for Cloudflare Workers
 just check            # TypeScript + Svelte check
 just test             # Vitest (unit tests)
 just e2e              # Playwright (E2E tests)
@@ -107,8 +107,8 @@ the container and do not apply:
 
 ```bash
 pnpm dev              # Vite dev server (localhost:5173)
-pnpm build            # Build for Cloudflare Pages
-pnpm preview          # Local Cloudflare Pages preview via wrangler
+pnpm build            # Build for Cloudflare Workers
+pnpm preview          # Local preview via wrangler
 pnpm check            # TypeScript + Svelte check
 pnpm test             # Vitest (unit tests)
 pnpm lint             # Prettier check
@@ -116,7 +116,7 @@ pnpm format           # Prettier write
 pnpm generate:assets  # SVG → PNG (favicon, OG image) re-render
 ```
 
-## Deployment (Cloudflare Pages)
+## Deployment (Cloudflare Workers)
 
 > **Fork note**: `wrangler.jsonc` contains only placeholder IDs. Before you can
 > deploy, you need to create your own Cloudflare resources (KV namespace,
@@ -138,15 +138,15 @@ For a step-by-step approach, see the individual commands in
 [scripts/README.md](scripts/README.md).
 
 Then replace the **Parqet Client ID** in `wrangler.jsonc` under
-`vars.PARQET_CLIENT_ID` with your own OAuth app ID from the Parqet Developer
-Portal. The redirect URI configured in your Parqet app must match your deploy
-domain.
+`env.production.vars.PARQET_CLIENT_ID` (and `env.preview.vars.PARQET_CLIENT_ID`)
+with your own OAuth app ID from the Parqet Developer Portal. The redirect URI
+configured in your Parqet app must match your deploy domain.
 
-Deploy via Git integration (push to `main`) or manually:
+Deploy via Git integration (push to `main`) or manually (Wrangler runs
+`pnpm build` first):
 
 ```bash
-pnpm build
-pnpm exec wrangler pages deploy .svelte-kit/cloudflare
+pnpm exec wrangler deploy --env production
 ```
 
 ## Project Structure

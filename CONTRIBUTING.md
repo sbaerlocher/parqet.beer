@@ -43,7 +43,7 @@ just test         # Vitest
 just e2e          # Playwright
 just lint         # Prettier --check + ESLint (CI enforced)
 just fmt          # Prettier write
-just build        # Build for Cloudflare Pages
+just build        # Build for Cloudflare Workers
 ```
 
 `just --list` shows every recipe. Apart from `just dev`, which manages the
@@ -81,7 +81,7 @@ pnpm test         # Vitest
 pnpm test:e2e     # Playwright
 pnpm lint         # Prettier --check (CI enforced)
 pnpm format       # Prettier write
-pnpm build        # Build for Cloudflare Pages
+pnpm build        # Build for Cloudflare Workers
 pnpm preview      # Wrangler preview against .svelte-kit/cloudflare
 ```
 

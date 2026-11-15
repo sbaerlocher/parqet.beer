@@ -6,7 +6,7 @@ Humorous web app that converts a Parqet user's portfolio value into beers, coffe
 
 ## Tech Stack
 
-- **Framework**: SvelteKit (SSR on Cloudflare Pages)
+- **Framework**: SvelteKit (SSR on Cloudflare Workers)
 - **Adapter**: `@sveltejs/adapter-cloudflare`
 - **Styling**: Tailwind CSS v4 (`@tailwindcss/vite`)
 - **Auth**: Parqet Connect OAuth 2.0 + PKCE (public client, no client secret),
@@ -72,7 +72,7 @@ commands below, without exception.
 ```bash
 dde project:up                            # Start container (runs pnpm install via adapter)
 dde project:exec pnpm dev --host 0.0.0.0  # Dev server (already runs via docker-compose command)
-dde project:exec pnpm build               # Build for CF Pages
+dde project:exec pnpm build               # Build for CF Workers
 dde project:exec pnpm preview             # Wrangler against .svelte-kit/cloudflare — requires build first
 dde project:exec pnpm check               # TypeScript + Svelte check
 dde project:exec pnpm check:watch         # svelte-check in watch mode
