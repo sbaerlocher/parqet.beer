@@ -138,15 +138,15 @@ For a step-by-step approach, see the individual commands in
 [scripts/README.md](scripts/README.md).
 
 Then replace the **Parqet Client ID** in `wrangler.jsonc` under
-`vars.PARQET_CLIENT_ID` with your own OAuth app ID from the Parqet Developer
-Portal. The redirect URI configured in your Parqet app must match your deploy
-domain.
+`env.production.vars.PARQET_CLIENT_ID` (and `env.preview.vars.PARQET_CLIENT_ID`)
+with your own OAuth app ID from the Parqet Developer Portal. The redirect URI
+configured in your Parqet app must match your deploy domain.
 
-Deploy via Git integration (push to `main`) or manually:
+Deploy via Git integration (push to `main`) or manually (Wrangler runs
+`pnpm build` first):
 
 ```bash
-pnpm build
-pnpm exec wrangler deploy --env production   # or --env preview
+pnpm exec wrangler deploy --env production
 ```
 
 ## Project Structure
