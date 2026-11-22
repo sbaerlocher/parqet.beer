@@ -27,9 +27,9 @@
         >
           🍺
         </span>
-        <span class="font-display font-bold text-lg"
-          >parqet<span class="text-amber-600">.beer</span></span
-        >
+        <span class="font-display font-bold text-lg">
+          parqet<span class="text-amber-600">.beer</span>
+        </span>
       </a>
       <div class="flex items-center gap-2">
         <ThemeToggle />

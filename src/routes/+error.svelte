@@ -71,8 +71,10 @@
         href="https://github.com/sbaerlocher/parqet.beer"
         target="_blank"
         rel="noopener noreferrer"
-        class="hover:text-amber-500 transition-colors">GitHub</a
+        class="hover:text-amber-500 transition-colors"
       >
+        GitHub
+      </a>
     </div>
   </footer>
 </div>

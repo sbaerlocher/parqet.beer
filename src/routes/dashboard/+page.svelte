@@ -712,12 +712,9 @@
             <div class="mt-4">
               <div class="font-mono text-[10px] text-amber-700 flex justify-between">
                 <span>→ {nextBadge.title}</span>
-                <span
-                  >{formatNumber(botdCount, $locale)} / {formatNumber(
-                    nextBadge.threshold,
-                    $locale
-                  )}</span
-                >
+                <span>
+                  {formatNumber(botdCount, $locale)} / {formatNumber(nextBadge.threshold, $locale)}
+                </span>
               </div>
               <div
                 class="mt-1.5 h-2 rounded overflow-hidden relative"
@@ -866,9 +863,9 @@
                 <div class="relative flex items-center justify-between gap-2">
                   <div class="flex items-center gap-2 min-w-0">
                     <button class="shrink-0 cursor-pointer" onclick={() => toggleFavorite(b.name)}>
-                      <span style="font-size: 14px; opacity: {isFav ? 1 : 0.25}"
-                        >{isFav ? '\u2605' : '\u2606'}</span
-                      >
+                      <span style="font-size: 14px; opacity: {isFav ? 1 : 0.25}">
+                        {isFav ? '\u2605' : '\u2606'}
+                      </span>
                     </button>
                     <span class="shrink-0">{countryFlag(b.country)}</span>
                     <div class="min-w-0">
@@ -878,8 +875,10 @@
                         {#if isBotd}
                           <span
                             class="font-mono text-[8px] py-0.5 px-1 rounded font-bold tracking-widest shrink-0"
-                            style="background: var(--amber-600, #d97706); color: white">BOTD</span
+                            style="background: var(--amber-600, #d97706); color: white"
                           >
+                            BOTD
+                          </span>
                         {/if}
                         <span class="truncate">{b.name}</span>
                         {#if b.note}
@@ -952,9 +951,9 @@
                     ? 'Als Favorit markieren'
                     : 'Mark as favorite'}
               >
-                <span style="font-size: 14px; opacity: {isFav ? 1 : 0.25}"
-                  >{isFav ? '\u2605' : '\u2606'}</span
-                >
+                <span style="font-size: 14px; opacity: {isFav ? 1 : 0.25}">
+                  {isFav ? '\u2605' : '\u2606'}
+                </span>
               </button>
               <div
                 class="px-1.5 py-2.5 text-center text-sm"
@@ -975,8 +974,10 @@
                   {#if isBotd}
                     <span
                       class="font-mono text-[9px] py-0.5 px-1.5 rounded font-bold tracking-widest"
-                      style="background: var(--amber-600, #d97706); color: white">BOTD</span
+                      style="background: var(--amber-600, #d97706); color: white"
                     >
+                      BOTD
+                    </span>
                   {/if}
                   {b.name}
                   {#if b.note}
@@ -1032,8 +1033,10 @@
             href="https://github.com/sbaerlocher/parqet.beer"
             target="_blank"
             rel="noopener noreferrer"
-            class="underline hover:text-amber-700 transition-colors">GitHub</a
-          >{$t.pricesWrongSuffix}
+            class="underline hover:text-amber-700 transition-colors"
+          >
+            GitHub
+          </a>{$t.pricesWrongSuffix}
         </div>
       </div>
 
@@ -1049,19 +1052,23 @@
           <a
             href="/achievements"
             class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
-            >{$locale === 'de' ? 'Erfolge' : 'Achievements'}</a
           >
+            {$locale === 'de' ? 'Erfolge' : 'Achievements'}
+          </a>
           <a
             href="/privacy"
             class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
-            >{$t.privacy}</a
           >
+            {$t.privacy}
+          </a>
           <a
             href="https://github.com/sbaerlocher/parqet.beer"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-amber-700 no-underline hover:text-amber-900 transition-colors">GitHub ↗</a
+            class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
           >
+            GitHub ↗
+          </a>
         </div>
       </div>
     {/if}

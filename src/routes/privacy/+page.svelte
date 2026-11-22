@@ -17,9 +17,9 @@
           >
             🍺
           </span>
-          <span class="font-display font-bold text-lg"
-            >parqet<span class="text-amber-600">.beer</span></span
-          >
+          <span class="font-display font-bold text-lg">
+            parqet<span class="text-amber-600">.beer</span>
+          </span>
         </a>
       </div>
       <div class="flex items-center gap-2">
@@ -147,8 +147,10 @@
               target="_blank"
               rel="noopener noreferrer"
               class="underline transition-colors"
-              style="color: var(--highlight)">GitHub</a
-            > einsehbar. Jeder kann prüfen, was genau mit den Daten passiert.
+              style="color: var(--highlight)"
+            >
+              GitHub
+            </a> einsehbar. Jeder kann prüfen, was genau mit den Daten passiert.
           </p>
         </section>
       {:else}
@@ -264,8 +266,10 @@
               target="_blank"
               rel="noopener noreferrer"
               class="underline transition-colors"
-              style="color: var(--highlight)">GitHub</a
-            >. Anyone can verify exactly what happens with the data.
+              style="color: var(--highlight)"
+            >
+              GitHub
+            </a>. Anyone can verify exactly what happens with the data.
           </p>
         </section>
       {/if}
@@ -294,15 +298,17 @@
           © 2026 · parqet.beer · Not affiliated with Parqet Fintech GmbH
         </div>
         <div class="flex gap-3.5 shrink-0">
-          <a href="/" class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
-            >← {$t.errorBackHome}</a
-          >
+          <a href="/" class="text-amber-700 no-underline hover:text-amber-900 transition-colors">
+            ← {$t.errorBackHome}
+          </a>
           <a
             href="https://github.com/sbaerlocher/parqet.beer"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-amber-700 no-underline hover:text-amber-900 transition-colors">GitHub ↗</a
+            class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
           >
+            GitHub ↗
+          </a>
         </div>
       </div>
     </main>
