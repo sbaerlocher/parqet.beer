@@ -58,14 +58,10 @@ Cloudflare KV
   `src/lib/server/fx-service.ts` fetches daily ECB rates from Frankfurter and
   caches them in KV under `fx:rates`. Display currencies (EUR/CHF/USD/GBP) are
   deliberately wider than the beverage price currencies (EUR/CHF).
-- **Commits**: Conventional Commits, DCO-signed off (`git commit -s`) — see
-  `CONTRIBUTING.md`
 
 ## Development
 
-This project has a `.dde/config.yml`. **All project-dependent commands run in
-the container, never directly on the host.** AI assistants: use the DDE
-commands below, without exception.
+This project has a `.dde/config.yml`.
 
 ### With DDE
 
