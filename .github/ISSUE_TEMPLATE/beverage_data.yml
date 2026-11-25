@@ -6,9 +6,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for curating beverage data! parqet.beer prefers **specialty over mass-market** — craft breweries, third-wave coffee roasters, indie smoothies, craft distilleries. See [CONTRIBUTING.md](../../CONTRIBUTING.md#adding-a-beverage) for the full curation rules.
+        Thanks for curating beverage data! parqet.beer prefers **specialty over mass-market** — craft breweries, third-wave coffee roasters, indie smoothies, craft distilleries. See [CONTRIBUTING.md](https://github.com/sbaerlocher/parqet.beer/blob/main/CONTRIBUTING.md#adding-a-beverage) for the full curation rules.
 
-        **One brand per issue.**
+        **One product per issue.**
   - type: dropdown
     id: category
     attributes:
