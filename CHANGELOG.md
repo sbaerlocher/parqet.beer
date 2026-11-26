@@ -19,6 +19,9 @@ All notable changes documented here. Format: [Keep a Changelog](https://keepacha
 
 ### Changed
 
+- Claude settings: shared permissions now live in `.claude/settings.json`,
+  while `.claude/settings.local.json` is ignored. Back up local edits before
+  pulling this change and restore them afterwards.
 - Local dev URL moved from `parqet-beer.test` to dde's canonical
   `parqet.beer.test`, so dde git worktrees run in parallel under
   `<suffix>.parqet.beer.test` with their own Traefik router. dde hooks keep
