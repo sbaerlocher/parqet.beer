@@ -76,9 +76,9 @@
         >
           🍺
         </span>
-        <span class="font-display font-bold text-lg"
-          >parqet<span class="text-amber-600">.beer</span></span
-        >
+        <span class="font-display font-bold text-lg">
+          parqet<span class="text-amber-600">.beer</span>
+        </span>
         <span
           class="hidden sm:inline font-mono text-[11px] text-amber-700 py-0.5 px-2 rounded ml-2"
           style="background: var(--accent)"
@@ -297,14 +297,18 @@
       <div class="flex gap-3.5 shrink-0">
         <a
           href="/privacy"
-          class="text-amber-700 no-underline hover:text-amber-900 transition-colors">{$t.privacy}</a
+          class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
         >
+          {$t.privacy}
+        </a>
         <a
           href="https://github.com/sbaerlocher/parqet.beer"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-amber-700 no-underline hover:text-amber-900 transition-colors">GitHub ↗</a
+          class="text-amber-700 no-underline hover:text-amber-900 transition-colors"
         >
+          GitHub ↗
+        </a>
       </div>
     </div>
   </div>
