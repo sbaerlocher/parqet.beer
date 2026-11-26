@@ -6,9 +6,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for curating beverage data! parqet.beer prefers **specialty over mass-market** — craft breweries, third-wave coffee roasters, indie smoothies. See [CONTRIBUTING.md](../../CONTRIBUTING.md#adding-a-beverage) for the full curation rules.
+        Thanks for curating beverage data! parqet.beer prefers **specialty over mass-market** — craft breweries, third-wave coffee roasters, indie smoothies, craft distilleries. See [CONTRIBUTING.md](https://github.com/sbaerlocher/parqet.beer/blob/main/CONTRIBUTING.md#adding-a-beverage) for the full curation rules.
 
-        **One brand per issue.**
+        **One product per issue.**
   - type: dropdown
     id: category
     attributes:
@@ -17,6 +17,7 @@ body:
         - Beer
         - Coffee
         - Smoothie
+        - Whisky
     validations:
       required: true
   - type: input
@@ -34,17 +35,20 @@ body:
     validations:
       required: true
   - type: input
-    id: price-eur
+    id: price
     attributes:
-      label: Price (EUR)
+      label: Price
       placeholder: '3.20'
     validations:
       required: true
-  - type: input
-    id: price-chf
+  - type: dropdown
+    id: currency
     attributes:
-      label: Price (CHF)
-      placeholder: '3.10'
+      label: Currency
+      description: CHF for Swiss-origin products (Swiss retail price), EUR for everything else (German retail price).
+      options:
+        - EUR
+        - CHF
     validations:
       required: true
   - type: input

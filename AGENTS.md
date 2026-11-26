@@ -50,9 +50,11 @@ Cloudflare KV
 - **Constants**: UPPER_SNAKE_CASE
 - **Server-only code**: `src/lib/server/` (SvelteKit enforces this automatically)
 - **Components**: `src/lib/components/`
-- **Beverage reference data**: `src/lib/data/{beer,coffee,smoothie}.json` —
-  schema: `{name, size, price, currency, country}` (price in local currency,
-  conversion via `convert()` in `src/lib/fx.ts`)
+- **Beverage reference data**: `src/lib/data/{beer,coffee,smoothie,whisky}.json` —
+  schema: `{name, size, price, currency, country, note?}` (`currency` is the
+  reference market of the price — CHF for Swiss origin, EUR otherwise;
+  `country` is the producer origin; conversion via `convert()` in
+  `src/lib/fx.ts`)
 - **FX**: `src/lib/fx.ts` holds the client-safe half (EUR-based `FxRates`,
   `FX_FALLBACK`, `convert()` — EUR is the pivot, so any pair works).
   `src/lib/server/fx-service.ts` fetches daily ECB rates from Frankfurter and

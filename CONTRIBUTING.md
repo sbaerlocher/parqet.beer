@@ -154,6 +154,7 @@ Beverage reference data lives in:
 - `src/lib/data/beer.json`
 - `src/lib/data/coffee.json`
 - `src/lib/data/smoothie.json`
+- `src/lib/data/whisky.json`
 
 Each entry follows this schema:
 
@@ -162,14 +163,21 @@ Each entry follows this schema:
   "name": "string",
   "size": "string (e.g. \"0.33l\", \"250ml\", \"12oz\")",
   "price": 0.0,
-  "currency": "EUR or CHF",
-  "country": "DE or CH (ISO 3166-1 alpha-2)"
+  "currency": "EUR or CHF (reference market of the price)",
+  "country": "producer origin, ISO 3166-1 alpha-2 (e.g. DE, CH, GB, IE, JP)"
 }
 ```
 
-Use the beverage's **real local price** in its home currency (e.g. EUR for
-German beers, CHF for Swiss beers). The app converts between currencies at
-runtime using the FX rate in `src/lib/fx.ts`.
+Entries may also carry an optional `note` (`{ "de": "…", "en": "…" }`). It is
+set by maintainers; leave it out of contributions.
+
+Each entry has **one real retail price**. `currency` names the market that
+price was observed in, not the producer's country: Swiss-origin products use
+CHF (Swiss retail), everything else uses EUR (German retail as the reference
+market). For most beer, coffee and smoothies origin and market coincide; for
+imported whisky they do not — Glenfiddich is `"country": "GB"` with a EUR
+price from a German retailer. The app converts between currencies at runtime
+using daily ECB rates (see `src/lib/fx.ts`).
 
 ### Curation rules
 
@@ -181,9 +189,13 @@ parqet.beer prefers **specialty over mass-market**. The bar is:
   named roasters. No chain-store default drip.
 - **Smoothies**: indie / cold-pressed / independent brands. No supermarket
   private label as a default choice.
+- **Whisky**: craft or independent distilleries and distillery-own single
+  malt / single pot still bottlings. No mass-market blends (Johnnie Walker,
+  Ballantine's, Jack Daniel's, etc.)
 
-**Max one entry per brand.** If a brand already has an entry, replace it or
-discuss in an issue first — do not stack SKUs.
+**Max one entry per product (brand + variant).** If that product already has
+an entry, replace it or discuss in an issue first — do not stack sizes or
+near-identical SKUs.
 
 ### Required in the PR body
 
@@ -192,8 +204,9 @@ discuss in an issue first — do not stack SKUs.
 2. **Date** you checked the price (prices drift; we want a timestamp).
 3. **Craft / specialty justification** — one or two sentences on why this
    producer fits the curation rule above.
-4. **Country & currency** — set `country` and `currency` to the beverage's
-   home market (e.g. `"DE"` / `"EUR"` or `"CH"` / `"CHF"`).
+4. **Country & currency** — set `country` to the producer's origin and
+   `currency` to the reference market of the price (CHF for Swiss-origin
+   products, EUR otherwise).
 
 PRs that only bump mass-market SKUs will be closed with a pointer back to this
 section.

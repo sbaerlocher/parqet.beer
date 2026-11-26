@@ -181,6 +181,9 @@ static/                       # Favicon, OG image, etc.
 - **Beer prices**: Coop.ch, Rewe, Edeka, supermarktcheck.de — maintained in
   [src/lib/data/beer.json](src/lib/data/beer.json)
 - **Coffee & smoothies**: cafe / shop prices, manually curated
+- **Whisky**: Swiss retail (CHF) for Swiss malts, Whisky.de and similar German
+  retailers (EUR) for imports — maintained in
+  [src/lib/data/whisky.json](src/lib/data/whisky.json)
 - All prices are community-curated. **Pull requests welcome!**
 
 ## Further Documentation
